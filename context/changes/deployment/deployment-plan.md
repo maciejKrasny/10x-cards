@@ -115,16 +115,16 @@ Each phase has a checkbox to mark when complete. Sub-bullets are individual step
 - [A] Confirm no other file references the old name (`grep -r "10x-astro-starter"`). README/docs that mention it should be updated to `10x-cards` in the same commit.
 - [A] Commit: `chore(deploy): rename worker to 10x-cards ahead of first production deploy`.
 
-### Phase 3 — Supabase auth configuration for production `[ ]`
+### Phase 3 — Supabase auth configuration for production `[x]`
 
 This is the largest external-integration phase. Wrong values here cause silent failures (email links 404, signup looks successful but session never lands).
 
-- [H] In the Supabase dashboard for the target project:
+- [x] In the Supabase dashboard for the target project:
   - **Authentication → URL Configuration → Site URL**: set to `https://10x-cards.<account>.workers.dev` (substitute your account subdomain — you'll see it in the dashboard after first deploy if unknown; for now place a stub and revisit).
   - **Authentication → URL Configuration → Redirect URLs (allowlist)**: add `https://10x-cards.<account>.workers.dev/**`. Keep `http://localhost:4321/**` for local dev.
-- [H] **Authentication → Email Templates**: replace the four default templates (Confirm signup, Magic Link, Change Email, Reset Password) with Polish copy. The repo convention (AGENTS.md: _"UI text/error messages in this project use Polish"_) applies to outbound email too. Keep `{{ .ConfirmationURL }}` placeholders unchanged.
-- [H] **Authentication → SMTP Settings**: configure a custom SMTP provider. The built-in Supabase SMTP is rate-limited to ~4 emails/hour and explicitly marked "for testing only" — this **will** break the first time two testers sign up in the same hour. Cheapest workable options: Resend (free 3000/mo), AWS SES, SendGrid free tier. Required fields: host, port (587 STARTTLS or 465 SSL), username, password, sender email (must be on a verified domain).
-- [H] **Authentication → Providers → Email**: confirm `Confirm email` is **enabled** (it is by default). If disabled in dev, the `confirm-email.astro` branch logic at line 4 (`isAutoConfirmed = import.meta.env.DEV`) won't reach the production path.
+- [x] **Authentication → Email Templates**: kept default English templates (MVP decision — Polish UI convention applies to in-app text only).
+- [x] **Authentication → SMTP Settings**: keeping built-in Supabase SMTP for MVP. Rate limit (~4 emails/hr) is acceptable at this scale; switch to Resend/SES/SendGrid if sign-up volume grows.
+- [x] **Authentication → Providers → Email**: confirm `Confirm email` is **enabled** (it is by default). If disabled in dev, the `confirm-email.astro` branch logic at line 4 (`isAutoConfirmed = import.meta.env.DEV`) won't reach the production path.
 - [A] **Document** the chosen SMTP provider + Site URL in `context/deployment/deploy-plan.md` once Phase 7 lands — Supabase doesn't surface "what SMTP did I configure" in a way the agent can re-derive later.
 
 **Edge cases / extra support:**
