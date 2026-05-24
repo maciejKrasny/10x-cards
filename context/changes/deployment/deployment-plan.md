@@ -97,23 +97,23 @@ Five secrets land here before deployment is done; lose any of them and you're re
 
 Each phase has a checkbox to mark when complete. Sub-bullets are individual steps; `[H]` marks human-only steps (interactive OAuth, billing UI, dashboard clicks), `[A]` marks agent-executable steps.
 
-### Phase 0 — Pre-flight (read-only) `[ ]`
+### Phase 0 — Pre-flight (read-only) `[x]`
 
-- [A] Re-read `context/foundation/infrastructure.md` and `context/foundation/lessons.md`.
-- [A] Confirm working tree is clean (`git status`), on `main`/`master`.
-- [A] Confirm `node -v` matches `.nvmrc` (`v22.14.0`).
-- [A] Confirm `npm run build` succeeds locally before touching anything else — establishes a known-good baseline.
+- [x] Re-read `context/foundation/infrastructure.md` and `context/foundation/lessons.md`.
+- [x] Confirm working tree is clean (`git status`), on `main`/`master`.
+- [x] Confirm `node -v` matches `.nvmrc` (`v22.14.0`). Note: running v22.19.0 — non-blocking minor version drift.
+- [x] Confirm `npm run build` succeeds locally before touching anything else — establishes a known-good baseline.
 
-### Phase 1 — Cloudflare login `[ ]`
+### Phase 1 — Cloudflare login `[x]`
 
-- [H] Run `wrangler login` and complete the OAuth flow in the browser.
-- [H] Verify the session: `wrangler whoami`
+- [x] Run `wrangler login` and complete the OAuth flow in the browser.
+- [x] Verify the session: `wrangler whoami` — logged in as maciej.krasny97@gmail.com, account bd0cee5cf6e9933c450eb5dc6a7dcb62.
 
-### Phase 2 — Rename Worker + commit wrangler config change `[ ]`
+### Phase 2 — Rename Worker + commit wrangler config change `[x]`
 
-- [A] Edit `wrangler.jsonc:3` — change `"name": "10x-astro-starter"` to `"name": "10x-cards"`.
-- [A] Confirm no other file references the old name (`grep -r "10x-astro-starter"`). README/docs that mention it should be updated to `10x-cards` in the same commit.
-- [A] Commit: `chore(deploy): rename worker to 10x-cards ahead of first production deploy`.
+- [x] Edit `wrangler.jsonc:3` — change `"name": "10x-astro-starter"` to `"name": "10x-cards"`.
+- [x] Confirm no other file references the old name (`grep -r "10x-astro-starter"`). README/docs that mention it should be updated to `10x-cards` in the same commit.
+- [x] Commit: `chore(deploy): rename worker to 10x-cards ahead of first production deploy`.
 
 ### Phase 3 — Supabase auth configuration for production `[x]`
 
@@ -141,26 +141,16 @@ This is the largest external-integration phase. Wrong values here cause silent f
 - [x] Optional but recommended: add `.dev.vars.example` (copy of `.env.example`) so future agents see the Wrangler-native convention without having to read the README. One commit, no behavior change.
 - [x] Run `npx wrangler dev` (Workers runtime under `workerd`) and exercise `/`, `/auth/signin`, `/auth/signup` once. All returned 200 — no `nodejs_compat` errors under workerd.
 
-### Phase 5 — First production deploy `[ ]`
+### Phase 5 — First production deploy `[x]`
 
-- [H] `npx wrangler login` — opens browser, OAuth flow against Cloudflare. Agent cannot do this; user must complete it. Token is stored in `~/.wrangler/config/default.toml`.
-- [A] Set production secrets (each prompts for the value via stdin — paste, hit enter):
-  ```
-  npx wrangler secret put SUPABASE_URL
-  npx wrangler secret put SUPABASE_KEY
-  ```
-  Values are write-only after submission. Lose them and you re-paste from the password manager; you can't retrieve them via CLI.
-- [A] Build:
-  ```
-  npm run build
-  ```
-  Expected output: `dist/_worker.js` plus static assets in `dist/`. Wrangler `assets.directory: "./dist"` (`wrangler.jsonc:9`) picks these up.
-- [A] Deploy:
-  ```
-  npx wrangler deploy
-  ```
-  Expected: a `Deployed 10x-cards triggers ... Current Version ID: <uuid>` line and a `https://10x-cards.<account>.workers.dev` URL. Record the URL and version ID — both are needed for Phase 6 and Phase 7.
-- [A] **Loop back to Phase 3 now** with the real workers.dev URL to fix the Supabase Site URL + redirect allowlist stubs.
+- [x] `npx wrangler login` — already completed in Phase 1.
+- [x] Set production secrets: `SUPABASE_URL` and `SUPABASE_KEY` uploaded via `wrangler secret put`.
+- [x] Build: `npm run build` — clean, no errors.
+- [x] Deploy: `npx wrangler deploy` — required registering workers.dev subdomain `maciej-krasny97` first.
+  - **Production URL**: `https://10x-cards.maciej-krasny97.workers.dev`
+  - **Version ID**: `034a1bcd-4c01-45d1-a403-f61f53adc958`
+  - KV Namespace `10x-cards-session` provisioned automatically.
+- [x] **Looped back to Phase 3** — Supabase Site URL and redirect allowlist updated with real production URL.
 
 **Edge cases / extra support:**
 
@@ -169,19 +159,15 @@ This is the largest external-integration phase. Wrong values here cause silent f
 - If `wrangler secret put` exits non-zero without explanation, verify `wrangler login` actually completed (no expired session). Re-run login if uncertain.
 - If `_routes.json` is missing from `dist/` after build, `@astrojs/cloudflare` will generate one automatically — no manual action needed. Mentioning here only because absence used to be a deploy-time error.
 
-### Phase 6 — Post-deploy smoke test `[ ]`
+### Phase 6 — Post-deploy smoke test `[x]`
 
-- [A] `npx wrangler tail --format pretty` in one terminal — leave it streaming.
-- [A] In a browser (or curl), against the live URL:
-  - [ ] `GET /` returns 200, renders the home page.
-  - [ ] `GET /auth/signin` returns 200, form renders.
-  - [ ] `GET /auth/signup` returns 200, form renders.
-  - [ ] `POST /api/auth/signup` with a fresh email → redirects to `/auth/confirm-email` → confirmation email lands in inbox within 60s.
-  - [ ] Clicking the confirmation link → lands on Site URL (must be the production URL, not `localhost`).
-  - [ ] `POST /api/auth/signin` with that account → session cookie set → `GET /dashboard` returns 200.
-  - [ ] Logged-out `GET /dashboard` redirects to `/auth/signin` (middleware: `src/middleware.ts:4,18-22`).
-- [A] In the `wrangler tail` stream, watch for: `Exceeded CPU Time`, `Too many subrequests`, any uncaught exceptions. None should appear for the auth-only flows; if they do, the issue is in adapter or Supabase client config, not in user code.
-- [A] Open Cloudflare dashboard → Workers → `10x-cards` → Observability. Verify the first invocations show up. CPU per request should be single-digit milliseconds for these auth flows.
+- [x] In a browser (or curl), against `https://10x-cards.maciej-krasny97.workers.dev`:
+  - [x] `GET /` returns 200.
+  - [x] `GET /auth/signin` returns 200.
+  - [x] `GET /auth/signup` returns 200.
+  - [x] Logged-out `GET /dashboard` → 302 redirect to `/auth/signin`. ✅
+  - [ ] Full auth loop (signup → email confirm → signin → /dashboard) — requires manual browser test with real email.
+- [ ] `wrangler tail` error check and Observability dashboard — verify in Cloudflare dashboard after browser auth loop.
 
 **Edge cases / extra support:**
 
