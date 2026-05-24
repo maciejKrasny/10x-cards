@@ -134,12 +134,12 @@ This is the largest external-integration phase. Wrong values here cause silent f
 - SMTP "from" address must match a DNS-verified domain on most providers. Using a workers.dev URL as a "from" will get the mail filed as spam by Gmail.
 - Email confirmation links in Supabase contain a token that expires in 24h by default. If testing across days, request a fresh confirmation rather than chasing "link expired" errors.
 
-### Phase 4 — Local dev parity check `[ ]`
+### Phase 4 — Local dev parity check `[x]`
 
-- [A] Confirm `.dev.vars` exists at repo root with the same two keys (`SUPABASE_URL`, `SUPABASE_KEY`) pointing at the **cloud** Supabase project (not local Docker). If missing, copy `.env.example` to `.dev.vars` and fill in.
-- [A] Confirm `.gitignore:21` covers `.dev.vars` (already does — verified).
-- [A] Optional but recommended: add `.dev.vars.example` (copy of `.env.example`) so future agents see the Wrangler-native convention without having to read the README. One commit, no behavior change.
-- [A] Run `npx wrangler dev` (Workers runtime under `workerd`) and exercise `/`, `/auth/signin`, `/auth/signup` once. This catches `nodejs_compat` subset issues (per infrastructure.md "Unknown unknowns" #1) **before** they surface in production.
+- [x] Confirm `.dev.vars` exists at repo root with the same two keys (`SUPABASE_URL`, `SUPABASE_KEY`) pointing at the **cloud** Supabase project (not local Docker). If missing, copy `.env.example` to `.dev.vars` and fill in.
+- [x] Confirm `.gitignore:21` covers `.dev.vars` (already does — verified).
+- [x] Optional but recommended: add `.dev.vars.example` (copy of `.env.example`) so future agents see the Wrangler-native convention without having to read the README. One commit, no behavior change.
+- [x] Run `npx wrangler dev` (Workers runtime under `workerd`) and exercise `/`, `/auth/signin`, `/auth/signup` once. All returned 200 — no `nodejs_compat` errors under workerd.
 
 ### Phase 5 — First production deploy `[ ]`
 
