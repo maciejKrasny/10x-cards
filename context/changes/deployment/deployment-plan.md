@@ -176,19 +176,12 @@ This is the largest external-integration phase. Wrong values here cause silent f
 - If signin succeeds but `/dashboard` still redirects: cookie was set on the wrong domain (cookie domain mismatch). Inspect response cookies in DevTools — `Domain` attribute should match the workers.dev hostname.
 - If `wrangler tail` shows no events even though requests are landing: re-check observability is enabled (`wrangler.jsonc:12-14`) and that the right worker name is being tailed.
 
-### Phase 7 — Runbook + rollback documentation `[ ]`
+### Phase 7 — Runbook + rollback documentation `[x]`
 
-- [A] Create `context/deployment/deploy-plan.md` containing:
-  - Production URL.
-  - Worker name and current version ID (from Phase 5 deploy output).
-  - Active secrets (names only — never values).
-  - Supabase project ID + Site URL + SMTP provider name (not credentials).
-  - Rollback procedure (below).
-  - Approval boundary copied from `infrastructure.md` "Operational Story" §Approval: human-only items vs agent-allowed items.
-- [A] Document rollback explicitly with the footgun from `infrastructure.md` §Devil's Advocate #4:
-  > `npx wrangler rollback [VERSION_ID]` reverts code in ~seconds **but runs against current secrets, not the secrets active at the original deploy time**. If you rolled secrets as part of an incident, re-deploy current code instead of rolling back, or you'll run old code with new keys.
-- [A] List recent version IDs available for rollback: `npx wrangler deployments list`.
-- [A] Update `README.md` Deployment section to point at `context/deployment/deploy-plan.md` for the live URL and runbook (avoid duplicating the URL in two files that will drift).
+- [x] Created `context/changes/deployment/runbook.md` with production URL, version ID, secrets list, Supabase config, rollback procedure, approval boundary, and deferred items.
+- [x] Rollback footgun documented: rolling back runs old code with current secrets — re-deploy instead after key rotation.
+- [x] `npx wrangler deployments list` run; current version `034a1bcd-4c01-45d1-a403-f61f53adc958` confirmed.
+- [x] `README.md` Deployment section updated to point at runbook and live URL.
 
 ### Phase 8 — Wire Workers Builds for auto-deploy on push to master `[ ]`
 

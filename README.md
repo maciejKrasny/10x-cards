@@ -152,19 +152,14 @@ Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_
 
 This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/).
 
-1. Build the project:
+**Live URL**: https://10x-cards.maciej-krasny97.workers.dev
+
+For the full runbook (secrets, rollback procedure, approval boundary, deferred items) see [`context/changes/deployment/runbook.md`](context/changes/deployment/runbook.md).
 
 ```bash
 npm run build
-```
-
-2. Deploy with Wrangler:
-
-```bash
 npx wrangler deploy
 ```
-
-Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or via `npx wrangler secret put`.
 
 ## CI
 
