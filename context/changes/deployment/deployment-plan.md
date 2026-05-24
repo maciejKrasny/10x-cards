@@ -6,7 +6,7 @@
 
 What's missing before a live URL exists:
 
-1. Cloudflare account is on the **free tier** — the LLM CPU-budget reasoning in `infrastructure.md` requires the **$5/mo Workers Standard** plan; that upgrade must happen before deploy, not after.
+1. Cloudflare account is on the **free tier**.
 2. Supabase project exists but **auth is not configured for the production origin** — Site URL, redirect allowlist, Polish email templates, and a non-built-in SMTP provider all need wiring or auth will silently break on the live URL.
 3. Worker name is still the starter default `10x-astro-starter` — rename to `10x-cards` before first deploy so the production hostname doesn't leak scaffolding origin.
 4. Production secrets (`SUPABASE_URL`, `SUPABASE_KEY`) have never been uploaded to Workers Secrets.
@@ -15,7 +15,7 @@ What's missing before a live URL exists:
 **Two deployment paths are required**, not one:
 
 - **Manual** — `npx wrangler deploy` from a local checkout. Always available; used for the very first deploy, for hotfixes when Workers Builds is wedged, and for any deploy of an unmerged branch.
-- **Automatic on push to master** — handled by **Cloudflare Workers Builds** (Cloudflare's native CI; explicitly *not* GitHub Actions per the user's preference). Wired after the first manual deploy succeeds so the production URL and secrets already exist when the build pipeline first runs.
+- **Automatic on push to master** — handled by **Cloudflare Workers Builds** (Cloudflare's native CI; explicitly _not_ GitHub Actions per the user's preference). Wired after the first manual deploy succeeds so the production URL and secrets already exist when the build pipeline first runs.
 
 Outcome: a live `10x-cards.<account>.workers.dev` URL with end-to-end auth (signin → signup → email confirmation → protected `/dashboard`) verified, secrets in Workers Secrets, Workers Builds auto-deploying on push to `master`, a rollback procedure documented, and a runbook in the repo.
 
@@ -25,32 +25,32 @@ Outcome: a live `10x-cards.<account>.workers.dev` URL with end-to-end auth (sign
 
 Complete these **before** starting Phase 0. They are one-time setup, require accounts/credentials that take time to obtain, and are not specific to this deployment — every Phase below assumes they're done.
 
-### CLI tooling
+### CLI tooling `[x]`
 
-| Tool                 | Required               | Verify with                                | If missing                                                                              |
-| -------------------- | ---------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------- |
-| **Node.js 22.14.0**  | yes                    | `node -v` matches `.nvmrc`                 | Install `nvm` (https://github.com/nvm-sh/nvm), then `nvm install` (uses `.nvmrc`)       |
-| **npm**              | yes (bundled w/ Node)  | `npm -v`                                   | Reinstall Node                                                                          |
-| **git**              | yes                    | `git --version`                            | macOS: `brew install git`                                                               |
-| **wrangler**         | yes (via `npx`)        | `npx wrangler --version` reports `4.x`     | Already in `devDependencies`; available after `npm install`                             |
-| **gh (GitHub CLI)**  | optional but useful    | `gh --version`                             | macOS: `brew install gh`; useful in Phase 8 to inspect Workers Builds status checks     |
+| Tool                | Required              | Verify with                            | If missing                                                                             |
+| ------------------- | --------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Node.js 22.14.0** | yes                   | `node -v` matches `.nvmrc`             | Using **Volta** on macOS — `volta install node@22.14.0` pins the version automatically |
+| **npm**             | yes (bundled w/ Node) | `npm -v`                               | Reinstall Node                                                                         |
+| **git**             | yes                   | `git --version`                        | macOS: `brew install git`                                                              |
+| **wrangler**        | yes (via `npx`)       | `npx wrangler --version` reports `4.x` | Already in `devDependencies`; available after `npm install`                            |
+| **gh (GitHub CLI)** | optional but useful   | `gh --version`                         | macOS: `brew install gh`; useful in Phase 8 to inspect Workers Builds status checks    |
 
 Run from the repo root after cloning:
 
 ```
-nvm use            # honors .nvmrc → 22.14.0
+# Volta pins Node automatically via .nvmrc / package.json engines — just run:
 npm install        # installs wrangler, astro, all deps; also wires Husky pre-commit
 ```
 
 Husky's `prepare` script runs during `npm install` — pre-commit hooks (ESLint on `.ts/.tsx/.astro`, Prettier on `.json/.css/.md`) will fire on every commit from now on. Don't bypass with `--no-verify`; fix lint failures instead.
 
-### Cloudflare account (free tier OK at this point — Phase 1 handles the upgrade)
+### Cloudflare account (free tier OK at this point — Phase 1 handles the upgrade) `[x]`
 
 - [H] Create an account at https://dash.cloudflare.com/sign-up if you don't have one. Email verification is required and can take a few minutes.
 - [H] Add a payment method under **Manage Account → Billing → Payment Methods**. The account stays on free tier until Phase 1 actively upgrades, but having the payment method on file avoids a context switch mid-deploy.
 - [H] Note your **account subdomain** at the top-right of the dashboard — it's the `<account>` segment in `10x-cards.<account>.workers.dev` and the value you'll need when configuring the Supabase Site URL in Phase 3.
 
-### Supabase account + production project
+### Supabase account + production project `[x]`
 
 This is the deeper prereq — region, key selection, and provider config all matter and are awkward to fix later.
 
@@ -76,12 +76,12 @@ This is the deeper prereq — region, key selection, and provider config all mat
   ```
 - [A] Smoke-test locally: `npm run dev`, open `http://localhost:4321`. The "Supabase nie jest skonfigurowany" warning banner (driven by `src/lib/config-status.ts:15-17`) should NOT appear. If it does, the env vars aren't loading — check `.dev.vars` is in repo root, not under `src/`.
 
-### GitHub access (needed in Phase 8 — Workers Builds)
+### GitHub access (needed in Phase 8 — Workers Builds) `[x]`
 
 - [H] Confirm you have **admin** rights on the `10x-cards` GitHub repository. Phase 8 installs the Cloudflare GitHub App, which requires admin permission to grant repo access.
 - [H] If the repo lives in a GitHub organization (not under your personal account), confirm the org allows third-party OAuth/GitHub Apps: Org → Settings → Third-party Access → GitHub Apps → Allow installation.
 
-### Password manager (have it ready)
+### Password manager (have it ready) `[x]`
 
 Five secrets land here before deployment is done; lose any of them and you're regenerating, not retrieving:
 
@@ -104,15 +104,10 @@ Each phase has a checkbox to mark when complete. Sub-bullets are individual step
 - [A] Confirm `node -v` matches `.nvmrc` (`v22.14.0`).
 - [A] Confirm `npm run build` succeeds locally before touching anything else — establishes a known-good baseline.
 
-### Phase 1 — Cloudflare account upgrade + scoped API token `[ ]`
+### Phase 1 — Cloudflare login `[ ]`
 
-- [H] Log in to the Cloudflare dashboard. **Workers & Pages → Plans → Workers Paid** → upgrade to Workers Standard ($5/mo). The infrastructure.md reasoning depends on the 30s default CPU ceiling and the 1,000 subrequest cap, both paid-tier numbers.
-- [H] Create a **scoped API token** at *My Profile → API Tokens → Create Token → Custom*:
-  - Permissions: `Account → Workers Scripts → Edit`, `Account → Workers Observability → Read` (for tail/analytics), `User → Memberships → Read`.
-  - Account resources: limit to this one account.
-  - Zone resources: **none** for now (no custom domain yet).
-  - Save the token to a password manager. It will be needed only if you ever script CI deploys; for local agent use, the OAuth flow below replaces it.
-- [H] (No agent step here — token creation cannot be automated safely.)
+- [H] Run `wrangler login` and complete the OAuth flow in the browser.
+- [H] Verify the session: `wrangler whoami`
 
 ### Phase 2 — Rename Worker + commit wrangler config change `[ ]`
 
@@ -127,7 +122,7 @@ This is the largest external-integration phase. Wrong values here cause silent f
 - [H] In the Supabase dashboard for the target project:
   - **Authentication → URL Configuration → Site URL**: set to `https://10x-cards.<account>.workers.dev` (substitute your account subdomain — you'll see it in the dashboard after first deploy if unknown; for now place a stub and revisit).
   - **Authentication → URL Configuration → Redirect URLs (allowlist)**: add `https://10x-cards.<account>.workers.dev/**`. Keep `http://localhost:4321/**` for local dev.
-- [H] **Authentication → Email Templates**: replace the four default templates (Confirm signup, Magic Link, Change Email, Reset Password) with Polish copy. The repo convention (AGENTS.md: *"UI text/error messages in this project use Polish"*) applies to outbound email too. Keep `{{ .ConfirmationURL }}` placeholders unchanged.
+- [H] **Authentication → Email Templates**: replace the four default templates (Confirm signup, Magic Link, Change Email, Reset Password) with Polish copy. The repo convention (AGENTS.md: _"UI text/error messages in this project use Polish"_) applies to outbound email too. Keep `{{ .ConfirmationURL }}` placeholders unchanged.
 - [H] **Authentication → SMTP Settings**: configure a custom SMTP provider. The built-in Supabase SMTP is rate-limited to ~4 emails/hour and explicitly marked "for testing only" — this **will** break the first time two testers sign up in the same hour. Cheapest workable options: Resend (free 3000/mo), AWS SES, SendGrid free tier. Required fields: host, port (587 STARTTLS or 465 SSL), username, password, sender email (must be on a verified domain).
 - [H] **Authentication → Providers → Email**: confirm `Confirm email` is **enabled** (it is by default). If disabled in dev, the `confirm-email.astro` branch logic at line 4 (`isAutoConfirmed = import.meta.env.DEV`) won't reach the production path.
 - [A] **Document** the chosen SMTP provider + Site URL in `context/deployment/deploy-plan.md` once Phase 7 lands — Supabase doesn't surface "what SMTP did I configure" in a way the agent can re-derive later.
@@ -217,12 +212,12 @@ Goal: every push to `master` triggers a Cloudflare-side build + deploy without l
 - [H] In the Workers Builds UI, configure:
   - **Repository**: `10x-cards`.
   - **Production branch**: `master`. (Pushes to this branch deploy to the production URL `https://10x-cards.<account>.workers.dev`.)
-  - **Preview branches**: *all non-production branches*. (Pushes to feature branches deploy to `https://<branch-slug>-10x-cards.<account>.workers.dev` — useful for PR review.)
+  - **Preview branches**: _all non-production branches_. (Pushes to feature branches deploy to `https://<branch-slug>-10x-cards.<account>.workers.dev` — useful for PR review.)
   - **Build command**: `npm run build`
   - **Deploy command**: `npx wrangler deploy` (this is the default; confirm it's what's set).
   - **Root directory**: `/` (repo root — `wrangler.jsonc` lives here).
-  - **Node version**: `22` (pin explicitly to match `.nvmrc:1` = `22.14.0`; default is Node 22 LTS but pinning prevents drift).
-  - **Build environment variables**: add `SUPABASE_URL` and `SUPABASE_KEY` with the same values as Workers Secrets. These are needed by the *build container*, not by the deployed Worker. The runtime values still come from Workers Secrets set in Phase 5; this is a separate copy purely for `astro build` to read via `astro:env`. (The env schema at `astro.config.mjs:19-20` marks both `optional: true`, so the build *should* succeed without them — but the existing `.github/workflows/ci.yml:24` passes them, so match that posture defensively.)
+  - **Node version**: `22` (pin explicitly to match `.nvmrc:1` = `22.14.0`; Cloudflare Workers Builds default Node version is unknown — verify in the build UI and pin to `22` explicitly to prevent drift).
+  - **Build environment variables**: add `SUPABASE_URL` and `SUPABASE_KEY` with the same values as Workers Secrets. These are needed by the _build container_, not by the deployed Worker. The runtime values still come from Workers Secrets set in Phase 5; this is a separate copy purely for `astro build` to read via `astro:env`. (The env schema at `astro.config.mjs:19-20` marks both `optional: true`, so the build _should_ succeed without them — but the existing `.github/workflows/ci.yml:24` passes them, so match that posture defensively.)
 - [A] Push a trivial commit to `master` (e.g. add `.dev.vars.example` from Phase 4, or a comment-only README tweak): `git push origin master`.
 - [A] Watch the build in the Cloudflare dashboard → Workers & Pages → 10x-cards → Deployments. The build log streams live. Expected: ~60–90s build, then a deploy log identical to the local `wrangler deploy` output. New version ID appears in `npx wrangler deployments list` once finished.
 - [A] Repeat the Phase 6 smoke test against the production URL to confirm the auto-deployed version is healthy.
@@ -232,9 +227,9 @@ Goal: every push to `master` triggers a Cloudflare-side build + deploy without l
 
 - **Manual deploy + Workers Builds can race.** If you run `npx wrangler deploy` locally while a Workers Builds run is in flight, both produce a new version and the last one to finish wins. Mitigation: don't run manual deploys during/after a `git push` to master unless you intend to override; check the dashboard for an in-flight build first.
 - **The existing `.github/workflows/ci.yml` keeps running on push.** It only lints + builds — it does not deploy — so it now overlaps with the Workers Builds build step (both will build the same commit). This is harmless duplication but burns CI minutes twice. Two options: (a) accept the duplication (recommended for MVP — GH Actions is the quality gate, Workers Builds is the deploy), or (b) narrow the GH Actions trigger to PRs only (`on: pull_request`) so push-to-master only triggers Workers Builds. Pick (a) for safety; flag (b) as a later optimization.
-- **Workers Builds does *not* gate on GitHub status checks.** A push to master with failing lint will still deploy via Workers Builds because Cloudflare doesn't wait for the GH Actions run. If you want a hard gate, configure GitHub branch protection on `master` requiring the CI check to pass before merge — which forces all changes to land via PR, not direct push.
+- **Workers Builds does _not_ gate on GitHub status checks.** A push to master with failing lint will still deploy via Workers Builds because Cloudflare doesn't wait for the GH Actions run. If you want a hard gate, configure GitHub branch protection on `master` requiring the CI check to pass before merge — which forces all changes to land via PR, not direct push.
 - **PRs from forks build in the upstream account** per `infrastructure.md` §Operational Story. If sensitive routes are exposed in previews, gate them with Cloudflare Access before merging the first external PR.
-- **Build container has no `.dev.vars` access.** It can read only the *Build environment variables* configured above and any plaintext in the repo. Never commit secrets to fix a "missing env" build error — add them to the Workers Builds env vars UI.
+- **Build container has no `.dev.vars` access.** It can read only the _Build environment variables_ configured above and any plaintext in the repo. Never commit secrets to fix a "missing env" build error — add them to the Workers Builds env vars UI.
 - **First build may fail with "secrets schema requires SUPABASE_URL" even though the schema says `optional`.** This is an Astro 6 + `envField.secret` interaction edge: in some adapter versions the build validates `secret` access mode even when `optional`. Workaround if it bites: add both build env vars (per above), or temporarily drop `access: "secret"` → `access: "public"` for the build (don't ship that change; revert after diagnosing).
 - **Rolling back an auto-deployed version uses the same `wrangler rollback [VERSION_ID]` from Phase 7.** Workers Builds doesn't add a separate rollback mechanism — version IDs are unified across manual and auto deploys.
 
@@ -252,18 +247,18 @@ These remain out of scope for the MVP per `infrastructure.md` §Out of Scope. Li
 
 ## External Integrations — At-a-Glance
 
-| Integration | Touchpoint | Phase | Failure mode | Recovery |
-|---|---|---|---|---|
-| Cloudflare account | Billing UI | 1 | Free tier silently caps at 10ms CPU | Upgrade to Workers Standard before deploy |
-| Cloudflare API token | Dashboard token UI | 1 | Over-scoped token = blast radius | Re-create with min scopes; revoke old |
-| Wrangler OAuth | Local browser | 5 | Session expires; CLI errors are vague | Re-run `wrangler login` |
-| Supabase Site URL | Auth → URL Config | 3 + 5 loopback | Email links 404 on production | Update Site URL with real workers.dev origin |
-| Supabase redirect allowlist | Auth → URL Config | 3 + 5 loopback | "Invalid redirect URL" on signup | Add `https://<host>/**` |
-| Supabase SMTP | Auth → SMTP | 3 | Built-in SMTP throttles at ~4/hr | Configure Resend/SES/SendGrid + verified domain |
-| Supabase email templates | Auth → Email Templates | 3 | English copy violates Polish-UI convention | Replace four templates; keep `{{ .ConfirmationURL }}` |
-| Workers Secrets | `wrangler secret put` | 5 | Write-only after set; lost = re-paste | Keep secrets in password manager |
-| GitHub ↔ Cloudflare app | GitHub App install | 8 | Org repo without admin can't install | Repo owner installs app, then connect |
-| Workers Builds env vars | Dashboard UI | 8 | Build container can't read `.dev.vars` or Workers Secrets | Add `SUPABASE_URL`/`SUPABASE_KEY` as build env vars separately |
+| Integration                 | Touchpoint             | Phase          | Failure mode                                              | Recovery                                                       |
+| --------------------------- | ---------------------- | -------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| Cloudflare account          | Billing UI             | 1              | Free tier silently caps at 10ms CPU                       | Upgrade to Workers Standard before deploy                      |
+| Cloudflare API token        | Dashboard token UI     | 1              | Over-scoped token = blast radius                          | Re-create with min scopes; revoke old                          |
+| Wrangler OAuth              | Local browser          | 5              | Session expires; CLI errors are vague                     | Re-run `wrangler login`                                        |
+| Supabase Site URL           | Auth → URL Config      | 3 + 5 loopback | Email links 404 on production                             | Update Site URL with real workers.dev origin                   |
+| Supabase redirect allowlist | Auth → URL Config      | 3 + 5 loopback | "Invalid redirect URL" on signup                          | Add `https://<host>/**`                                        |
+| Supabase SMTP               | Auth → SMTP            | 3              | Built-in SMTP throttles at ~4/hr                          | Configure Resend/SES/SendGrid + verified domain                |
+| Supabase email templates    | Auth → Email Templates | 3              | English copy violates Polish-UI convention                | Replace four templates; keep `{{ .ConfirmationURL }}`          |
+| Workers Secrets             | `wrangler secret put`  | 5              | Write-only after set; lost = re-paste                     | Keep secrets in password manager                               |
+| GitHub ↔ Cloudflare app     | GitHub App install     | 8              | Org repo without admin can't install                      | Repo owner installs app, then connect                          |
+| Workers Builds env vars     | Dashboard UI           | 8              | Build container can't read `.dev.vars` or Workers Secrets | Add `SUPABASE_URL`/`SUPABASE_KEY` as build env vars separately |
 
 ---
 

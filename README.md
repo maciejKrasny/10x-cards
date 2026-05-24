@@ -1,4 +1,4 @@
-# 10x Astro Starter
+# 10x Cards
 
 ![](./public/template.png)
 
