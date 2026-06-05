@@ -1,7 +1,7 @@
 ---
 change_id: ai-generate-from-paste
 title: Paste text → AI-generated cards saved to the deck
-status: implementing
+status: implemented
 created: 2026-06-05
 updated: 2026-06-05
 archived_at: null

@@ -375,19 +375,19 @@ Rollback: `npx wrangler rollback [VERSION_ID]` reverts the route. Note (per infr
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 `npx astro check` passes
-- [x] 3.3 `npm run build` passes
+- [x] 3.1 `npm run lint` passes — de2863c
+- [x] 3.2 `npx astro check` passes — de2863c
+- [x] 3.3 `npm run build` passes — de2863c
 
 #### Manual
 
-- [x] 3.4 Logged-in `/dashboard` shows textarea + counter + generate button
-- [x] 3.5 Anonymous `/dashboard` → redirected to `/auth/signin`
-- [x] 3.6 Live char counter updates and turns red at the limit
-- [x] 3.7 Generate button disabled while submitting
-- [x] 3.8 Progress bar + first English label appear < 2 s after submit; labels rotate through all three phases
-- [x] 3.9 Happy path: textarea clears, read-only list appears, English success toast shows correct N
-- [x] 3.10 Replace-on-next-batch: a second generate replaces (not appends) the list
-- [x] 3.11 LLM failure: English error toast appears, textarea preserved, no list, no DB rows
-- [x] 3.12 Input-bounds bypass attempts return server-side 400 with the right English error
-- [x] 3.13 DevTools Console contains no log lines referencing the paste text or LLM output during a happy-path run
+- [x] 3.4 Logged-in `/dashboard` shows textarea + counter + generate button — de2863c
+- [x] 3.5 Anonymous `/dashboard` → redirected to `/auth/signin` — de2863c
+- [x] 3.6 Live char counter updates and turns red at the limit — de2863c
+- [x] 3.7 Generate button disabled while submitting — de2863c
+- [x] 3.8 Progress bar + first English label appear < 2 s after submit; labels rotate through all three phases — de2863c
+- [x] 3.9 Happy path: textarea clears, read-only list appears, English success toast shows correct N — de2863c
+- [x] 3.10 Replace-on-next-batch: a second generate replaces (not appends) the list — de2863c
+- [x] 3.11 LLM failure: English error toast appears, textarea preserved, no list, no DB rows — de2863c
+- [x] 3.12 Input-bounds bypass attempts return server-side 400 with the right English error — de2863c
+- [x] 3.13 DevTools Console contains no log lines referencing the paste text or LLM output during a happy-path run — de2863c
