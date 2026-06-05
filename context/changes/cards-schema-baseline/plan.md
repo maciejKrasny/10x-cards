@@ -126,8 +126,10 @@ Wire `supabase gen types` into an npm script, write its output to `src/db/databa
 **Contract**: New entry in `scripts`:
 
 ```json
-"db:types": "supabase gen types typescript --local > src/db/database.types.ts"
+"db:types": "supabase gen types typescript --local > src/db/database.types.ts && prettier --write src/db/database.types.ts"
 ```
+
+The `prettier --write` tail is required so the generated file has deterministic formatting — without it, the CI types-in-sync diff check (Phase 5) becomes flaky and ESLint flags the file. Also add `src/db/database.types.ts` to `eslint.config.js` ignores: the file is generated, must not be hand-edited, and prettier alone guarantees stable formatting.
 
 #### 2. Generate the types file
 
@@ -219,11 +221,14 @@ commit;
 
 **Intent**: Make the test trivial to run; future CI integration becomes one extra step.
 
-**Contract**: New script:
+**Contract**: Two scripts — one for local, one for the linked hosted project — both invoking the same `.sql` file so assertions stay identical across environments:
 
 ```json
-"db:test:rls": "psql \"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" -v ON_ERROR_STOP=1 -f supabase/tests/rls_cards_isolation.sql"
+"db:test:rls": "cat supabase/tests/rls_cards_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1",
+"db:test:rls:linked": "cat supabase/tests/rls_cards_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1"
 ```
+
+Both shell out to `psql` via Docker — the local variant `exec`s into the already-running stack container (`supabase_db_<project_id>`), and the linked variant uses a transient `postgres:17-alpine` to avoid requiring a local `psql` install. `HOSTED_DB_URL` is set from the Supabase dashboard → Project Settings → Database; never committed.
 
 #### 3. Document the test in README
 
@@ -275,11 +280,11 @@ Apply the migration to `adtjatwwrarnbsbiexul.supabase.co` so the deployed Worker
 
 #### 3. Run the isolation test against the hosted DB
 
-**Run**: `psql "$HOSTED_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rls_cards_isolation.sql` (the hosted DB URL is retrieved from the Supabase dashboard; not committed to the repo).
+**Run**: `export HOSTED_DB_URL="..."` (from Supabase dashboard → Project Settings → Database) then `npm run db:test:rls:linked`. Equivalent path: paste the `.sql` file into the dashboard SQL editor.
 
 **Intent**: Confirm the policies behave identically on the hosted infra. Catches any subtle config drift between local and hosted.
 
-**Contract**: The test exits 0 against the hosted DB. Because the script commits both transactions, it leaves two synthetic rows; delete them after the run via `delete from public.cards where user_id in ('11111111-...', '22222222-...');` from a service-role context. Keep this cleanup path consistent with the runbook entry added in Phase 4.
+**Contract**: The test exits 0 against the hosted DB. The script's final `commit;` block deletes its own synthetic rows (both `public.cards` and `auth.users` entries), so no manual cleanup is required and re-runs are idempotent.
 
 #### 4. Extend the deploy runbook
 

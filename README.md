@@ -138,6 +138,15 @@ npm run db:test:rls
 
 The script exits non-zero (with a leak message) if any row crosses user boundaries. It cleans up its synthetic rows on success, so re-runs are idempotent.
 
+To run the same script against the hosted DB after a migration touches RLS:
+
+```bash
+export HOSTED_DB_URL="postgresql://postgres:<pwd>@db.<ref>.supabase.co:5432/postgres"   # from Supabase dashboard → Project Settings → Database → Connection string
+npm run db:test:rls:linked
+```
+
+The `:linked` variant uses a transient `postgres:17-alpine` container (no local `psql` install required) and the same SQL file as the local variant — guaranteeing identical assertions on both environments. If you prefer not to manage `HOSTED_DB_URL` locally, run the script via the dashboard SQL editor instead (see `context/changes/deployment/runbook.md`).
+
 ### Using a cloud Supabase project instead
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:

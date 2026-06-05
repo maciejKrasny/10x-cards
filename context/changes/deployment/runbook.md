@@ -83,7 +83,12 @@ npm run db:types                                       # regenerate src/db/datab
 
 Manually review the diff in the push prompt before confirming. Push is human-gated; not automated from CI.
 
-After any RLS change or new user-scoped table, re-run the isolation test against hosted via the Supabase dashboard SQL editor (https://supabase.com/dashboard/project/adtjatwwrarnbsbiexul/sql) using the contents of `supabase/tests/rls_cards_isolation.sql`. The script inserts synthetic rows, asserts cross-user invisibility, and cleans up after itself — no manual row deletion needed.
+After any RLS change or new user-scoped table, re-run the isolation test against hosted. Two equivalent paths:
+
+- **From the CLI** (preferred for scripted runs): `export HOSTED_DB_URL="..."` (Supabase dashboard → Project Settings → Database → Connection string, direct connection), then `npm run db:test:rls:linked`. Uses a transient `postgres:17-alpine` container; no local `psql` install required.
+- **From the dashboard SQL editor** (https://supabase.com/dashboard/project/adtjatwwrarnbsbiexul/sql), pasting the contents of `supabase/tests/rls_cards_isolation.sql`.
+
+Either path inserts synthetic rows, asserts cross-user invisibility, and cleans up after itself — no manual row deletion needed.
 
 ## Deferred (post-MVP)
 
