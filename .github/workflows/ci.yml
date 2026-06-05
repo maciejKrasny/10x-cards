@@ -18,6 +18,19 @@ jobs:
       - run: npm ci
       - run: npx astro sync
       - run: npm run lint
+      - name: Start local Postgres for type generation
+        run: npx supabase db start
+      - name: Apply migrations and regenerate types
+        run: |
+          npx supabase db reset --no-seed
+          npm run db:types
+      - name: Verify generated types are in sync
+        run: |
+          if ! git diff --exit-code src/db/database.types.ts; then
+            echo "::error::src/db/database.types.ts is out of sync with the latest migration."
+            echo "Fix: run 'npm run db:types && git add src/db/database.types.ts' locally and commit the result."
+            exit 1
+          fi
       - run: npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

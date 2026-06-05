@@ -436,23 +436,23 @@ No existing data — `cards` table is new. No backfill, no compatibility shim. I
 
 #### Automated
 
-- [x] 4.1 `supabase migration list` shows migration applied on local and linked
-- [x] 4.2 Hosted DB has four policies on `cards` (`pg_policies` count = 4)
-- [x] 4.3 Isolation test exits 0 against hosted DB
+- [x] 4.1 `supabase migration list` shows migration applied on local and linked — e48c092
+- [x] 4.2 Hosted DB has four policies on `cards` (`pg_policies` count = 4) — e48c092
+- [x] 4.3 Isolation test exits 0 against hosted DB — e48c092
 
 #### Manual
 
-- [x] 4.4 Supabase dashboard shows `cards` table with four RLS policies
-- [x] 4.5 Deployed Worker auth flows (signin/signup) still work
-- [x] 4.6 Any synthetic test rows in hosted DB deleted
+- [x] 4.4 Supabase dashboard shows `cards` table with four RLS policies — e48c092
+- [x] 4.5 Deployed Worker auth flows (signin/signup) still work — e48c092
+- [x] 4.6 Any synthetic test rows in hosted DB deleted — e48c092
 
 ### Phase 5: CI types-in-sync guardrail
 
 #### Automated
 
-- [ ] 5.1 Test PR that edits migration without regenerating types fails on new step with fix command visible
-- [ ] 5.2 PR with no migration changes passes the new step
-- [ ] 5.3 CI time increases by less than ~90 seconds
+- [x] 5.1 Test PR that edits migration without regenerating types fails on new step with fix command visible
+- [x] 5.2 PR with no migration changes passes the new step
+- [x] 5.3 CI time increases by less than ~90 seconds
 
 #### Manual
 
