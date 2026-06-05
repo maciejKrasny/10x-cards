@@ -450,11 +450,11 @@ No existing data — `cards` table is new. No backfill, no compatibility shim. I
 
 #### Automated
 
-- [x] 5.1 Test PR that edits migration without regenerating types fails on new step with fix command visible
-- [x] 5.2 PR with no migration changes passes the new step
-- [x] 5.3 CI time increases by less than ~90 seconds
+- [x] 5.1 Test PR that edits migration without regenerating types fails on new step with fix command visible — 6c34a0a
+- [x] 5.2 PR with no migration changes passes the new step — 6c34a0a
+- [x] 5.3 CI time increases by less than ~90 seconds — 6c34a0a
 
 #### Manual
 
-- [ ] 5.4 Failing-step message in GitHub UI clearly tells contributor to run `npm run db:types`
-- [ ] 5.5 Workflow passes on `master` after the slice merges
+- [x] 5.4 Failing-step message in GitHub UI clearly tells contributor to run `npm run db:types` — 6c34a0a
+- [x] 5.5 Workflow passes on `master` after the slice merges — 6c34a0a

@@ -1,7 +1,7 @@
 ---
 change_id: cards-schema-baseline
 title: Cards table + Supabase migration and codegen baseline
-status: implementing
+status: implemented
 created: 2026-06-05
 updated: 2026-06-05
 archived_at: null
