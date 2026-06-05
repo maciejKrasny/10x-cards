@@ -337,38 +337,38 @@ Rollback: `npx wrangler rollback [VERSION_ID]` reverts the route. Note (per infr
 
 #### Automated
 
-- [x] 1.1 `npm install` completes; `zod` appears in `package.json` and `package-lock.json`
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 `npx astro check` passes
-- [x] 1.4 `npm run build` passes
+- [x] 1.1 `npm install` completes; `zod` appears in `package.json` and `package-lock.json` — c22bd4b
+- [x] 1.2 `npm run lint` passes — c22bd4b
+- [x] 1.3 `npx astro check` passes — c22bd4b
+- [x] 1.4 `npm run build` passes — c22bd4b
 
 #### Manual
 
-- [x] 1.5 `generateCardsFromText` returns a Zod-valid `GeneratedCard[]` against a real OpenRouter key
-- [x] 1.6 `generateCardsFromText` throws `LLM_HTTP_ERROR` on a deliberately wrong key, message contains no paste substring
-- [x] 1.7 `.dev.vars.example`, README, AGENTS.md reflect the two new env vars
+- [x] 1.5 `generateCardsFromText` returns a Zod-valid `GeneratedCard[]` against a real OpenRouter key — c22bd4b
+- [x] 1.6 `generateCardsFromText` throws `LLM_HTTP_ERROR` on a deliberately wrong key, message contains no paste substring — c22bd4b
+- [x] 1.7 `.dev.vars.example`, README, AGENTS.md reflect the two new env vars — c22bd4b
 
 ### Phase 2: POST /api/cards/generate endpoint
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npx astro check` passes
-- [ ] 2.3 `npm run build` passes
-- [ ] 2.4 CI `git diff --exit-code src/db/database.types.ts` types-in-sync guardrail still passes
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npx astro check` passes
+- [x] 2.3 `npm run build` passes
+- [x] 2.4 CI `git diff --exit-code src/db/database.types.ts` types-in-sync guardrail still passes
 
 #### Manual
 
-- [ ] 2.5 Happy path: signed-in `curl` returns 200 + cards; Supabase Studio shows the new rows
-- [ ] 2.6 Anonymous `curl` → 401 `UNAUTHORIZED`
-- [ ] 2.7 Empty text → 400 `INPUT_TOO_SHORT`
-- [ ] 2.8 Oversized text → 400 `INPUT_TOO_LONG`
-- [ ] 2.9 Bad JSON → 400 `INVALID_REQUEST`
-- [ ] 2.10 LLM failure simulation → 502 `LLM_FAILURE`, no DB rows added
-- [ ] 2.11 NFR-2 audit 1/4: `rg console\.` in `src/pages/api/cards/` and `src/lib/llm/` → no logging of paste / LLM I/O
-- [ ] 2.12 NFR-2 audit 2/4: `cards` schema review confirms no column stores raw paste
-- [ ] 2.13 NFR-2 audit 3/4: `wrangler.jsonc` `observability` config does not sample/store request bodies
-- [ ] 2.14 NFR-2 audit 4/4: no analytics/telemetry SDK imports near the request lifecycle
+- [x] 2.5 Happy path: signed-in `curl` returns 200 + cards; Supabase Studio shows the new rows
+- [x] 2.6 Anonymous `curl` → 401 `UNAUTHORIZED`
+- [x] 2.7 Empty text → 400 `INPUT_TOO_SHORT`
+- [x] 2.8 Oversized text → 400 `INPUT_TOO_LONG`
+- [x] 2.9 Bad JSON → 400 `INVALID_REQUEST`
+- [x] 2.10 LLM failure simulation → 502 `LLM_FAILURE`, no DB rows added
+- [x] 2.11 NFR-2 audit 1/4: `rg console\.` in `src/pages/api/cards/` and `src/lib/llm/` → no logging of paste / LLM I/O
+- [x] 2.12 NFR-2 audit 2/4: `cards` schema review confirms no column stores raw paste
+- [x] 2.13 NFR-2 audit 3/4: `wrangler.jsonc` `observability` config does not sample/store request bodies
+- [x] 2.14 NFR-2 audit 4/4: no analytics/telemetry SDK imports near the request lifecycle
 - [ ] 2.15 `wrangler tail` against a preview deploy shows no paste substring on a happy-path run
 
 ### Phase 3: Dashboard paste UI + read-only post-gen list
