@@ -69,6 +69,22 @@ npx wrangler tail --format json          # structured output
 
 Historical logs and analytics: Cloudflare dashboard → Workers → `10x-cards` → Observability.
 
+## Database migrations
+
+Migrations live in `supabase/migrations/` and are versioned by CLI-generated timestamps. The linked hosted project is `adtjatwwrarnbsbiexul` (see Supabase project section above).
+
+Apply a new migration to the hosted DB:
+
+```bash
+npx supabase link --project-ref adtjatwwrarnbsbiexul   # one-time per workstation
+npx supabase db push                                   # applies pending local migrations
+npm run db:types                                       # regenerate src/db/database.types.ts
+```
+
+Manually review the diff in the push prompt before confirming. Push is human-gated; not automated from CI.
+
+After any RLS change or new user-scoped table, re-run the isolation test against hosted via the Supabase dashboard SQL editor (https://supabase.com/dashboard/project/adtjatwwrarnbsbiexul/sql) using the contents of `supabase/tests/rls_cards_isolation.sql`. The script inserts synthetic rows, asserts cross-user invisibility, and cleans up after itself — no manual row deletion needed.
+
 ## Deferred (post-MVP)
 
 - Custom domain (requires DNS migration + Cloudflare zone)

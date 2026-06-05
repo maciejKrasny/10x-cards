@@ -424,27 +424,27 @@ No existing data — `cards` table is new. No backfill, no compatibility shim. I
 
 #### Automated
 
-- [x] 3.1 `npm run db:test:rls` exits 0 against fresh `supabase db reset`
-- [x] 3.2 Deliberately dropping `cards_select_own` makes `npm run db:test:rls` exit non-zero with assertion message; policy then restored
+- [x] 3.1 `npm run db:test:rls` exits 0 against fresh `supabase db reset` — a6797ce
+- [x] 3.2 Deliberately dropping `cards_select_own` makes `npm run db:test:rls` exit non-zero with assertion message; policy then restored — a6797ce
 
 #### Manual
 
-- [x] 3.3 SQL file is readable by a future agent and extensible to new tables
-- [x] 3.4 README mentions the test and regen-after-policy-change rule
+- [x] 3.3 SQL file is readable by a future agent and extensible to new tables — a6797ce
+- [x] 3.4 README mentions the test and regen-after-policy-change rule — a6797ce
 
 ### Phase 4: Link + push to hosted Supabase + hosted smoke
 
 #### Automated
 
-- [ ] 4.1 `supabase migration list` shows migration applied on local and linked
-- [ ] 4.2 Hosted DB has four policies on `cards` (`pg_policies` count = 4)
-- [ ] 4.3 Isolation test exits 0 against hosted DB
+- [x] 4.1 `supabase migration list` shows migration applied on local and linked
+- [x] 4.2 Hosted DB has four policies on `cards` (`pg_policies` count = 4)
+- [x] 4.3 Isolation test exits 0 against hosted DB
 
 #### Manual
 
-- [ ] 4.4 Supabase dashboard shows `cards` table with four RLS policies
-- [ ] 4.5 Deployed Worker auth flows (signin/signup) still work
-- [ ] 4.6 Any synthetic test rows in hosted DB deleted
+- [x] 4.4 Supabase dashboard shows `cards` table with four RLS policies
+- [x] 4.5 Deployed Worker auth flows (signin/signup) still work
+- [x] 4.6 Any synthetic test rows in hosted DB deleted
 
 ### Phase 5: CI types-in-sync guardrail
 
