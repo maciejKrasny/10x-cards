@@ -3,7 +3,7 @@ project: 10xCards
 version: 1
 status: draft
 created: 2026-05-28
-updated: 2026-05-28
+updated: 2026-06-05
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -29,7 +29,7 @@ top_blocker: capacity
 
 | ID   | Change ID                       | Outcome (user can …)                                                            | Prerequisites | PRD refs                               | Status   |
 | ---- | ------------------------------- | ------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
-| F-01 | cards-schema-baseline           | (foundation) cards table + RLS + migration & codegen pattern established        | —             | Access Control, Guardrails-1           | ready    |
+| F-01 | cards-schema-baseline           | (foundation) cards table + RLS + migration & codegen pattern established        | —             | Access Control, Guardrails-1           | done     |
 | S-01 | ai-generate-from-paste          | paste a block of text and get AI-generated cards auto-saved to their deck       | F-01          | US-01, FR-004, NFR-1, NFR-2            | proposed |
 | S-02 | deck-management                 | list, edit, delete, and manually create cards                                   | F-01          | FR-005, FR-006, FR-007, FR-008         | proposed |
 | S-03 | first-spaced-repetition-session | study their deck via a spaced-repetition session that persists review progress  | F-01, S-01    | US-01, FR-009, Primary SC, Guardrails-2 | proposed |
@@ -70,7 +70,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Sequenced first because every user-facing slice needs the `cards` table; under `top_blocker: capacity`, F-01 unlocks `S-01 ∥ S-02` parallel work, which is the single biggest lever for fitting the MVP into evening-only capacity. Failure mode: misconfigured RLS leaks one user's deck into another's view, violating Guardrails-1 — mitigation is to write the RLS policy explicitly in this slice and verify with a two-user smoke test before declaring `done`.
-- **Status:** ready
+- **Status:** done
 
 ## Slices
 
@@ -159,3 +159,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 ## Done
 
 (Empty on first generation. `/10x-archive` appends an entry here when a change whose `Change ID` matches a roadmap item is archived.)
+
+- **F-01: (foundation) Supabase migrations and typed-client codegen pipeline are in place; a `cards` table exists with a Row-Level Security policy isolating each card to its owning user; downstream slices can extend the schema by following the established migration + codegen pattern.** — Archived 2026-06-05 → `context/archive/2026-06-05-cards-schema-baseline/`. Lesson: —.
