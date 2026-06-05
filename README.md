@@ -128,6 +128,16 @@ npm run db:types                    # regenerates src/db/database.types.ts from 
 
 The CI workflow re-runs `npm run db:types` and fails if the regenerated file would diff against what's checked in; run `npm run db:types && git add src/db/database.types.ts` after any migration change to keep CI green.
 
+### RLS isolation test
+
+`supabase/tests/rls_cards_isolation.sql` asserts that no user can see another user's cards (FR Guardrails-1). It inserts synthetic rows under two JWTs and asserts each user sees zero of the other's rows. Re-run it after any migration that touches RLS or adds a new user-scoped table.
+
+```bash
+npm run db:test:rls
+```
+
+The script exits non-zero (with a leak message) if any row crosses user boundaries. It cleans up its synthetic rows on success, so re-runs are idempotent.
+
 ### Using a cloud Supabase project instead
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:

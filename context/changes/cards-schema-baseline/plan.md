@@ -410,27 +410,27 @@ No existing data — `cards` table is new. No backfill, no compatibility shim. I
 
 #### Automated
 
-- [x] 2.1 `npm run db:types` exits 0 and writes non-empty `src/db/database.types.ts`
-- [x] 2.2 `npm run build` passes against the new typed client
-- [x] 2.3 `npm run lint` passes
+- [x] 2.1 `npm run db:types` exits 0 and writes non-empty `src/db/database.types.ts` — 5e58b01
+- [x] 2.2 `npm run build` passes against the new typed client — 5e58b01
+- [x] 2.3 `npm run lint` passes — 5e58b01
 
 #### Manual
 
-- [x] 2.4 `src/db/database.types.ts` contains `Database` export with `cards` table
-- [x] 2.5 Trial typed query in scratch route shows correct autocomplete in editor
-- [x] 2.6 README subsection on regen flow reads correctly
+- [x] 2.4 `src/db/database.types.ts` contains `Database` export with `cards` table — 5e58b01
+- [x] 2.5 Trial typed query in scratch route shows correct autocomplete in editor — 5e58b01
+- [x] 2.6 README subsection on regen flow reads correctly — 5e58b01
 
 ### Phase 3: RLS isolation SQL test
 
 #### Automated
 
-- [ ] 3.1 `npm run db:test:rls` exits 0 against fresh `supabase db reset`
-- [ ] 3.2 Deliberately dropping `cards_select_own` makes `npm run db:test:rls` exit non-zero with assertion message; policy then restored
+- [x] 3.1 `npm run db:test:rls` exits 0 against fresh `supabase db reset`
+- [x] 3.2 Deliberately dropping `cards_select_own` makes `npm run db:test:rls` exit non-zero with assertion message; policy then restored
 
 #### Manual
 
-- [ ] 3.3 SQL file is readable by a future agent and extensible to new tables
-- [ ] 3.4 README mentions the test and regen-after-policy-change rule
+- [x] 3.3 SQL file is readable by a future agent and extensible to new tables
+- [x] 3.4 README mentions the test and regen-after-policy-change rule
 
 ### Phase 4: Link + push to hosted Supabase + hosted smoke
 

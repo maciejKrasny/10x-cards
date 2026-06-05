@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "db:types": "supabase gen types typescript --local > src/db/database.types.ts && prettier --write src/db/database.types.ts"
+    "db:types": "supabase gen types typescript --local > src/db/database.types.ts && prettier --write src/db/database.types.ts",
+    "db:test:rls": "cat supabase/tests/rls_cards_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
