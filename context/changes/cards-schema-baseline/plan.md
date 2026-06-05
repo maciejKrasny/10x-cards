@@ -397,28 +397,28 @@ No existing data — `cards` table is new. No backfill, no compatibility shim. I
 
 #### Automated
 
-- [x] 1.1 Migration file exists at `supabase/migrations/*_cards_baseline.sql`
-- [x] 1.2 `npx supabase db reset` exits 0
-- [x] 1.3 `npm run lint` passes
+- [x] 1.1 Migration file exists at `supabase/migrations/*_cards_baseline.sql` — f075649
+- [x] 1.2 `npx supabase db reset` exits 0 — f075649
+- [x] 1.3 `npm run lint` passes — f075649
 
 #### Manual
 
-- [x] 1.4 Studio shows `cards` table with columns, constraints, and four RLS policies
-- [x] 1.5 `select` against `cards` as `anon` returns error or zero rows
+- [x] 1.4 Studio shows `cards` table with columns, constraints, and four RLS policies — f075649
+- [x] 1.5 `select` against `cards` as `anon` returns error or zero rows — f075649
 
 ### Phase 2: TypeScript codegen pipeline + typed Supabase client
 
 #### Automated
 
-- [ ] 2.1 `npm run db:types` exits 0 and writes non-empty `src/db/database.types.ts`
-- [ ] 2.2 `npm run build` passes against the new typed client
-- [ ] 2.3 `npm run lint` passes
+- [x] 2.1 `npm run db:types` exits 0 and writes non-empty `src/db/database.types.ts`
+- [x] 2.2 `npm run build` passes against the new typed client
+- [x] 2.3 `npm run lint` passes
 
 #### Manual
 
-- [ ] 2.4 `src/db/database.types.ts` contains `Database` export with `cards` table
-- [ ] 2.5 Trial typed query in scratch route shows correct autocomplete in editor
-- [ ] 2.6 README subsection on regen flow reads correctly
+- [x] 2.4 `src/db/database.types.ts` contains `Database` export with `cards` table
+- [x] 2.5 Trial typed query in scratch route shows correct autocomplete in editor
+- [x] 2.6 README subsection on regen flow reads correctly
 
 ### Phase 3: RLS isolation SQL test
 

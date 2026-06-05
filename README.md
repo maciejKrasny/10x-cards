@@ -111,7 +111,22 @@ npx supabase stop
 
 The local Studio UI is available at `http://localhost:54323`.
 
-No database tables or migrations are required — this project uses Supabase Auth's built-in `auth.users` table only.
+### Database migrations and types
+
+The `cards` table and any future user-scoped schema lives under `supabase/migrations/`. Generated TypeScript types in `src/db/database.types.ts` are derived from the local stack and checked in.
+
+After editing or adding a migration, run the four-step loop against a running local stack (`npx supabase start` must be up first):
+
+```bash
+npx supabase migration new <name>   # creates a timestamped .sql file
+# edit the SQL
+npx supabase db reset               # destructive: drops and recreates the local DB
+npm run db:types                    # regenerates src/db/database.types.ts from the new schema
+```
+
+`supabase db reset` wipes all local data — anyone running it loses their seed inserts. Local codegen requires the reset first so the generated types reflect the latest migration.
+
+The CI workflow re-runs `npm run db:types` and fails if the regenerated file would diff against what's checked in; run `npm run db:types && git add src/db/database.types.ts` after any migration change to keep CI green.
 
 ### Using a cloud Supabase project instead
 
