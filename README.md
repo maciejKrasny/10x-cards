@@ -151,14 +151,25 @@ The `:linked` variant uses a transient `postgres:17-alpine` container (no local 
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:
 
-| Variable       | Description                                                |
-| -------------- | ---------------------------------------------------------- |
-| `SUPABASE_URL` | Project URL from Supabase dashboard → Settings → API       |
-| `SUPABASE_KEY` | `anon` public key from Supabase dashboard → Settings → API |
+| Variable             | Description                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `SUPABASE_URL`       | Project URL from Supabase dashboard → Settings → API                                                         |
+| `SUPABASE_KEY`       | `anon` public key from Supabase dashboard → Settings → API                                                   |
+| `OPENROUTER_API_KEY` | API key for [OpenRouter](https://openrouter.ai/) — used by the AI card-generation endpoint                   |
+| `OPENROUTER_MODEL`   | OpenRouter model id, e.g. `openai/gpt-4o-mini` (default if unset); must support `response_format: json_schema` |
 
 ```
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_KEY=<anon-key>
+OPENROUTER_API_KEY=<openrouter-key>
+OPENROUTER_MODEL=openai/gpt-4o-mini
+```
+
+For production (Cloudflare Workers), set the OpenRouter values as secrets:
+
+```bash
+npx wrangler secret put OPENROUTER_API_KEY
+npx wrangler secret put OPENROUTER_MODEL
 ```
 
 ### Email confirmation in local development

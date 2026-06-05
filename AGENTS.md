@@ -27,9 +27,12 @@ npx wrangler dev     # local Cloudflare Workers runtime (differs from astro dev)
 
 **Supabase client**: Created in `src/lib/supabase.ts`. Returns `null` if env vars are missing — code must guard against this. Credentials are server-only (`astro:env/server`) and never reach the browser.
 
+**LLM client**: `src/lib/llm/openrouter.ts` wraps OpenRouter's chat-completions endpoint with strict `json_schema` response format. Reads `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` (default `openai/gpt-4o-mini`) from `astro:env/server`. Errors throw `Error` with stable code messages (`LLM_HTTP_ERROR`, `LLM_EMPTY_RESPONSE`, `LLM_INVALID_OUTPUT`, `LLM_NOT_CONFIGURED`) and never leak request/response strings.
+
 **Routing**:
-- `src/pages/api/auth/` — POST-only form handlers (signin, signup, signout), no JSON API
-- `src/middleware.ts` — session extraction and route protection
+- `src/pages/api/auth/` — POST-only form handlers (signin, signup, signout); form-encoded in, redirect out
+- `src/pages/api/cards/` — JSON-in / JSON-out endpoints; must call `supabase.auth.getUser()` for auth (middleware does not redirect API routes)
+- `src/middleware.ts` — session extraction and route protection (pages only)
 
 **Components**: `.astro` files for layout/structure, `.tsx` React files for interactive UI. Shadcn-style component registry configured (`components.json`) — add new primitives to `src/components/ui/`.
 
@@ -50,3 +53,9 @@ See @context/foundation/lessons.md for project-specific rules captured from past
 ## Environment setup
 
 For Supabase and Cloudflare local dev setup, see @README.md. Wrangler local dev requires `.dev.vars`, not `.env`.
+
+Env vars (all server-only, declared in `astro.config.mjs`):
+
+- `SUPABASE_URL`, `SUPABASE_KEY` — Supabase project + `anon` key
+- `OPENROUTER_API_KEY` — OpenRouter API key for AI card generation
+- `OPENROUTER_MODEL` — OpenRouter model id (default `openai/gpt-4o-mini`)
