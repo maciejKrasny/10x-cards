@@ -352,42 +352,42 @@ Rollback: `npx wrangler rollback [VERSION_ID]` reverts the route. Note (per infr
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npx astro check` passes
-- [x] 2.3 `npm run build` passes
-- [x] 2.4 CI `git diff --exit-code src/db/database.types.ts` types-in-sync guardrail still passes
+- [x] 2.1 `npm run lint` passes — 93c98a7
+- [x] 2.2 `npx astro check` passes — 93c98a7
+- [x] 2.3 `npm run build` passes — 93c98a7
+- [x] 2.4 CI `git diff --exit-code src/db/database.types.ts` types-in-sync guardrail still passes — 93c98a7
 
 #### Manual
 
-- [x] 2.5 Happy path: signed-in `curl` returns 200 + cards; Supabase Studio shows the new rows
-- [x] 2.6 Anonymous `curl` → 401 `UNAUTHORIZED`
-- [x] 2.7 Empty text → 400 `INPUT_TOO_SHORT`
-- [x] 2.8 Oversized text → 400 `INPUT_TOO_LONG`
-- [x] 2.9 Bad JSON → 400 `INVALID_REQUEST`
-- [x] 2.10 LLM failure simulation → 502 `LLM_FAILURE`, no DB rows added
-- [x] 2.11 NFR-2 audit 1/4: `rg console\.` in `src/pages/api/cards/` and `src/lib/llm/` → no logging of paste / LLM I/O
-- [x] 2.12 NFR-2 audit 2/4: `cards` schema review confirms no column stores raw paste
-- [x] 2.13 NFR-2 audit 3/4: `wrangler.jsonc` `observability` config does not sample/store request bodies
-- [x] 2.14 NFR-2 audit 4/4: no analytics/telemetry SDK imports near the request lifecycle
+- [x] 2.5 Happy path: signed-in `curl` returns 200 + cards; Supabase Studio shows the new rows — 93c98a7
+- [x] 2.6 Anonymous `curl` → 401 `UNAUTHORIZED` — 93c98a7
+- [x] 2.7 Empty text → 400 `INPUT_TOO_SHORT` — 93c98a7
+- [x] 2.8 Oversized text → 400 `INPUT_TOO_LONG` — 93c98a7
+- [x] 2.9 Bad JSON → 400 `INVALID_REQUEST` — 93c98a7
+- [x] 2.10 LLM failure simulation → 502 `LLM_FAILURE`, no DB rows added — 93c98a7
+- [x] 2.11 NFR-2 audit 1/4: `rg console\.` in `src/pages/api/cards/` and `src/lib/llm/` → no logging of paste / LLM I/O — 93c98a7
+- [x] 2.12 NFR-2 audit 2/4: `cards` schema review confirms no column stores raw paste — 93c98a7
+- [x] 2.13 NFR-2 audit 3/4: `wrangler.jsonc` `observability` config does not sample/store request bodies — 93c98a7
+- [x] 2.14 NFR-2 audit 4/4: no analytics/telemetry SDK imports near the request lifecycle — 93c98a7
 - [ ] 2.15 `wrangler tail` against a preview deploy shows no paste substring on a happy-path run
 
 ### Phase 3: Dashboard paste UI + read-only post-gen list
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npx astro check` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npx astro check` passes
+- [x] 3.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 3.4 Logged-in `/dashboard` shows textarea + counter + generate button
-- [ ] 3.5 Anonymous `/dashboard` → redirected to `/auth/signin`
-- [ ] 3.6 Live char counter updates and turns red at the limit
-- [ ] 3.7 Generate button disabled while submitting
-- [ ] 3.8 Progress bar + first English label appear < 2 s after submit; labels rotate through all three phases
-- [ ] 3.9 Happy path: textarea clears, read-only list appears, English success toast shows correct N
-- [ ] 3.10 Replace-on-next-batch: a second generate replaces (not appends) the list
-- [ ] 3.11 LLM failure: English error toast appears, textarea preserved, no list, no DB rows
-- [ ] 3.12 Input-bounds bypass attempts return server-side 400 with the right English error
-- [ ] 3.13 DevTools Console contains no log lines referencing the paste text or LLM output during a happy-path run
+- [x] 3.4 Logged-in `/dashboard` shows textarea + counter + generate button
+- [x] 3.5 Anonymous `/dashboard` → redirected to `/auth/signin`
+- [x] 3.6 Live char counter updates and turns red at the limit
+- [x] 3.7 Generate button disabled while submitting
+- [x] 3.8 Progress bar + first English label appear < 2 s after submit; labels rotate through all three phases
+- [x] 3.9 Happy path: textarea clears, read-only list appears, English success toast shows correct N
+- [x] 3.10 Replace-on-next-batch: a second generate replaces (not appends) the list
+- [x] 3.11 LLM failure: English error toast appears, textarea preserved, no list, no DB rows
+- [x] 3.12 Input-bounds bypass attempts return server-side 400 with the right English error
+- [x] 3.13 DevTools Console contains no log lines referencing the paste text or LLM output during a happy-path run
