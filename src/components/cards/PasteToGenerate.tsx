@@ -10,8 +10,8 @@ const PHASE_LABELS = ["Sending text to AI…", "Generating cards…", "Saving to
 
 const ERROR_MESSAGES: Record<string, string> = {
   UNAUTHORIZED: "Please sign in to generate cards.",
-  INPUT_TOO_SHORT: "Text must be between 1 and 6000 characters.",
-  INPUT_TOO_LONG: "Text must be between 1 and 6000 characters.",
+  INPUT_TOO_SHORT: "Text is empty. Please paste at least 1 character.",
+  INPUT_TOO_LONG: "Text exceeds 6000 characters. Please shorten it.",
   LLM_FAILURE: "Generation failed. Please try again.",
   DB_INSERT_FAILED: "Saving failed. Please try again.",
   INVALID_REQUEST: "Something went wrong. Please try again.",
@@ -144,13 +144,6 @@ export default function PasteToGenerate() {
           <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/10">
             <div className="paste-progress-bar absolute top-0 left-0 h-full w-1/3 rounded-full bg-blue-400" />
           </div>
-          <style>{`
-            @keyframes paste-progress-slide {
-              0% { transform: translateX(-110%); }
-              100% { transform: translateX(310%); }
-            }
-            .paste-progress-bar { animation: paste-progress-slide 1.4s ease-in-out infinite; }
-          `}</style>
         </div>
       )}
 

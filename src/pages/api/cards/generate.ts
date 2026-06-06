@@ -18,8 +18,8 @@ type ErrorCode =
 
 const ERROR_MESSAGES: Record<ErrorCode, string> = {
   INVALID_REQUEST: "Request body is invalid.",
-  INPUT_TOO_SHORT: "Text must be between 1 and 6000 characters.",
-  INPUT_TOO_LONG: "Text must be between 1 and 6000 characters.",
+  INPUT_TOO_SHORT: "Text is empty. Please paste at least 1 character.",
+  INPUT_TOO_LONG: "Text exceeds 6000 characters. Please shorten it.",
   UNAUTHORIZED: "Please sign in to generate cards.",
   LLM_FAILURE: "Generation failed. Please try again.",
   DB_INSERT_FAILED: "Saving failed. Please try again.",

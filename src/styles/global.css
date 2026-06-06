@@ -122,3 +122,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes paste-progress-slide {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(310%);
+  }
+}
+
+.paste-progress-bar {
+  animation: paste-progress-slide 1.4s ease-in-out infinite;
+}

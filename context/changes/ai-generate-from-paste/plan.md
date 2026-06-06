@@ -329,6 +329,12 @@ Rollback: `npx wrangler rollback [VERSION_ID]` reverts the route. Note (per infr
 - **`response_format` JSON-schema model coverage**: not all OpenRouter-hosted models support strict json_schema. The plan assumes the chosen model does; if the implementer needs to fall back to a model that doesn't, the LLM client must switch to `response_format: { type: 'json_object' }` + Zod parse — same control flow, slightly less reliable upstream, no API-contract change.
 - **Wrangler observability default behaviour**: the plan asserts (consistent with Cloudflare docs as of 2026-Q2) that `observability.enabled: true` records invocation metadata but not request/response bodies. If a future Cloudflare release changes this default, the NFR-2 audit's bullet 3 must be re-verified.
 
+## Implementation Addenda
+
+> Discovered during implementation; appended after the plan was authored to keep the plan honest as a source of truth.
+
+- **Error code `SERVER_MISCONFIGURED` (500)** added to `src/pages/api/cards/generate.ts`. Returned when `createClient()` in `src/lib/supabase.ts` resolves to `null` because `SUPABASE_URL` / `SUPABASE_KEY` env vars are unset. Defence-in-depth — the dashboard route is already gated by middleware, so this path is only reachable on a deployment-config mistake. The client-visible `message` is the same generic `"Something went wrong. Please try again."` mapped to `INVALID_REQUEST` on the React island, so no new UI branch is required.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
