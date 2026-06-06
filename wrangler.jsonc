@@ -9,6 +9,9 @@
     "directory": "./dist",
     "not_found_handling": "404-page",
   },
+  "vars": {
+    "OPENROUTER_MODEL": "google/gemma-4-31b-it:free",
+  },
   "observability": {
     "enabled": true,
   },
