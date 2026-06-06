@@ -46,7 +46,9 @@ export async function generateCardsFromText(text: string): Promise<GeneratedCard
   }
 
   const model = OPENROUTER_MODEL ?? DEFAULT_MODEL;
-
+  // TEMP DIAGNOSTIC — remove after resolving production 402.
+  // eslint-disable-next-line no-console -- ops trace; NFR-2 safe (no paste/generated content)
+  console.log("Using model: ", model);
   let response: Response;
   try {
     response = await fetch(ENDPOINT, {
@@ -73,8 +75,24 @@ export async function generateCardsFromText(text: string): Promise<GeneratedCard
   }
 
   if (!response.ok) {
-    // eslint-disable-next-line no-console -- ops trace; status code only, no body/paste leakage (NFR-2 safe)
-    console.warn("LLM upstream non-OK", response.status);
+    // TEMP DIAGNOSTIC — remove after resolving production 402.
+    // Logs only the model id we sent and the OpenRouter error envelope (error.code + truncated error.message).
+    // Does NOT log paste text, generated cards, or the request body.
+    let upstreamError: { code?: unknown; message?: string } | null = null;
+    try {
+      const text = await response.text();
+      const parsed = JSON.parse(text) as { error?: { code?: unknown; message?: unknown } };
+      const message = typeof parsed.error?.message === "string" ? parsed.error.message.slice(0, 240) : undefined;
+      upstreamError = { code: parsed.error?.code, message };
+    } catch {
+      // ignore — body not JSON
+    }
+    // eslint-disable-next-line no-console -- ops trace; NFR-2 safe (no paste/generated content)
+    console.warn("LLM upstream non-OK", {
+      status: response.status,
+      model,
+      error: upstreamError,
+    });
     throw new Error("LLM_HTTP_ERROR");
   }
 
