@@ -25,7 +25,12 @@ export const GET: APIRoute = async (context) => {
 
   // Verify deck ownership AND fetch the name in one round-trip; the deck-detail
   // page renders the heading from this same payload, no second query.
-  const { data: deck } = await supabase.from("decks").select("id, name").eq("id", id).maybeSingle();
+  const { data: deck } = await supabase
+    .from("decks")
+    .select("id, name")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .maybeSingle();
   if (!deck) {
     return errorResponse("DECK_NOT_FOUND");
   }
@@ -81,7 +86,7 @@ export const POST: APIRoute = async (context) => {
   // Security-critical ownership check: RLS on cards-insert only validates user_id,
   // not deck_id. Without this SELECT (RLS-scoped to current user), a session
   // could insert into another user's deck by guessing its uuid.
-  const { data: deck } = await supabase.from("decks").select("id").eq("id", id).maybeSingle();
+  const { data: deck } = await supabase.from("decks").select("id").eq("id", id).eq("user_id", user.id).maybeSingle();
   if (!deck) {
     return errorResponse("DECK_NOT_FOUND");
   }

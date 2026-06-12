@@ -363,7 +363,7 @@ New `/decks` page mounting a React island that fetches `GET /api/decks` and lets
   - `handleCreate(name)` → POST `/api/decks`; prepend new deck to list on success.
   - `handleRename(id, name)` → PATCH `/api/decks/[id]`; replace in-place on success; clear `editingDeckId`.
   - `handleDelete(id)` → DELETE `/api/decks/[id]`; remove from list on success; clear `deletingDeck`.
-- Renders, in order: heading "Your decks", success/error `Alert` (transient), `AddDeckForm` (toggleable), then `decks.map(d => <DeckRow ... />)`. Empty state: "No decks yet. Create your first deck below." (the AddDeckForm CTA is always visible).
+- Renders, in order: heading "Your decks", success/error `Alert` (transient), `AddDeckForm` (toggleable), then `decks.map(d => <DeckRow ... />)`. Empty state: "No decks yet. Create your first deck above." (the AddDeckForm CTA is always visible).
 - Card-count badge per row: `{deck.card_count} cards` (singular/plural with a small helper).
 - Each `DeckRow` is a link wrapper around the deck name (navigates to `/decks/[id]`); rename / delete buttons are siblings that do NOT trigger navigation.
 - All UI text is English.
@@ -410,7 +410,7 @@ New `/decks` page mounting a React island that fetches `GET /api/decks` and lets
 - **Delete deck (with cards)**: create a card via API/Studio in "My Deck"; refresh `/decks`; Delete on "My Deck" → dialog shows the correct count; confirm → row removed; verify in Studio that the cards cascade-deleted.
 - **Validation**: try to submit an empty name (button is disabled). Try to submit > 100 chars (input maxLength caps; server-side also rejects); UI handles gracefully.
 - **Server error**: stop the local Astro server mid-mutation; click Delete; an English error toast appears; row remains in the list.
-- **Empty state**: delete every deck (cascade-deletes everything); list shows "No decks yet. Create your first deck below." with the form visible.
+- **Empty state**: delete every deck (cascade-deletes everything); list shows "No decks yet. Create your first deck above." with the form visible.
 
 **Implementation Note**: After Phase 3, decks can be managed but `/decks/[id]` does not exist yet — clicking a deck name 404s. Pause for sign-off and proceed to Phase 4.
 

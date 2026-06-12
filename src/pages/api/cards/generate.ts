@@ -37,7 +37,12 @@ export const POST: APIRoute = async (context) => {
   // that deck_id belongs to the caller. Without this SELECT (RLS-scoped to current user),
   // a session with any valid auth could insert cards into another user's deck by guessing
   // its uuid. 404 (not 403) avoids confirming existence to a scanner.
-  const { data: deck } = await supabase.from("decks").select("id").eq("id", deck_id).maybeSingle();
+  const { data: deck } = await supabase
+    .from("decks")
+    .select("id")
+    .eq("id", deck_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
   if (!deck) {
     return errorResponse("DECK_NOT_FOUND");
   }

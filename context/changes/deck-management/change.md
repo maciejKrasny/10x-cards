@@ -1,7 +1,7 @@
 ---
 change_id: deck-management
 title: Deck management — list, edit, delete, and manually create cards
-status: implemented
+status: impl_reviewed
 created: 2026-06-12
 updated: 2026-06-12
 
