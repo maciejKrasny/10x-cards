@@ -671,43 +671,43 @@ This slice introduces one SQL migration (Phase 1) that mutates the existing `car
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npx astro check` passes
-- [x] 2.3 `npm run build` passes
-- [x] 2.4 CI types-in-sync guardrail (`git diff --exit-code src/db/database.types.ts`) unaffected
+- [x] 2.1 `npm run lint` passes — 36f46fa
+- [x] 2.2 `npx astro check` passes — 36f46fa
+- [x] 2.3 `npm run build` passes — 36f46fa
+- [x] 2.4 CI types-in-sync guardrail (`git diff --exit-code src/db/database.types.ts`) unaffected — 36f46fa
 
 #### Manual
 
-- [x] 2.5 `curl GET /api/decks` returns user's decks with card_count
-- [x] 2.6 `curl POST /api/decks` creates a deck; visible in Studio
-- [x] 2.7 `curl PATCH /api/decks/[id]` renames; `curl DELETE /api/decks/[id]` deletes and cascades cards
-- [x] 2.8 `curl GET /api/decks/[id]/cards` returns newest-first; `curl POST .../cards` creates with correct deck_id
-- [x] 2.9 `curl PATCH /api/cards/[id]` edits; `curl DELETE /api/cards/[id]` deletes a single card
-- [x] 2.10 `curl POST /api/cards/generate` with valid `deck_id` saves cards; without `deck_id` returns 400; with another user's `deck_id` returns 404
-- [x] 2.11 Cross-user isolation: user B's session cannot mutate user A's decks or cards (404 returned)
-- [x] 2.12 Every endpoint without cookie returns 401
-- [x] 2.13 NFR-2 carry-over: `rg console\.` in new API files and `src/lib/llm/` shows no logging of `text` or LLM I/O
-- [x] 2.14 `src/lib/api/errors.ts` exists; `generate.ts` and all five new routes import `errorResponse` from it (no inline `ErrorCode` / `ERROR_MESSAGES` / `STATUS_BY_CODE` redeclarations outside `errors.ts`)
+- [x] 2.5 `curl GET /api/decks` returns user's decks with card_count — 36f46fa
+- [x] 2.6 `curl POST /api/decks` creates a deck; visible in Studio — 36f46fa
+- [x] 2.7 `curl PATCH /api/decks/[id]` renames; `curl DELETE /api/decks/[id]` deletes and cascades cards — 36f46fa
+- [x] 2.8 `curl GET /api/decks/[id]/cards` returns newest-first; `curl POST .../cards` creates with correct deck_id — 36f46fa
+- [x] 2.9 `curl PATCH /api/cards/[id]` edits; `curl DELETE /api/cards/[id]` deletes a single card — 36f46fa
+- [x] 2.10 `curl POST /api/cards/generate` with valid `deck_id` saves cards; without `deck_id` returns 400; with another user's `deck_id` returns 404 — 36f46fa
+- [x] 2.11 Cross-user isolation: user B's session cannot mutate user A's decks or cards (404 returned) — 36f46fa
+- [x] 2.12 Every endpoint without cookie returns 401 — 36f46fa
+- [x] 2.13 NFR-2 carry-over: `rg console\.` in new API files and `src/lib/llm/` shows no logging of `text` or LLM I/O — 36f46fa
+- [x] 2.14 `src/lib/api/errors.ts` exists; `generate.ts` and all five new routes import `errorResponse` from it (no inline `ErrorCode` / `ERROR_MESSAGES` / `STATUS_BY_CODE` redeclarations outside `errors.ts`) — 36f46fa
 
 ### Phase 3: `/decks` list page + AlertDialog primitive + deck CRUD UI
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npx astro check` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npx astro check` passes
+- [x] 3.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 3.4 `/decks` renders deck list for signed-in user; "My Deck" present if backfill ran
-- [ ] 3.5 Anonymous `/decks` → redirected to `/auth/signin`
-- [ ] 3.6 "+ Add deck" creates a new deck; prepended to list
-- [ ] 3.7 Rename swaps row to inline input; Save updates; Cancel discards
-- [ ] 3.8 Delete (empty deck) shows "0 cards" in confirm; on confirm, row removed
-- [ ] 3.9 Delete (deck with cards) shows correct count; cards cascade-delete in Studio
-- [ ] 3.10 Empty-state copy renders when zero decks
-- [ ] 3.11 Server error during mutation shows English error toast and preserves list
-- [ ] 3.12 Empty/over-length name validation handled gracefully
+- [x] 3.4 `/decks` renders deck list for signed-in user; "My Deck" present if backfill ran
+- [x] 3.5 Anonymous `/decks` → redirected to `/auth/signin`
+- [x] 3.6 "+ Add deck" creates a new deck; prepended to list
+- [x] 3.7 Rename swaps row to inline input; Save updates; Cancel discards
+- [x] 3.8 Delete (empty deck) shows "0 cards" in confirm; on confirm, row removed
+- [x] 3.9 Delete (deck with cards) shows correct count; cards cascade-delete in Studio
+- [x] 3.10 Empty-state copy renders when zero decks
+- [x] 3.11 Server error during mutation shows English error toast and preserves list
+- [x] 3.12 Empty/over-length name validation handled gracefully
 
 ### Phase 4: `/decks/[id]` detail page — card CRUD UI + `NewCardsBanner`
 
