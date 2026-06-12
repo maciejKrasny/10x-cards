@@ -736,19 +736,19 @@ This slice introduces one SQL migration (Phase 1) that mutates the existing `car
 
 #### Automated
 
-- [x] 5.1 `npm run lint` passes
-- [x] 5.2 `npx astro check` passes
-- [x] 5.3 `npm run build` passes
+- [x] 5.1 `npm run lint` passes — 7ad2856
+- [x] 5.2 `npx astro check` passes — 7ad2856
+- [x] 5.3 `npm run build` passes — 7ad2856
 
 #### Manual
 
-- [x] 5.4 Fresh user with zero decks: dashboard lazy-creates "My Deck" via POST `/api/decks` on first mount
-- [x] 5.5 Existing user: dropdown shows all decks newest-first; first entry selected by default
-- [x] 5.6 `sessionStorage.lastUsedDeckId` persists across visits; cleared sessionStorage reverts to default
-- [x] 5.7 Happy path: pick deck → paste → generate → browser navigates to `/decks/[id]?since=<iso>` → banner + NEW badges visible
-- [x] 5.8 Failure path: LLM error shows toast; textarea preserved; no navigation; no DB rows added
-- [x] 5.9 "Latest batch" rendering removed from dashboard
-- [x] 5.10 Stale-tab deck deletion: paste in tab A after deleting selected deck in tab B → 404 error toast; reload restores valid dropdown
-- [x] 5.11 "Manage decks →" link navigates to `/decks`
-- [x] 5.12 No `console.*` of `text` value or LLM response in modified `PasteToGenerate.tsx`
-- [x] 5.13 End-to-end smoke flow (steps 1-12 in Testing Strategy) passes
+- [x] 5.4 Fresh user with zero decks: dashboard lazy-creates "My Deck" via POST `/api/decks` on first mount — 7ad2856
+- [x] 5.5 Existing user: dropdown shows all decks newest-first; first entry selected by default — 7ad2856
+- [x] 5.6 `sessionStorage.lastUsedDeckId` persists across visits; cleared sessionStorage reverts to default — 7ad2856
+- [x] 5.7 Happy path: pick deck → paste → generate → browser navigates to `/decks/[id]?since=<iso>` → banner + NEW badges visible — 7ad2856
+- [x] 5.8 Failure path: LLM error shows toast; textarea preserved; no navigation; no DB rows added — 7ad2856
+- [x] 5.9 "Latest batch" rendering removed from dashboard — 7ad2856
+- [x] 5.10 Stale-tab deck deletion: paste in tab A after deleting selected deck in tab B → 404 error toast; reload restores valid dropdown — 7ad2856
+- [x] 5.11 "Manage decks →" link navigates to `/decks` — 7ad2856
+- [x] 5.12 No `console.*` of `text` value or LLM response in modified `PasteToGenerate.tsx` — 7ad2856
+- [x] 5.13 End-to-end smoke flow (steps 1-12 in Testing Strategy) passes — 7ad2856
