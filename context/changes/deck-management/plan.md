@@ -713,42 +713,42 @@ This slice introduces one SQL migration (Phase 1) that mutates the existing `car
 
 #### Automated
 
-- [x] 4.1 `npm run lint` passes
-- [x] 4.2 `npx astro check` passes
-- [x] 4.3 `npm run build` passes
+- [x] 4.1 `npm run lint` passes — 970eed3
+- [x] 4.2 `npx astro check` passes — 970eed3
+- [x] 4.3 `npm run build` passes — 970eed3
 
 #### Manual
 
-- [x] 4.4 `/decks/[id]` renders cards newest-first with deck name in heading
-- [x] 4.5 Anonymous `/decks/[id]` → redirected to `/auth/signin`
-- [x] 4.6 Navigating to another user's deck id shows error state ("Couldn't load this deck...")
-- [x] 4.7 "+ Add card" creates a card via POST; prepended to list
-- [x] 4.8 Edit swaps row to inline edit fields; Save updates; Cancel discards
-- [x] 4.9 Delete shows confirm with front preview; confirm removes the row
-- [x] 4.10 Empty-state copy renders when zero cards
-- [x] 4.11 500-cap banner renders when `cards.length === 500`
-- [x] 4.12 `?since=<iso>` URL: banner shows "N new cards added"; rows with `created_at >= since` show NEW badge
-- [x] 4.13 Dismissing the banner removes the query param from URL; NEW badges remain until reload
-- [x] 4.14 Empty front/back disables Save in edit mode
-- [x] 4.15 Server error during edit shows English toast; row stays in edit mode (adapted from plan: preserves typed changes for retry per user preference)
+- [x] 4.4 `/decks/[id]` renders cards newest-first with deck name in heading — 970eed3
+- [x] 4.5 Anonymous `/decks/[id]` → redirected to `/auth/signin` — 970eed3
+- [x] 4.6 Navigating to another user's deck id shows error state ("Couldn't load this deck...") — 970eed3
+- [x] 4.7 "+ Add card" creates a card via POST; prepended to list — 970eed3
+- [x] 4.8 Edit swaps row to inline edit fields; Save updates; Cancel discards — 970eed3
+- [x] 4.9 Delete shows confirm with front preview; confirm removes the row — 970eed3
+- [x] 4.10 Empty-state copy renders when zero cards — 970eed3
+- [x] 4.11 500-cap banner renders when `cards.length === 500` — 970eed3
+- [x] 4.12 `?since=<iso>` URL: banner shows "N new cards added"; rows with `created_at >= since` show NEW badge — 970eed3
+- [x] 4.13 Dismissing the banner removes the query param from URL; NEW badges remain until reload — 970eed3
+- [x] 4.14 Empty front/back disables Save in edit mode — 970eed3
+- [x] 4.15 Server error during edit shows English toast; row stays in edit mode (adapted from plan: preserves typed changes for retry per user preference) — 970eed3
 
 ### Phase 5: Dashboard paste-flow integration — deck dropdown, lazy-create, navigate
 
 #### Automated
 
-- [ ] 5.1 `npm run lint` passes
-- [ ] 5.2 `npx astro check` passes
-- [ ] 5.3 `npm run build` passes
+- [x] 5.1 `npm run lint` passes
+- [x] 5.2 `npx astro check` passes
+- [x] 5.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 5.4 Fresh user with zero decks: dashboard lazy-creates "My Deck" via POST `/api/decks` on first mount
-- [ ] 5.5 Existing user: dropdown shows all decks newest-first; first entry selected by default
-- [ ] 5.6 `sessionStorage.lastUsedDeckId` persists across visits; cleared sessionStorage reverts to default
-- [ ] 5.7 Happy path: pick deck → paste → generate → browser navigates to `/decks/[id]?since=<iso>` → banner + NEW badges visible
-- [ ] 5.8 Failure path: LLM error shows toast; textarea preserved; no navigation; no DB rows added
-- [ ] 5.9 "Latest batch" rendering removed from dashboard
-- [ ] 5.10 Stale-tab deck deletion: paste in tab A after deleting selected deck in tab B → 404 error toast; reload restores valid dropdown
-- [ ] 5.11 "Manage decks →" link navigates to `/decks`
-- [ ] 5.12 No `console.*` of `text` value or LLM response in modified `PasteToGenerate.tsx`
-- [ ] 5.13 End-to-end smoke flow (steps 1-12 in Testing Strategy) passes
+- [x] 5.4 Fresh user with zero decks: dashboard lazy-creates "My Deck" via POST `/api/decks` on first mount
+- [x] 5.5 Existing user: dropdown shows all decks newest-first; first entry selected by default
+- [x] 5.6 `sessionStorage.lastUsedDeckId` persists across visits; cleared sessionStorage reverts to default
+- [x] 5.7 Happy path: pick deck → paste → generate → browser navigates to `/decks/[id]?since=<iso>` → banner + NEW badges visible
+- [x] 5.8 Failure path: LLM error shows toast; textarea preserved; no navigation; no DB rows added
+- [x] 5.9 "Latest batch" rendering removed from dashboard
+- [x] 5.10 Stale-tab deck deletion: paste in tab A after deleting selected deck in tab B → 404 error toast; reload restores valid dropdown
+- [x] 5.11 "Manage decks →" link navigates to `/decks`
+- [x] 5.12 No `console.*` of `text` value or LLM response in modified `PasteToGenerate.tsx`
+- [x] 5.13 End-to-end smoke flow (steps 1-12 in Testing Strategy) passes

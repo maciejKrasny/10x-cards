@@ -17,14 +17,17 @@ const { user } = Astro.locals;
             Signed in as <span class="font-semibold text-white">{user?.email}</span>
           </p>
         </div>
-        <form method="POST" action="/api/auth/signout">
-          <button
-            type="submit"
-            class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-          >
-            Sign out
-          </button>
-        </form>
+        <div class="flex items-center gap-3">
+          <a href="/decks" class="text-sm text-blue-200 hover:text-white">View decks →</a>
+          <form method="POST" action="/api/auth/signout">
+            <button
+              type="submit"
+              class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
 
       <PasteToGenerate client:load />

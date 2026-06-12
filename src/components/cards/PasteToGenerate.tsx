@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   INPUT_TOO_LONG: "Text exceeds 6000 characters. Please shorten it.",
   LLM_FAILURE: "Generation failed. Please try again.",
   DB_INSERT_FAILED: "Saving failed. Please try again.",
+  DECK_NOT_FOUND: "This deck no longer exists. Reload to pick another.",
   INVALID_REQUEST: "Something went wrong. Please try again.",
 };
 
@@ -22,32 +23,83 @@ function mapErrorMessage(code: string | undefined): string {
   return ERROR_MESSAGES[code] ?? ERROR_MESSAGES.INVALID_REQUEST;
 }
 
-interface GeneratedCardRow {
+interface Deck {
   id: string;
-  front: string;
-  back: string;
+  name: string;
   created_at: string;
+  card_count: number;
 }
 
-type Status = "idle" | "submitting" | "success" | "error";
+type DecksStatus = "loading" | "idle" | "error";
+type SubmitStatus = "idle" | "submitting" | "error";
+
+type DeckListResponse = { ok: true; decks: Deck[] } | { ok: false; error: { code: string; message: string } };
+type DeckCreateResponse = { ok: true; deck: Deck } | { ok: false; error: { code: string; message: string } };
 
 export default function PasteToGenerate() {
+  const [decks, setDecks] = useState<Deck[]>([]);
+  const [decksStatus, setDecksStatus] = useState<DecksStatus>("loading");
+  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
+
   const [text, setText] = useState("");
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<SubmitStatus>("idle");
   const [phase, setPhase] = useState<0 | 1 | 2>(0);
-  const [cards, setCards] = useState<GeneratedCardRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const loadDecks = useCallback(async () => {
+    setDecksStatus("loading");
+    try {
+      const res = await fetch("/api/decks");
+      const body = (await res.json()) as DeckListResponse;
+      if (!res.ok || !body.ok) {
+        setDecksStatus("error");
+        return;
+      }
+
+      if (body.decks.length === 0) {
+        const createRes = await fetch("/api/decks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "My Deck" }),
+        });
+        const createBody = (await createRes.json()) as DeckCreateResponse;
+        if (!createRes.ok || !createBody.ok) {
+          setDecksStatus("error");
+          return;
+        }
+        setDecks([createBody.deck]);
+        setSelectedDeckId(createBody.deck.id);
+        setDecksStatus("idle");
+        return;
+      }
+
+      const stored = window.sessionStorage.getItem("lastUsedDeckId");
+      const defaultId = stored && body.decks.some((d) => d.id === stored) ? stored : body.decks[0].id;
+      setDecks(body.decks);
+      setSelectedDeckId(defaultId);
+      setDecksStatus("idle");
+    } catch {
+      setDecksStatus("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- mount: load decks; setState calls happen post-await */
+    void loadDecks();
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [loadDecks]);
 
   const overLimit = text.length > MAX_CHARS;
-  const canSubmit = text.length > 0 && !overLimit && status !== "submitting";
+  const canSubmit =
+    text.length > 0 && !overLimit && status !== "submitting" && decksStatus === "idle" && selectedDeckId !== null;
 
   async function handleGenerate() {
-    if (!canSubmit) return;
+    if (!canSubmit || !selectedDeckId) return;
     setStatus("submitting");
     setPhase(0);
     setErrorMessage(null);
-    setSuccessMessage(null);
+
+    const requestStartedAt = new Date().toISOString();
 
     const phaseTimers = [
       setTimeout(() => {
@@ -68,7 +120,7 @@ export default function PasteToGenerate() {
       response = await fetch("/api/cards/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, deck_id: selectedDeckId }),
       });
     } catch {
       clearPhaseTimers();
@@ -77,7 +129,7 @@ export default function PasteToGenerate() {
       return;
     }
 
-    let body: { ok?: boolean; cards?: GeneratedCardRow[]; error?: { code?: string } };
+    let body: { ok?: boolean; cards?: unknown[]; error?: { code?: string } };
     try {
       body = (await response.json()) as typeof body;
     } catch {
@@ -89,11 +141,9 @@ export default function PasteToGenerate() {
 
     clearPhaseTimers();
 
-    if (response.ok && body.ok && Array.isArray(body.cards)) {
-      setCards(body.cards);
-      setSuccessMessage(`Saved ${body.cards.length} cards to your deck`);
-      setText("");
-      setStatus("success");
+    if (response.ok && body.ok) {
+      window.sessionStorage.setItem("lastUsedDeckId", selectedDeckId);
+      window.location.href = `/decks/${selectedDeckId}?since=${encodeURIComponent(requestStartedAt)}`;
       return;
     }
 
@@ -103,18 +153,59 @@ export default function PasteToGenerate() {
 
   return (
     <div className="space-y-4 text-white">
-      {successMessage && (
-        <Alert className="border-emerald-300/30 bg-emerald-500/15 text-emerald-50">
-          <AlertTitle>Success</AlertTitle>
-          <AlertDescription>{successMessage}</AlertDescription>
-        </Alert>
-      )}
       {errorMessage && (
         <Alert variant="destructive" className="border-red-300/40 bg-red-500/15 text-red-50">
           <AlertTitle>Couldn&apos;t generate cards</AlertTitle>
           <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>
       )}
+
+      {decksStatus === "error" && (
+        <Alert variant="destructive" className="border-red-300/40 bg-red-500/15 text-red-50">
+          <AlertTitle>Couldn&apos;t load decks</AlertTitle>
+          <AlertDescription>
+            Reload the page to try again.
+            <Button
+              onClick={() => {
+                void loadDecks();
+              }}
+              variant="outline"
+              size="sm"
+              className="ml-2 border-white/30 bg-white/10 text-white hover:bg-white/20"
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex-1 space-y-1">
+          <label htmlFor="deck-select" className="text-xs font-medium tracking-wide text-blue-200/70 uppercase">
+            Target deck
+          </label>
+          <select
+            id="deck-select"
+            value={selectedDeckId ?? ""}
+            onChange={(e) => {
+              setSelectedDeckId(e.target.value);
+            }}
+            disabled={status === "submitting" || decksStatus !== "idle" || decks.length === 0}
+            className="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-400/50 focus:outline-none disabled:opacity-50"
+          >
+            {decksStatus === "loading" && <option value="">Loading…</option>}
+            {decksStatus === "idle" &&
+              decks.map((deck) => (
+                <option key={deck.id} value={deck.id} className="bg-slate-900">
+                  {deck.name}
+                </option>
+              ))}
+          </select>
+        </div>
+        <a href="/decks" className="text-sm text-blue-200 hover:text-white">
+          Manage decks →
+        </a>
+      </div>
 
       <div className="space-y-2">
         <Textarea
@@ -132,7 +223,12 @@ export default function PasteToGenerate() {
           <span className={overLimit ? "text-red-300" : "text-blue-100/60"}>
             {text.length} / {MAX_CHARS}
           </span>
-          <Button onClick={handleGenerate} disabled={!canSubmit}>
+          <Button
+            onClick={() => {
+              void handleGenerate();
+            }}
+            disabled={!canSubmit}
+          >
             {status === "submitting" ? "Generating…" : "Generate flashcards"}
           </Button>
         </div>
@@ -144,22 +240,6 @@ export default function PasteToGenerate() {
           <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/10">
             <div className="paste-progress-bar absolute top-0 left-0 h-full w-1/3 rounded-full bg-blue-400" />
           </div>
-        </div>
-      )}
-
-      {cards.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">Latest batch</h2>
-          <ul className="space-y-2">
-            {cards.map((card) => (
-              <li key={card.id} className="rounded-lg border border-white/10 bg-white/5 p-4 text-left">
-                <p className="text-xs font-medium tracking-wide text-blue-200/70 uppercase">Front</p>
-                <p className="mb-2 text-white">{card.front}</p>
-                <p className="text-xs font-medium tracking-wide text-blue-200/70 uppercase">Back</p>
-                <p className="text-white">{card.back}</p>
-              </li>
-            ))}
-          </ul>
         </div>
       )}
     </div>
