@@ -12,6 +12,10 @@
 -- authenticated role + JWT claims so RLS policies apply to the insert
 -- and select. UUIDs are inlined (no psql `\set`) so the script runs
 -- under `supabase db query`, which doesn't support psql metacommands.
+--
+-- After S-02 (decks_baseline), cards.deck_id is NOT NULL. Each insert block
+-- first creates a synthetic deck for the user via a CTE so the card insert
+-- has a valid deck_id without needing two separate statements.
 
 begin;
   insert into auth.users (id, instance_id, aud, role, email, encrypted_password, created_at, updated_at)
@@ -20,8 +24,13 @@ begin;
     on conflict (id) do nothing;
   set local role authenticated;
   set local request.jwt.claims to '{"sub": "11111111-1111-1111-1111-111111111111", "role": "authenticated"}';
-  insert into public.cards (user_id, front, back)
-    values ('11111111-1111-1111-1111-111111111111', 'A-front', 'A-back');
+  with d as (
+    insert into public.decks (user_id, name)
+      values ('11111111-1111-1111-1111-111111111111', 'A-deck')
+      returning id
+  )
+  insert into public.cards (user_id, deck_id, front, back)
+    select '11111111-1111-1111-1111-111111111111', d.id, 'A-front', 'A-back' from d;
 commit;
 
 begin;
@@ -31,8 +40,13 @@ begin;
     on conflict (id) do nothing;
   set local role authenticated;
   set local request.jwt.claims to '{"sub": "22222222-2222-2222-2222-222222222222", "role": "authenticated"}';
-  insert into public.cards (user_id, front, back)
-    values ('22222222-2222-2222-2222-222222222222', 'B-front', 'B-back');
+  with d as (
+    insert into public.decks (user_id, name)
+      values ('22222222-2222-2222-2222-222222222222', 'B-deck')
+      returning id
+  )
+  insert into public.cards (user_id, deck_id, front, back)
+    select '22222222-2222-2222-2222-222222222222', d.id, 'B-front', 'B-back' from d;
 commit;
 
 begin;
@@ -62,9 +76,13 @@ begin;
 commit;
 
 -- Cleanup so the script is idempotent across re-runs and leaves no synthetic
--- rows behind (matters especially against the hosted DB).
+-- rows behind (matters especially against the hosted DB). Cards cascade from
+-- the deck delete; we still delete cards explicitly in case the FK is dropped.
 begin;
   delete from public.cards
+    where user_id in ('11111111-1111-1111-1111-111111111111',
+                      '22222222-2222-2222-2222-222222222222');
+  delete from public.decks
     where user_id in ('11111111-1111-1111-1111-111111111111',
                       '22222222-2222-2222-2222-222222222222');
   delete from auth.users

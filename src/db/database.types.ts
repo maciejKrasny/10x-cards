@@ -32,6 +32,7 @@ export type Database = {
         Row: {
           back: string;
           created_at: string;
+          deck_id: string;
           front: string;
           id: string;
           user_id: string;
@@ -39,6 +40,7 @@ export type Database = {
         Insert: {
           back: string;
           created_at?: string;
+          deck_id: string;
           front: string;
           id?: string;
           user_id: string;
@@ -46,8 +48,38 @@ export type Database = {
         Update: {
           back?: string;
           created_at?: string;
+          deck_id?: string;
           front?: string;
           id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cards_deck_id_fkey";
+            columns: ["deck_id"];
+            isOneToOne: false;
+            referencedRelation: "decks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      decks: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
           user_id?: string;
         };
         Relationships: [];

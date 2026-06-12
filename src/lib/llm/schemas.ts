@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const GenerateRequestSchema = z.object({
   text: z.string().min(1).max(6000),
+  deck_id: z.uuid(),
 });
 
 export const GeneratedCardSchema = z.object({
