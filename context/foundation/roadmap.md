@@ -31,7 +31,7 @@ top_blocker: capacity
 | ---- | ------------------------------- | ------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
 | F-01 | cards-schema-baseline           | (foundation) cards table + RLS + migration & codegen pattern established        | —             | Access Control, Guardrails-1           | done     |
 | S-01 | ai-generate-from-paste          | paste a block of text and get AI-generated cards auto-saved to their deck       | F-01          | US-01, FR-004, NFR-1, NFR-2            | done     |
-| S-02 | deck-management                 | list, edit, delete, and manually create cards                                   | F-01          | FR-005, FR-006, FR-007, FR-008         | proposed |
+| S-02 | deck-management                 | list, edit, delete, and manually create cards                                   | F-01          | FR-005, FR-006, FR-007, FR-008         | done     |
 | S-03 | first-spaced-repetition-session | study their deck via a spaced-repetition session that persists review progress  | F-01, S-01    | US-01, FR-009, Primary SC, Guardrails-2 | proposed |
 | S-04 | auth-prd-compliance             | sign up, confirm email, sign in, sign out — PRD-compliant journey with user-readable error states | —             | FR-001, FR-002, FR-003, Access Control | ready    |
 
@@ -101,7 +101,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Inline-edit-in-list versus a separate edit screen? — Owner: implementer. Block: no.
   - Delete confirmation gate, undo affordance, or hard delete? — Owner: implementer. Block: no.
 - **Risk:** Required for US-01 acceptance ("user can edit or delete any card in the batch after generation" + "if AI generation fails, the user can still add cards manually"). Parallel-with `S-01` maximizes capacity utilization under `top_blocker: capacity`. Failure mode: scope creep into "deck organization" features (tagging, search, bulk actions) that are not in the must-have FRs and should stay in `## Parked`.
-- **Status:** proposed
+- **Status:** done
 
 ### S-03: First spaced-repetition session (north star)
 
@@ -162,3 +162,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 - **F-01: (foundation) Supabase migrations and typed-client codegen pipeline are in place; a `cards` table exists with a Row-Level Security policy isolating each card to its owning user; downstream slices can extend the schema by following the established migration + codegen pattern.** — Archived 2026-06-05 → `context/archive/2026-06-05-cards-schema-baseline/`. Lesson: —.
 - **S-01: A logged-in user pastes a block of text, triggers AI generation, and finds the generated cards already saved to their deck — visible in a minimal post-generation view, with acknowledgement appearing within 2 s of triggering and visible progress for the full duration of the operation.** — Archived 2026-06-12 → `context/archive/2026-06-05-ai-generate-from-paste/`. Lesson: —.
+- **S-02: A logged-in user views every card in their deck, edits the front/back of any card, deletes any card, and adds a new card manually (the gen-failure fallback path that US-01's acceptance criteria require).** — Archived 2026-06-12 → `context/archive/2026-06-12-deck-management/`. Lesson: —.
