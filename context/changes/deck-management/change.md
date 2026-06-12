@@ -4,6 +4,7 @@ title: Deck management — list, edit, delete, and manually create cards
 status: implementing
 created: 2026-06-12
 updated: 2026-06-12
+
 archived_at: null
 ---
 

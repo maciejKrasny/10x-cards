@@ -650,44 +650,44 @@ This slice introduces one SQL migration (Phase 1) that mutates the existing `car
 
 #### Automated
 
-- [x] 1.1 New migration file exists at `supabase/migrations/*_decks_baseline.sql`
-- [x] 1.2 `npx supabase db reset` exits 0
-- [x] 1.3 `npm run db:types` exits 0; `src/db/database.types.ts` has `decks` and `cards.deck_id`
-- [x] 1.4 `npm run db:test:rls` exits 0 (cards test updated for `deck_id`)
-- [x] 1.5 `npm run db:test:rls:decks` exits 0
-- [x] 1.6 `npm run lint` passes
-- [x] 1.7 `npx astro check` passes
-- [x] 1.8 `npm run build` passes
+- [x] 1.1 New migration file exists at `supabase/migrations/*_decks_baseline.sql` — 2b50cf0
+- [x] 1.2 `npx supabase db reset` exits 0 — 2b50cf0
+- [x] 1.3 `npm run db:types` exits 0; `src/db/database.types.ts` has `decks` and `cards.deck_id` — 2b50cf0
+- [x] 1.4 `npm run db:test:rls` exits 0 (cards test updated for `deck_id`) — 2b50cf0
+- [x] 1.5 `npm run db:test:rls:decks` exits 0 — 2b50cf0
+- [x] 1.6 `npm run lint` passes — 2b50cf0
+- [x] 1.7 `npx astro check` passes — 2b50cf0
+- [x] 1.8 `npm run build` passes — 2b50cf0
 
 #### Manual
 
-- [x] 1.9 Studio shows `decks` table with four RLS policies and `cards.deck_id` with FK
-- [x] 1.10 Existing cards have non-null `deck_id` pointing at a per-user "My Deck"
-- [x] 1.11 `npx supabase db push` applies to hosted DB; hosted `pg_policies` count = 4 on `decks`
-- [x] 1.12 Both RLS tests pass against hosted DB
-- [x] 1.13 Supabase dashboard policies view shows all four decks policies
+- [x] 1.9 Studio shows `decks` table with four RLS policies and `cards.deck_id` with FK — 2b50cf0
+- [x] 1.10 Existing cards have non-null `deck_id` pointing at a per-user "My Deck" — 2b50cf0
+- [x] 1.11 `npx supabase db push` applies to hosted DB; hosted `pg_policies` count = 4 on `decks` — 2b50cf0
+- [x] 1.12 Both RLS tests pass against hosted DB — 2b50cf0
+- [x] 1.13 Supabase dashboard policies view shows all four decks policies — 2b50cf0
 
 ### Phase 2: REST API — decks CRUD + deck-scoped cards CRUD + generate-route `deck_id`
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npx astro check` passes
-- [ ] 2.3 `npm run build` passes
-- [ ] 2.4 CI types-in-sync guardrail (`git diff --exit-code src/db/database.types.ts`) unaffected
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npx astro check` passes
+- [x] 2.3 `npm run build` passes
+- [x] 2.4 CI types-in-sync guardrail (`git diff --exit-code src/db/database.types.ts`) unaffected
 
 #### Manual
 
-- [ ] 2.5 `curl GET /api/decks` returns user's decks with card_count
-- [ ] 2.6 `curl POST /api/decks` creates a deck; visible in Studio
-- [ ] 2.7 `curl PATCH /api/decks/[id]` renames; `curl DELETE /api/decks/[id]` deletes and cascades cards
-- [ ] 2.8 `curl GET /api/decks/[id]/cards` returns newest-first; `curl POST .../cards` creates with correct deck_id
-- [ ] 2.9 `curl PATCH /api/cards/[id]` edits; `curl DELETE /api/cards/[id]` deletes a single card
-- [ ] 2.10 `curl POST /api/cards/generate` with valid `deck_id` saves cards; without `deck_id` returns 400; with another user's `deck_id` returns 404
-- [ ] 2.11 Cross-user isolation: user B's session cannot mutate user A's decks or cards (404 returned)
-- [ ] 2.12 Every endpoint without cookie returns 401
-- [ ] 2.13 NFR-2 carry-over: `rg console\.` in new API files and `src/lib/llm/` shows no logging of `text` or LLM I/O
-- [ ] 2.14 `src/lib/api/errors.ts` exists; `generate.ts` and all five new routes import `errorResponse` from it (no inline `ErrorCode` / `ERROR_MESSAGES` / `STATUS_BY_CODE` redeclarations outside `errors.ts`)
+- [x] 2.5 `curl GET /api/decks` returns user's decks with card_count
+- [x] 2.6 `curl POST /api/decks` creates a deck; visible in Studio
+- [x] 2.7 `curl PATCH /api/decks/[id]` renames; `curl DELETE /api/decks/[id]` deletes and cascades cards
+- [x] 2.8 `curl GET /api/decks/[id]/cards` returns newest-first; `curl POST .../cards` creates with correct deck_id
+- [x] 2.9 `curl PATCH /api/cards/[id]` edits; `curl DELETE /api/cards/[id]` deletes a single card
+- [x] 2.10 `curl POST /api/cards/generate` with valid `deck_id` saves cards; without `deck_id` returns 400; with another user's `deck_id` returns 404
+- [x] 2.11 Cross-user isolation: user B's session cannot mutate user A's decks or cards (404 returned)
+- [x] 2.12 Every endpoint without cookie returns 401
+- [x] 2.13 NFR-2 carry-over: `rg console\.` in new API files and `src/lib/llm/` shows no logging of `text` or LLM I/O
+- [x] 2.14 `src/lib/api/errors.ts` exists; `generate.ts` and all five new routes import `errorResponse` from it (no inline `ErrorCode` / `ERROR_MESSAGES` / `STATUS_BY_CODE` redeclarations outside `errors.ts`)
 
 ### Phase 3: `/decks` list page + AlertDialog primitive + deck CRUD UI
 
