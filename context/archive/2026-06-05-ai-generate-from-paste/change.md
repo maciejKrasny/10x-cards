@@ -1,10 +1,10 @@
 ---
 change_id: ai-generate-from-paste
 title: Paste text → AI-generated cards saved to the deck
-status: impl_reviewed
+status: archived
 created: 2026-06-05
-updated: 2026-06-06
-archived_at: null
+updated: 2026-06-12
+archived_at: 2026-06-12T13:50:04Z
 ---
 
 ## Notes

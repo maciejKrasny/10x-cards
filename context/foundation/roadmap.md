@@ -3,7 +3,7 @@ project: 10xCards
 version: 1
 status: draft
 created: 2026-05-28
-updated: 2026-06-05
+updated: 2026-06-12
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -30,7 +30,7 @@ top_blocker: capacity
 | ID   | Change ID                       | Outcome (user can …)                                                            | Prerequisites | PRD refs                               | Status   |
 | ---- | ------------------------------- | ------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
 | F-01 | cards-schema-baseline           | (foundation) cards table + RLS + migration & codegen pattern established        | —             | Access Control, Guardrails-1           | done     |
-| S-01 | ai-generate-from-paste          | paste a block of text and get AI-generated cards auto-saved to their deck       | F-01          | US-01, FR-004, NFR-1, NFR-2            | proposed |
+| S-01 | ai-generate-from-paste          | paste a block of text and get AI-generated cards auto-saved to their deck       | F-01          | US-01, FR-004, NFR-1, NFR-2            | done     |
 | S-02 | deck-management                 | list, edit, delete, and manually create cards                                   | F-01          | FR-005, FR-006, FR-007, FR-008         | proposed |
 | S-03 | first-spaced-repetition-session | study their deck via a spaced-repetition session that persists review progress  | F-01, S-01    | US-01, FR-009, Primary SC, Guardrails-2 | proposed |
 | S-04 | auth-prd-compliance             | sign up, confirm email, sign in, sign out — PRD-compliant journey with user-readable error states | —             | FR-001, FR-002, FR-003, Access Control | ready    |
@@ -87,7 +87,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - How is "pasted text leaves no operator-accessible trace" verified — no log line, no analytics event, no Supabase row capturing the raw text? — Owner: implementer. Block: no.
   - Hard cap on number of generated cards per paste, to stay within Cloudflare Workers' subrequest cap and CPU-time budget? — Owner: implementer. Block: no.
 - **Risk:** Wedge of the product AND the highest-technical-risk slice in the must-have set. `infrastructure.md` risk register flags CPU-time exhaustion and subrequest-cap breach on long pastes as Medium-likelihood / High-impact. Under `main_goal: speed`, sequencing the wedge as `S-01` surfaces this risk in week 1 rather than week 3 — if AI-gen quality or platform economics fail, every downstream slice's value collapses. Failure mode: long pastes time out silently or produce low-quality cards that the user deletes en-masse, eroding the wedge.
-- **Status:** proposed
+- **Status:** done
 
 ### S-02: Deck management — list, edit, delete, and manually create cards
 
@@ -161,3 +161,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 (Empty on first generation. `/10x-archive` appends an entry here when a change whose `Change ID` matches a roadmap item is archived.)
 
 - **F-01: (foundation) Supabase migrations and typed-client codegen pipeline are in place; a `cards` table exists with a Row-Level Security policy isolating each card to its owning user; downstream slices can extend the schema by following the established migration + codegen pattern.** — Archived 2026-06-05 → `context/archive/2026-06-05-cards-schema-baseline/`. Lesson: —.
+- **S-01: A logged-in user pastes a block of text, triggers AI generation, and finds the generated cards already saved to their deck — visible in a minimal post-generation view, with acknowledgement appearing within 2 s of triggering and visible progress for the full duration of the operation.** — Archived 2026-06-12 → `context/archive/2026-06-05-ai-generate-from-paste/`. Lesson: —.
