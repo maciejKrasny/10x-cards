@@ -693,44 +693,44 @@ This slice introduces one SQL migration (Phase 1) that mutates the existing `car
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 `npx astro check` passes
-- [x] 3.3 `npm run build` passes
+- [x] 3.1 `npm run lint` passes — 6c601c7
+- [x] 3.2 `npx astro check` passes — 6c601c7
+- [x] 3.3 `npm run build` passes — 6c601c7
 
 #### Manual
 
-- [x] 3.4 `/decks` renders deck list for signed-in user; "My Deck" present if backfill ran
-- [x] 3.5 Anonymous `/decks` → redirected to `/auth/signin`
-- [x] 3.6 "+ Add deck" creates a new deck; prepended to list
-- [x] 3.7 Rename swaps row to inline input; Save updates; Cancel discards
-- [x] 3.8 Delete (empty deck) shows "0 cards" in confirm; on confirm, row removed
-- [x] 3.9 Delete (deck with cards) shows correct count; cards cascade-delete in Studio
-- [x] 3.10 Empty-state copy renders when zero decks
-- [x] 3.11 Server error during mutation shows English error toast and preserves list
-- [x] 3.12 Empty/over-length name validation handled gracefully
+- [x] 3.4 `/decks` renders deck list for signed-in user; "My Deck" present if backfill ran — 6c601c7
+- [x] 3.5 Anonymous `/decks` → redirected to `/auth/signin` — 6c601c7
+- [x] 3.6 "+ Add deck" creates a new deck; prepended to list — 6c601c7
+- [x] 3.7 Rename swaps row to inline input; Save updates; Cancel discards — 6c601c7
+- [x] 3.8 Delete (empty deck) shows "0 cards" in confirm; on confirm, row removed — 6c601c7
+- [x] 3.9 Delete (deck with cards) shows correct count; cards cascade-delete in Studio — 6c601c7
+- [x] 3.10 Empty-state copy renders when zero decks — 6c601c7
+- [x] 3.11 Server error during mutation shows English error toast and preserves list — 6c601c7
+- [x] 3.12 Empty/over-length name validation handled gracefully — 6c601c7
 
 ### Phase 4: `/decks/[id]` detail page — card CRUD UI + `NewCardsBanner`
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` passes
-- [ ] 4.2 `npx astro check` passes
-- [ ] 4.3 `npm run build` passes
+- [x] 4.1 `npm run lint` passes
+- [x] 4.2 `npx astro check` passes
+- [x] 4.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 4.4 `/decks/[id]` renders cards newest-first with deck name in heading
-- [ ] 4.5 Anonymous `/decks/[id]` → redirected to `/auth/signin`
-- [ ] 4.6 Navigating to another user's deck id shows error state ("Couldn't load this deck...")
-- [ ] 4.7 "+ Add card" creates a card via POST; prepended to list
-- [ ] 4.8 Edit swaps row to inline edit fields; Save updates; Cancel discards
-- [ ] 4.9 Delete shows confirm with front preview; confirm removes the row
-- [ ] 4.10 Empty-state copy renders when zero cards
-- [ ] 4.11 500-cap banner renders when `cards.length === 500`
-- [ ] 4.12 `?since=<iso>` URL: banner shows "N new cards added"; rows with `created_at >= since` show NEW badge
-- [ ] 4.13 Dismissing the banner removes the query param from URL; NEW badges remain until reload
-- [ ] 4.14 Empty front/back disables Save in edit mode
-- [ ] 4.15 Server error during edit shows English toast; row reverts to display mode
+- [x] 4.4 `/decks/[id]` renders cards newest-first with deck name in heading
+- [x] 4.5 Anonymous `/decks/[id]` → redirected to `/auth/signin`
+- [x] 4.6 Navigating to another user's deck id shows error state ("Couldn't load this deck...")
+- [x] 4.7 "+ Add card" creates a card via POST; prepended to list
+- [x] 4.8 Edit swaps row to inline edit fields; Save updates; Cancel discards
+- [x] 4.9 Delete shows confirm with front preview; confirm removes the row
+- [x] 4.10 Empty-state copy renders when zero cards
+- [x] 4.11 500-cap banner renders when `cards.length === 500`
+- [x] 4.12 `?since=<iso>` URL: banner shows "N new cards added"; rows with `created_at >= since` show NEW badge
+- [x] 4.13 Dismissing the banner removes the query param from URL; NEW badges remain until reload
+- [x] 4.14 Empty front/back disables Save in edit mode
+- [x] 4.15 Server error during edit shows English toast; row stays in edit mode (adapted from plan: preserves typed changes for retry per user preference)
 
 ### Phase 5: Dashboard paste-flow integration — deck dropdown, lazy-create, navigate
 
