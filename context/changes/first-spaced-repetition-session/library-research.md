@@ -43,13 +43,13 @@ Constraints from `context/foundation/tech-stack.md` and `AGENTS.md`:
 
 ## Alternates considered
 
-| Package | Algo | Status | Why not first pick |
-| --- | --- | --- | --- |
-| `@squeakyrobot/fsrs` | FSRS v4.5 (+v6) | 0 deps; explicit CF Workers example in README | 7 weekly downloads — unproven; v0.x |
-| `quanta-fsrs` | FSRS v4.5/v5 | 0 deps; edge-ready; in production at quanta-study.de | Single contributor; recent (Apr 2026) |
-| `@open-spaced-repetition/sm-2` | SM-2 | 0 deps; from same org | SM-2 is materially worse (FSRS-5 reduces daily reviews ~25% for same retention); roadmap example points to FSRS |
-| `supermemo` (VienDinhCom) | SM-2 | 331 stars; mature | 1987-era algorithm; same accuracy gap as above |
-| `@x1ee7/sm2-spaced-repetition` | SM-2 | 0 deps; new | New, no ecosystem traction |
+| Package                        | Algo            | Status                                               | Why not first pick                                                                                              |
+| ------------------------------ | --------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `@squeakyrobot/fsrs`           | FSRS v4.5 (+v6) | 0 deps; explicit CF Workers example in README        | 7 weekly downloads — unproven; v0.x                                                                             |
+| `quanta-fsrs`                  | FSRS v4.5/v5    | 0 deps; edge-ready; in production at quanta-study.de | Single contributor; recent (Apr 2026)                                                                           |
+| `@open-spaced-repetition/sm-2` | SM-2            | 0 deps; from same org                                | SM-2 is materially worse (FSRS-5 reduces daily reviews ~25% for same retention); roadmap example points to FSRS |
+| `supermemo` (VienDinhCom)      | SM-2            | 331 stars; mature                                    | 1987-era algorithm; same accuracy gap as above                                                                  |
+| `@x1ee7/sm2-spaced-repetition` | SM-2            | 0 deps; new                                          | New, no ecosystem traction                                                                                      |
 
 ## Decision
 

@@ -62,31 +62,31 @@ The doc says ts-fsrs needs **full Card state** persisted (a minimal event log al
 
 Current `cards` table — [supabase/migrations/20260605112924_cards_baseline.sql](../../../supabase/migrations/20260605112924_cards_baseline.sql) + [supabase/migrations/20260612153147_decks_baseline.sql](../../../supabase/migrations/20260612153147_decks_baseline.sql):
 
-| Column | Type | Note |
-|---|---|---|
-| `id` | uuid PK | `gen_random_uuid()` |
-| `user_id` | uuid | FK → `auth.users(id)` CASCADE |
-| `deck_id` | uuid | FK → `public.decks(id)` CASCADE (added by S-02 migration) |
-| `front` | text | CHECK 1..1000 |
-| `back` | text | CHECK 1..1000 |
-| `created_at` | timestamptz | default `now()` |
+| Column       | Type        | Note                                                      |
+| ------------ | ----------- | --------------------------------------------------------- |
+| `id`         | uuid PK     | `gen_random_uuid()`                                       |
+| `user_id`    | uuid        | FK → `auth.users(id)` CASCADE                             |
+| `deck_id`    | uuid        | FK → `public.decks(id)` CASCADE (added by S-02 migration) |
+| `front`      | text        | CHECK 1..1000                                             |
+| `back`       | text        | CHECK 1..1000                                             |
+| `created_at` | timestamptz | default `now()`                                           |
 
 No `updated_at` trigger; no enums; no jsonb columns; RLS policies `cards_{select,insert,update,delete}_own` all gated on `user_id = auth.uid()`.
 
 Delta needed for the ts-fsrs `Card` interface ([ts-fsrs-api-docs.md:37-50](ts-fsrs-api-docs.md)):
 
-| ts-fsrs field | Current column | Proposed addition | Rationale |
-|---|---|---|---|
-| `difficulty` | — | `difficulty float8 not null default 0` | FSRS metric |
-| `due` | — | `due timestamptz not null default now()` | Required for due-cards query |
-| `elapsed_days` | — | `elapsed_days integer not null default 0` | Live (not deprecated on Card) |
-| `lapses` | — | `lapses integer not null default 0` | |
-| `last_review` | — | `last_review timestamptz null` | Nullable for new cards |
-| `learning_steps` | — | `learning_steps integer not null default 0` | |
-| `reps` | — | `reps integer not null default 0` | |
-| `scheduled_days` | — | `scheduled_days integer not null default 0` | |
-| `stability` | — | `stability float8 not null default 0` | FSRS metric |
-| `state` | — | `state smallint not null default 0` | See "Open decision 1" below |
+| ts-fsrs field    | Current column | Proposed addition                           | Rationale                     |
+| ---------------- | -------------- | ------------------------------------------- | ----------------------------- |
+| `difficulty`     | —              | `difficulty float8 not null default 0`      | FSRS metric                   |
+| `due`            | —              | `due timestamptz not null default now()`    | Required for due-cards query  |
+| `elapsed_days`   | —              | `elapsed_days integer not null default 0`   | Live (not deprecated on Card) |
+| `lapses`         | —              | `lapses integer not null default 0`         |                               |
+| `last_review`    | —              | `last_review timestamptz null`              | Nullable for new cards        |
+| `learning_steps` | —              | `learning_steps integer not null default 0` |                               |
+| `reps`           | —              | `reps integer not null default 0`           |                               |
+| `scheduled_days` | —              | `scheduled_days integer not null default 0` |                               |
+| `stability`      | —              | `stability float8 not null default 0`       | FSRS metric                   |
+| `state`          | —              | `state smallint not null default 0`         | See "Open decision 1" below   |
 
 Backfill: existing rows are all "new" cards (state = `State.New` = 0); defaults above suffice — no explicit UPDATE needed. The doc notes `CardInput` accepts ISO-string `DateInput` ([ts-fsrs-api-docs.md:52](ts-fsrs-api-docs.md)), so Supabase's default `timestamptz → string` codegen round-trip works without coercion.
 
@@ -165,7 +165,7 @@ The doc's recommended persistence model ([ts-fsrs-api-docs.md:117](ts-fsrs-api-d
 
 - **No service layer yet** — handler files do their own Supabase work. The doc's stateful FSRS API is the strongest case so far for introducing a thin `src/lib/study/service.ts` (mirroring the LLM module). Doing so in S-03 sets the pattern for future stateful domains.
 - **The "full Card state" persistence requirement is well-aligned with Postgres + Supabase codegen** — every ts-fsrs `Card` field is a primitive or `Date`, all map to native Postgres types, no jsonb gymnastics needed. The schema can stay relationally normal.
-- **The `(card_id, review)` unique key is doing double duty** — it's both the audit-log natural identity *and* the idempotency anchor. Picking it instead of a separate `idempotency_key` column avoids inventing a parallel mechanism for a slice that doesn't have one yet.
+- **The `(card_id, review)` unique key is doing double duty** — it's both the audit-log natural identity _and_ the idempotency anchor. Picking it instead of a separate `idempotency_key` column avoids inventing a parallel mechanism for a slice that doesn't have one yet.
 - **The doc's library-swap note** ([ts-fsrs-api-docs.md:116](ts-fsrs-api-docs.md)) is mostly aspirational at MVP — Card-state columns are FSRS-specific. Keeping the append-only `review_logs` table (with `rating + review` as the portable subset) is the practical hedge. The roadmap's Non-Goal-1 already constrains us not to fight this.
 
 ## Historical Context (from prior changes)

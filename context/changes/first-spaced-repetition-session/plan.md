@@ -75,6 +75,7 @@ Add 10 FSRS columns to `cards`, create `review_logs`, wire RLS + indexes, regene
 **Intent**: Apply the additive schema delta that makes existing cards behave as "new" FSRS cards (`state=0`, `due=now()`, all metrics 0), creates an append-only `review_logs` table with the idempotency anchor and a denormalized `user_id` for cheap RLS, adds the due-cards index, and enables RLS with select+insert policies on `review_logs` that gate on `user_id = auth.uid()`. No backfill needed; column defaults cover existing rows.
 
 **Contract**:
+
 - `ALTER TABLE public.cards` adds 10 columns: `difficulty float8 NOT NULL DEFAULT 0`, `due timestamptz NOT NULL DEFAULT now()`, `elapsed_days integer NOT NULL DEFAULT 0`, `lapses integer NOT NULL DEFAULT 0`, `last_review timestamptz NULL`, `learning_steps integer NOT NULL DEFAULT 0`, `reps integer NOT NULL DEFAULT 0`, `scheduled_days integer NOT NULL DEFAULT 0`, `stability float8 NOT NULL DEFAULT 0`, `state smallint NOT NULL DEFAULT 0`.
 - `COMMENT ON COLUMN public.cards.state IS '0=New, 1=Learning, 2=Review, 3=Relearning (ts-fsrs State enum)'`.
 - `CREATE INDEX idx_cards_user_due ON public.cards (user_id, due)`.
@@ -159,6 +160,7 @@ Install `ts-fsrs@^5.4`, scaffold `src/lib/study/`, and implement the single modu
 **Intent**: The only module that imports `ts-fsrs`. Encapsulates: (a) converting a `cards` row into a ts-fsrs `Card`, (b) converting a ts-fsrs `Card` back into a `TablesUpdate<"cards">` patch, (c) computing the four interval previews for a card, (d) fetching the next due card for a (`userId`, `deckId`) pair ordered by `due ASC, id ASC` (LIMIT 1), (e) the persist-then-acknowledge `applyRating` routine — insert review log with `ON CONFLICT (card_id, review) DO NOTHING`, then on `INSERT … RETURNING` returning nothing (= conflict) re-read both the existing log and the current card, return the canonical card state either way.
 
 **Contract**: Exports:
+
 - `cardRowToFsrs(row: Tables<"cards">): Card`
 - `fsrsToCardUpdate(card: Card): TablesUpdate<"cards">`
 - `previewIntervals(card: Card, now: Date): IntervalPreview[]` (uses `scheduler.repeat`)
@@ -199,6 +201,7 @@ Add `GET /api/study/next` and `POST /api/study/review` following the established
 **Intent**: Add one new code the study endpoints emit: `REVIEW_CONFLICT` (the rare client-side error where the `review_at` falls outside the ±60s window). The empty-queue case is NOT an error — `GET /api/study/next` returns `{ ok: true, card: null }`, mirroring `POST /api/study/review`'s `ReviewResult.next: StudyCardView | null` shape. This keeps the existing convention that `ok: false` only appears with 4xx/5xx HTTP statuses.
 
 **Contract**:
+
 - Append `"REVIEW_CONFLICT"` to `ErrorCode` union (lines 10-22).
 - Add to `ERROR_MESSAGES`: `REVIEW_CONFLICT: "Review timestamp is out of range. Please try again."`.
 - Add to `STATUS_BY_CODE`: `REVIEW_CONFLICT: 409`.
@@ -210,6 +213,7 @@ Add `GET /api/study/next` and `POST /api/study/review` following the established
 **Intent**: Return the next due card for the authenticated user in the given deck, plus the four interval previews. Auth + deck-ownership check mirror `src/pages/api/cards/generate.ts:24-48`. On empty queue, return `{ ok: true, card: null }` (success envelope; the client renders the empty-state summary).
 
 **Contract**:
+
 - `export const prerender = false`. `export const GET: APIRoute`.
 - Parse `deckId` from `context.url.searchParams`; if missing or not a UUID, `errorResponse("INVALID_REQUEST")`.
 - `createClient` + `supabase.auth.getUser()` → `UNAUTHORIZED` if missing.
@@ -225,6 +229,7 @@ Add `GET /api/study/next` and `POST /api/study/review` following the established
 **Intent**: Persist a review log + advance the card atomically, returning the next due card (or `done: true`). Idempotent: replaying with the same `(card_id, review_at)` returns the same `next` view without double-advancing.
 
 **Contract**:
+
 - `export const prerender = false`. `export const POST: APIRoute`.
 - Parse body JSON → `INVALID_REQUEST` on parse error.
 - `ReviewRequestSchema.safeParse` → `classifyZodError(parsed.error, ["card_id", "rating", "review_at"])` on failure.
@@ -294,6 +299,7 @@ Add `/study/[deckId]` page + `StudySessionPage` React component implementing the
 **Intent**: The interactive React component for the session. State machine: `loading → showFront → showAnswer → submitting → (next | done)`. Single-screen reveal — "Show answer" (or Space) toggles to the `showAnswer` state which renders the back text + 4 rating buttons together; clicking a button (or pressing `1`-`4`) calls `POST /api/study/review` with `review_at = new Date().toISOString()` and advances to the next card from the response. Track `reviewed: { again, hard, good, easy }` counters in component state for the summary. On `next === null` (queue exhausted) or on initial `NO_DUE_CARDS`, render the summary card with counts + next-due relative time + "Back to deck" link (`/decks`).
 
 **Contract**:
+
 - `interface Props { deckId: string }`. Pure `useState` + `useCallback` + `useEffect` (no zustand, no TanStack Query) per the convention at `src/components/cards/PasteToGenerate.tsx:40-47`.
 - On mount: `GET /api/study/next?deckId=...`. On `{ ok: true, card: null }`: show empty-state summary. On `{ ok: true, card: { ... } }`: render the front.
 - "Show answer" button + a `useEffect` keydown listener on `Space` (only fires when `showFront`). Disable the listener while `showAnswer` so `Space` doesn't double-submit.
@@ -432,24 +438,24 @@ Add the "Study" button to `DeckRow` and run the full end-to-end smoke checklist 
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly against a fresh local Supabase: `npx supabase db reset`
-- [x] 1.2 TypeScript compiles after codegen refresh: `npm run build`
-- [x] 1.3 Lint passes: `npm run lint`
-- [x] 1.4 RLS isolation test passes: `psql … -f supabase/tests/rls_review_logs_isolation.sql`
+- [x] 1.1 Migration applies cleanly against a fresh local Supabase: `npx supabase db reset` — fb3640f
+- [x] 1.2 TypeScript compiles after codegen refresh: `npm run build` — fb3640f
+- [x] 1.3 Lint passes: `npm run lint` — fb3640f
+- [x] 1.4 RLS isolation test passes: `psql … -f supabase/tests/rls_review_logs_isolation.sql` — fb3640f
 
 #### Manual
 
-- [ ] 1.5 Supabase Studio shows `cards` with 10 new columns + comment, `review_logs` table present with unique constraint, indexes visible, RLS enabled on both tables
-- [ ] 1.6 Pre-existing card row presents as `state=0`, `due=now()`, all metrics 0
+- [x] 1.5 Supabase Studio shows `cards` with 10 new columns + comment, `review_logs` table present with unique constraint, indexes visible, RLS enabled on both tables — fb3640f
+- [x] 1.6 Pre-existing card row presents as `state=0`, `due=now()`, all metrics 0 — fb3640f
 
 ### Phase 2: Study service module + `ts-fsrs` dependency
 
 #### Automated
 
-- [ ] 2.1 Type check passes: `npm run build`
-- [ ] 2.2 Lint passes: `npm run lint`
-- [ ] 2.3 Format clean: `npm run format`
-- [ ] 2.4 `ts-fsrs` resolves at build time (no "Could not resolve" warnings)
+- [x] 2.1 Type check passes: `npm run build`
+- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.3 Format clean: `npm run format`
+- [x] 2.4 `ts-fsrs` resolves at build time (no "Could not resolve" warnings)
 
 #### Manual
 
