@@ -14,6 +14,7 @@ export type ErrorCode =
   | "UNAUTHORIZED"
   | "DECK_NOT_FOUND"
   | "CARD_NOT_FOUND"
+  | "REVIEW_CONFLICT"
   | "LLM_FAILURE"
   | "DB_INSERT_FAILED"
   | "DB_QUERY_FAILED"
@@ -28,6 +29,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   UNAUTHORIZED: "Please sign in.",
   DECK_NOT_FOUND: "Deck not found.",
   CARD_NOT_FOUND: "Card not found.",
+  REVIEW_CONFLICT: "Review timestamp is out of range. Please try again.",
   LLM_FAILURE: "Generation failed. Please try again.",
   DB_INSERT_FAILED: "Saving failed. Please try again.",
   DB_QUERY_FAILED: "Couldn't load data. Please try again.",
@@ -43,6 +45,7 @@ export const STATUS_BY_CODE: Record<ErrorCode, number> = {
   UNAUTHORIZED: 401,
   DECK_NOT_FOUND: 404,
   CARD_NOT_FOUND: 404,
+  REVIEW_CONFLICT: 409,
   LLM_FAILURE: 502,
   DB_INSERT_FAILED: 500,
   DB_QUERY_FAILED: 500,

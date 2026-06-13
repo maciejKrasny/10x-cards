@@ -452,30 +452,30 @@ Add the "Study" button to `DeckRow` and run the full end-to-end smoke checklist 
 
 #### Automated
 
-- [x] 2.1 Type check passes: `npm run build`
-- [x] 2.2 Lint passes: `npm run lint`
-- [x] 2.3 Format clean: `npm run format`
-- [x] 2.4 `ts-fsrs` resolves at build time (no "Could not resolve" warnings)
+- [x] 2.1 Type check passes: `npm run build` — 8a11bf7
+- [x] 2.2 Lint passes: `npm run lint` — 8a11bf7
+- [x] 2.3 Format clean: `npm run format` — 8a11bf7
+- [x] 2.4 `ts-fsrs` resolves at build time (no "Could not resolve" warnings) — 8a11bf7
 
 #### Manual
 
-- [ ] 2.5 REPL or API sanity check confirms `getNextDueCard` returns a fresh card and `applyRating` with `Good` advances `due` + increments `reps`
+- [x] 2.5 REPL or API sanity check confirms `getNextDueCard` returns a fresh card and `applyRating` with `Good` advances `due` + increments `reps`
 
 ### Phase 3: API endpoints
 
 #### Automated
 
-- [ ] 3.1 `npm run build` passes (route registration + types)
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `GET /api/study/next?deckId=<uuid>` curl smoke returns `{ ok: true, card }` or `{ ok: true, card: null }`
-- [ ] 3.4 `POST /api/study/review` curl smoke returns `{ ok: true, next, done }`
+- [x] 3.1 `npm run build` passes (route registration + types)
+- [x] 3.2 `npm run lint` passes
+- [x] 3.3 `GET /api/study/next?deckId=<uuid>` curl smoke returns `{ ok: true, card }` or `{ ok: true, card: null }`
+- [x] 3.4 `POST /api/study/review` curl smoke returns `{ ok: true, next, done }`
 
 #### Manual
 
-- [ ] 3.5 Replayed `POST /api/study/review` (same body twice within 60s) returns identical response; `review_logs` row count is exactly 1
-- [ ] 3.6 Rating `Again` advances `due` by minutes; `Good` advances by days
-- [ ] 3.7 `review_at` outside ±60s window returns `REVIEW_CONFLICT` (409)
-- [ ] 3.8 User B hitting user A's `card_id` returns `CARD_NOT_FOUND` (not a DB error)
+- [x] 3.5 Replayed `POST /api/study/review` (same body twice within 60s) returns identical response; `review_logs` row count is exactly 1
+- [x] 3.6 Rating `Again` advances `due` by minutes; `Good` advances by days
+- [x] 3.7 `review_at` outside ±60s window returns `REVIEW_CONFLICT` (409)
+- [x] 3.8 User B hitting user A's `card_id` returns `CARD_NOT_FOUND` (not a DB error)
 
 ### Phase 4: Study session UI
 
