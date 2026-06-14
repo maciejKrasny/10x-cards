@@ -459,42 +459,42 @@ Add the "Study" button to `DeckRow` and run the full end-to-end smoke checklist 
 
 #### Manual
 
-- [x] 2.5 REPL or API sanity check confirms `getNextDueCard` returns a fresh card and `applyRating` with `Good` advances `due` + increments `reps`
+- [x] 2.5 REPL or API sanity check confirms `getNextDueCard` returns a fresh card and `applyRating` with `Good` advances `due` + increments `reps` — af3f465
 
 ### Phase 3: API endpoints
 
 #### Automated
 
-- [x] 3.1 `npm run build` passes (route registration + types)
-- [x] 3.2 `npm run lint` passes
-- [x] 3.3 `GET /api/study/next?deckId=<uuid>` curl smoke returns `{ ok: true, card }` or `{ ok: true, card: null }`
-- [x] 3.4 `POST /api/study/review` curl smoke returns `{ ok: true, next, done }`
+- [x] 3.1 `npm run build` passes (route registration + types) — af3f465
+- [x] 3.2 `npm run lint` passes — af3f465
+- [x] 3.3 `GET /api/study/next?deckId=<uuid>` curl smoke returns `{ ok: true, card }` or `{ ok: true, card: null }` — af3f465
+- [x] 3.4 `POST /api/study/review` curl smoke returns `{ ok: true, next, done }` — af3f465
 
 #### Manual
 
-- [x] 3.5 Replayed `POST /api/study/review` (same body twice within 60s) returns identical response; `review_logs` row count is exactly 1
-- [x] 3.6 Rating `Again` advances `due` by minutes; `Good` advances by days
-- [x] 3.7 `review_at` outside ±60s window returns `REVIEW_CONFLICT` (409)
-- [x] 3.8 User B hitting user A's `card_id` returns `CARD_NOT_FOUND` (not a DB error)
+- [x] 3.5 Replayed `POST /api/study/review` (same body twice within 60s) returns identical response; `review_logs` row count is exactly 1 — af3f465
+- [x] 3.6 Rating `Again` advances `due` by minutes; `Good` advances by days — af3f465
+- [x] 3.7 `review_at` outside ±60s window returns `REVIEW_CONFLICT` (409) — af3f465
+- [x] 3.8 User B hitting user A's `card_id` returns `CARD_NOT_FOUND` (not a DB error) — af3f465
 
 ### Phase 4: Study session UI
 
 #### Automated
 
-- [ ] 4.1 `npm run build` passes (route present, no import errors)
-- [ ] 4.2 `npm run lint` passes
-- [ ] 4.3 `npm run format` clean
+- [x] 4.1 `npm run build` passes (route present, no import errors)
+- [x] 4.2 `npm run lint` passes
+- [x] 4.3 `npm run format` clean
 
 #### Manual
 
-- [ ] 4.4 Visiting `/study/<deckId>` logged-out redirects to `/auth/signin`
-- [ ] 4.5 Logged-in user with due cards sees the front
-- [ ] 4.6 "Show answer" reveals back + 4 buttons; clicking `Good` advances or shows summary
-- [ ] 4.7 `Space` reveals the back; `1`/`2`/`3`/`4` rate when revealed; keys do nothing on the front
-- [ ] 4.8 Summary card shows correct rating counts AND the "Come back tomorrow" copy
-- [ ] 4.9 Empty-deck case renders summary with zero counts + "Nothing due right now" + "Back to deck" link
-- [ ] 4.10 Mobile viewport (≤375px) keeps the 4 buttons tappable
-- [ ] 4.11 Retry idempotency: throttle network in devtools to "Offline", click `Good`, the request fails with a retryable Alert; toggle back to "Online", click `Good` again — the request body shows the SAME `review_at` (component retained `pendingReviewAt`), the card advances exactly once, and `review_logs` shows exactly 1 row for that card
+- [x] 4.4 Visiting `/study/<deckId>` logged-out redirects to `/auth/signin`
+- [x] 4.5 Logged-in user with due cards sees the front
+- [x] 4.6 "Show answer" reveals back + 4 buttons; clicking `Good` advances or shows summary
+- [x] 4.7 `Space` reveals the back; `1`/`2`/`3`/`4` rate when revealed; keys do nothing on the front
+- [x] 4.8 Summary card shows correct rating counts AND the "Come back tomorrow" copy
+- [x] 4.9 Empty-deck case renders summary with zero counts + "Nothing due right now" + "Back to deck" link
+- [x] 4.10 Mobile viewport (≤375px) keeps the 4 buttons tappable
+- [x] 4.11 Retry idempotency: throttle network in devtools to "Offline", click `Good`, the request fails with a retryable Alert; toggle back to "Online", click `Good` again — the request body shows the SAME `review_at` (component retained `pendingReviewAt`), the card advances exactly once, and `review_logs` shows exactly 1 row for that card
 
 ### Phase 5: Entry point + smoke pass
 
