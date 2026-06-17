@@ -191,8 +191,8 @@ export default function DeckDetailPage({ deckId }: Props) {
       {status === "idle" && cards.length === 0 && (
         <p className="text-sm text-blue-100/70">
           No cards yet. Add one above or{" "}
-          <a href="/dashboard" className="text-blue-200 hover:text-white">
-            paste text on the dashboard
+          <a href="/generate" className="text-blue-200 hover:text-white">
+            use Generate to paste text
           </a>
           .
         </p>
