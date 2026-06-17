@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: Deck Management
 
 - **Plan**: `context/changes/deck-management/plan.md`
@@ -9,13 +10,13 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
 | Architectural Fitness | WARNING |
-| Blind Spots | PASS |
-| Plan Completeness | FAIL |
+| Blind Spots           | PASS    |
+| Plan Completeness     | FAIL    |
 
 ## Grounding
 
@@ -49,7 +50,7 @@
 - **Detail**: Mechanical Progress↔SC contract violations:
   - Phase 3 SC has "Validation" bullet (line 395); Progress 3.x has no matching entry.
   - Phase 4 SC has "Validation" (line 488) and "Server error" (line 489) bullets; Progress 4.x has neither.
-  Per `references/progress-format.md`, /10x-implement parses Progress as the canonical execution gate; missing entries mean the implementer never ticks those boxes, then declares "phase complete" without verifying validation / failure UI.
+    Per `references/progress-format.md`, /10x-implement parses Progress as the canonical execution gate; missing entries mean the implementer never ticks those boxes, then declares "phase complete" without verifying validation / failure UI.
 - **Fix**: Add three checkboxes:
   - Phase 3 Progress: `- [ ] 3.12 Empty/over-length name validation handled gracefully`
   - Phase 4 Progress: `- [ ] 4.14 Empty front/back disables Save in edit mode`

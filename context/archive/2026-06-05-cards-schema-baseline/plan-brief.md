@@ -16,15 +16,15 @@ A logged-in user (via existing auth) has, in both local and hosted Postgres, a `
 
 ## Key Decisions Made
 
-| Decision                          | Choice                                                                 | Why (1 sentence)                                                                                                       | Source |
-| --------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------ |
-| Migration authoring               | Versioned SQL files via `supabase migration new`                       | Explicit reviewable diffs; trivial pattern for future agents — "write a new file, never edit old ones"                 | Plan   |
-| Schema columns                    | Minimum-viable: `id`, `user_id`, `front`, `back`, `created_at`         | Defer `source`/`updated_at`/etc. to the slices that need them; the migration pattern is the foundation, not the table  | Plan   |
-| Constraints & indexes             | NOT NULL + length CHECK (1..1000) + btree on `user_id`                 | Protects against long-paste pathology (S-01 risk) and gives deck-list query a sane plan day one                        | Plan   |
-| Codegen pipeline                  | Local stack → `src/db/database.types.ts` via `npm run db:types`        | No cloud dependency for dev; deterministic against local migrations; matches README's "no cloud needed" default        | Plan   |
-| Hosted propagation                | Link + `supabase db push` as part of F-01                              | Closes the loop — deployed Worker has schema day one; isolation test can run against hosted too                        | Plan   |
-| RLS verification gate             | Scripted SQL test using `set request.jwt.claims`                       | Repeatable, anchors Guardrails-1 against future schema changes, cheap to add to CI later                               | Plan   |
-| CI guardrail                      | Types-in-sync check (start Supabase, db reset, regen, fail-on-diff)    | Catches the most likely silent regression — migration added without regenerating types                                 | Plan   |
+| Decision              | Choice                                                              | Why (1 sentence)                                                                                                      | Source |
+| --------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------ |
+| Migration authoring   | Versioned SQL files via `supabase migration new`                    | Explicit reviewable diffs; trivial pattern for future agents — "write a new file, never edit old ones"                | Plan   |
+| Schema columns        | Minimum-viable: `id`, `user_id`, `front`, `back`, `created_at`      | Defer `source`/`updated_at`/etc. to the slices that need them; the migration pattern is the foundation, not the table | Plan   |
+| Constraints & indexes | NOT NULL + length CHECK (1..1000) + btree on `user_id`              | Protects against long-paste pathology (S-01 risk) and gives deck-list query a sane plan day one                       | Plan   |
+| Codegen pipeline      | Local stack → `src/db/database.types.ts` via `npm run db:types`     | No cloud dependency for dev; deterministic against local migrations; matches README's "no cloud needed" default       | Plan   |
+| Hosted propagation    | Link + `supabase db push` as part of F-01                           | Closes the loop — deployed Worker has schema day one; isolation test can run against hosted too                       | Plan   |
+| RLS verification gate | Scripted SQL test using `set request.jwt.claims`                    | Repeatable, anchors Guardrails-1 against future schema changes, cheap to add to CI later                              | Plan   |
+| CI guardrail          | Types-in-sync check (start Supabase, db reset, regen, fail-on-diff) | Catches the most likely silent regression — migration added without regenerating types                                | Plan   |
 
 ## Scope
 
@@ -53,13 +53,13 @@ Five phases, each independently verifiable. Phases 1-3 are local-only (migration
 
 ## Phases at a Glance
 
-| Phase                              | What it delivers                                              | Key risk                                                                              |
-| ---------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 1. Migration + cards + RLS         | Migration file + locally applied schema with four policies    | RLS policy typo: easy to write `using` without `with check` for insert/update         |
-| 2. Codegen pipeline + typed client | `npm run db:types`, `src/db/database.types.ts`, typed client  | Codegen requires `supabase start` running; contributors without Docker can't regen    |
-| 3. RLS isolation SQL test          | Checked-in SQL test + `npm run db:test:rls`                   | `set local request.jwt.claims` idiom is unfamiliar; test must commit-then-read-back   |
-| 4. Hosted push + smoke             | Migration applied on hosted DB; same test passes there        | Mutates a shared resource; requires manual gate before `db push`                      |
-| 5. CI types-in-sync guardrail      | CI step fails when migrations drift from `database.types.ts`  | Adds ~90s of Docker bootstrap to CI; first failure may confuse contributors           |
+| Phase                              | What it delivers                                             | Key risk                                                                            |
+| ---------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| 1. Migration + cards + RLS         | Migration file + locally applied schema with four policies   | RLS policy typo: easy to write `using` without `with check` for insert/update       |
+| 2. Codegen pipeline + typed client | `npm run db:types`, `src/db/database.types.ts`, typed client | Codegen requires `supabase start` running; contributors without Docker can't regen  |
+| 3. RLS isolation SQL test          | Checked-in SQL test + `npm run db:test:rls`                  | `set local request.jwt.claims` idiom is unfamiliar; test must commit-then-read-back |
+| 4. Hosted push + smoke             | Migration applied on hosted DB; same test passes there       | Mutates a shared resource; requires manual gate before `db push`                    |
+| 5. CI types-in-sync guardrail      | CI step fails when migrations drift from `database.types.ts` | Adds ~90s of Docker bootstrap to CI; first failure may confuse contributors         |
 
 **Prerequisites:** Docker running locally for codegen + isolation test. Supabase CLI authenticated (`supabase login`) for the hosted-push step. Hosted project ref `adtjatwwrarnbsbiexul` already documented in `runbook.md:24`.
 

@@ -19,6 +19,7 @@ Roadmap slice **S-02** (`deck-management`) from `context/foundation/roadmap.md`.
 **Prerequisites:** F-01 (done). **Parallel with:** S-01 (done).
 
 **Open unknowns to resolve in `/10x-plan`:**
+
 - Inline-edit-in-list versus a separate edit screen.
 - Delete confirmation gate, undo affordance, or hard delete.
 

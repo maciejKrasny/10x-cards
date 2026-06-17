@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: F-01: cards-schema-baseline — Implementation Plan
 
 - **Plan**: `context/changes/cards-schema-baseline/plan.md`
@@ -9,15 +10,16 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
-| Architectural Fitness | PASS |
-| Blind Spots | PASS |
-| Plan Completeness | PASS |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
+| Architectural Fitness | PASS    |
+| Blind Spots           | PASS    |
+| Plan Completeness     | PASS    |
 
 ## Grounding
+
 Grounding: 5/5 paths ✓, 4/4 symbols ✓, brief↔plan ✓
 
 ## Findings
@@ -51,4 +53,3 @@ Grounding: 5/5 paths ✓, 4/4 symbols ✓, brief↔plan ✓
 - **Detail**: Kontrakt zostawiał dwie równoległe opcje cleanupu i nie narzucał jednej spójnej ścieżki.
 - **Fix**: Wybrano jedną ścieżkę: commit transakcji + jawny cleanup testowych rekordów po teście.
 - **Decision**: FIXED (Fix in plan)
-

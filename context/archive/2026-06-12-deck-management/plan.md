@@ -89,6 +89,7 @@ Land the schema baseline for multi-deck. One migration file does all of it: crea
 **Intent**: Land the decks table + RLS policies, add the FK column on cards, backfill existing cards into a per-user "My Deck", and lock the column as NOT NULL — all in one transactional migration.
 
 **Contract**:
+
 - `CREATE TABLE public.decks (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade, name text not null check (char_length(name) between 1 and 100), created_at timestamptz not null default now())`.
 - Index `idx_decks_user_id` on `(user_id)`.
 - `ALTER TABLE public.decks ENABLE ROW LEVEL SECURITY` + four policies (`decks_select_own`, `decks_insert_own`, `decks_update_own`, `decks_delete_own`), each `TO authenticated`, gating on `user_id = auth.uid()`. Mirror the cards-policy shape in `20260605112924_cards_baseline.sql:15-30`.
@@ -134,6 +135,7 @@ update public.cards
 **Intent**: One-command run for the decks RLS test, mirroring the existing cards test commands.
 
 **Contract**: Two new scripts in `package.json`:
+
 - `"db:test:rls:decks": "cat supabase/tests/rls_decks_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1"`
 - `"db:test:rls:decks:linked": "cat supabase/tests/rls_decks_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1"`
 
@@ -193,6 +195,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: Define the validation schemas the decks routes use, plus the inferred TypeScript types.
 
 **Contract**:
+
 - `DeckBodySchema = z.object({ name: z.string().min(1).max(100) })`.
 - Exported type: `DeckBody = z.infer<typeof DeckBodySchema>`.
 - Bounds match the `name` CHECK constraint in the migration (`char_length between 1 and 100`).
@@ -204,6 +207,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: Define the validation schema for manual create + edit. Reused by `POST /api/decks/[id]/cards` and `PATCH /api/cards/[id]`.
 
 **Contract**:
+
 - `CardBodySchema = z.object({ front: z.string().min(1).max(1000), back: z.string().min(1).max(1000) })`.
 - Exported type: `CardBody = z.infer<typeof CardBodySchema>`.
 - Bounds match the existing `cards` CHECK constraints.
@@ -216,6 +220,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: Consolidate the error-envelope plumbing currently inlined in `src/pages/api/cards/generate.ts` (lines 10–44 today) into one module that all six routes import from. Six near-identical copies of `ErrorCode` / `ERROR_MESSAGES` / `STATUS_BY_CODE` / `errorResponse()` is past the threshold where duplication starts to drift; one shared module keeps status codes and English copy aligned across the surface.
 
 **Contract**:
+
 - Exports:
   - `ErrorCode` — union of all codes used across the API: `'INVALID_REQUEST' | 'INPUT_TOO_SHORT' | 'INPUT_TOO_LONG' | 'UNAUTHORIZED' | 'DECK_NOT_FOUND' | 'CARD_NOT_FOUND' | 'LLM_FAILURE' | 'DB_INSERT_FAILED' | 'DB_QUERY_FAILED' | 'DB_UPDATE_FAILED' | 'DB_DELETE_FAILED' | 'SERVER_MISCONFIGURED'`.
   - `ERROR_MESSAGES: Record<ErrorCode, string>` — single source of truth for the English client-visible copy.
@@ -231,6 +236,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: Make `deck_id` a required field in the request body; verify the deck belongs to the user before generating; inject `deck_id` into the inserted rows. Also migrate the route to the shared error helpers introduced in §3.
 
 **Contract**:
+
 - Extend `GenerateRequestSchema` in `src/lib/llm/schemas.ts`: add `deck_id: z.string().uuid()`. (Keep `text` field unchanged.)
 - After `supabase.auth.getUser()` and before the LLM call: `SELECT id FROM decks WHERE id = :deck_id` (RLS-scoped to current user). If no row, return `errorResponse('DECK_NOT_FOUND')` (the code, status 404, and English message all come from `src/lib/api/errors.ts`).
 - When building the rows for bulk insert, include `deck_id: parsed.data.deck_id` alongside `user_id, front, back`.
@@ -244,6 +250,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: `GET /api/decks` returns the user's decks (newest-first) WITH a `card_count` per deck; `POST /api/decks` creates a new deck.
 
 **Contract**:
+
 - `export const prerender = false`.
 - `GET`: auth via `supabase.auth.getUser()`; query `SELECT id, name, created_at, (SELECT count(*) FROM cards WHERE cards.deck_id = decks.id) AS card_count FROM decks ORDER BY created_at DESC`. RLS scopes both selects to the user. Response: `{ ok: true, decks: Array<{ id, name, created_at, card_count }> }`. (Supabase JS API: use `.select('id, name, created_at, cards(count)')` with the `count` foreign-table aggregation, or fall back to a raw RPC; pick whichever Supabase JS supports cleanly at implementation time. If the foreign-table count syntax is awkward, two-query pattern — list decks then aggregate counts client-side — is an acceptable fallback for MVP volume.)
 - `POST`: auth check; parse body via `DeckBodySchema.safeParse`; on validation failure return `errorResponse('INVALID_REQUEST')` (no field-detail leakage — the UI only sends valid inputs); insert `{ user_id, name }`; return `{ ok: true, deck: { id, name, created_at, card_count: 0 } }`.
@@ -256,6 +263,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: `PATCH /api/decks/[id]` renames a deck; `DELETE /api/decks/[id]` deletes a deck (cards cascade via the FK).
 
 **Contract**:
+
 - `export const prerender = false`.
 - `PATCH`: auth check; parse `DeckBodySchema`; `.update({ name }).eq('id', id).select('id, name, created_at').single()`. RLS gates ownership; if `.single()` returns no row, return `errorResponse('DECK_NOT_FOUND')`. Defence-in-depth: also include `.eq('user_id', user.id)`. Success response: `{ ok: true, deck: {...} }`.
 - `DELETE`: auth check; `.delete().eq('id', id).select('id').single()`. Same 404 handling. Success response: `{ ok: true }`. Cards in the deck disappear via FK cascade — no application-layer iteration.
@@ -268,6 +276,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: `GET /api/decks/[id]/cards` returns the deck's cards (newest-first, cap 500); `POST /api/decks/[id]/cards` creates a card in that deck (FR-005 manual create path).
 
 **Contract**:
+
 - `export const prerender = false`.
 - Both methods: auth check; verify deck ownership by `SELECT id, name FROM decks WHERE id = :id` (RLS-scoped). If no row, return `errorResponse('DECK_NOT_FOUND')`. This is the security-critical check called out in Critical Implementation Details — without it, the route would happily insert cards into another user's deck (RLS on cards INSERT only validates `user_id`, not `deck_id`). The `name` column from this SELECT doubles as the source for the `deck` field returned by `GET` (see below).
 - `GET`: `SELECT id, front, back, created_at FROM cards WHERE deck_id = :id ORDER BY created_at DESC LIMIT 500`. Return `{ ok: true, deck: { id, name }, cards: [...] }` — `deck` reuses the row already fetched for the ownership check, so the deck-detail page can render its heading without a second round-trip. The 500 cap is policy not protection — if hit, the UI displays a banner; pagination is parked.
@@ -281,6 +290,7 @@ All HTTP surface for the slice lands in one phase. Four new route files (decks l
 **Intent**: `PATCH /api/cards/[id]` edits a card's front/back; `DELETE /api/cards/[id]` deletes a single card.
 
 **Contract**:
+
 - `export const prerender = false`.
 - `PATCH`: auth check; parse `CardBodySchema`; `.update({ front, back }).eq('id', id).select('id, front, back, created_at, deck_id').single()`. If no row, return `errorResponse('CARD_NOT_FOUND')`. Defence-in-depth: `.eq('user_id', user.id)`. Both `front` and `back` are required (full replacement, not partial). Success: `{ ok: true, card: {...} }`.
 - `DELETE`: auth check; `.delete().eq('id', id).select('id').single()`. Same 404 handling. Success: `{ ok: true }`.
@@ -357,6 +367,7 @@ New `/decks` page mounting a React island that fetches `GET /api/decks` and lets
 **Intent**: Top-level React component that fetches `GET /api/decks` on mount, owns the list state, and composes `AddDeckForm` + per-deck `DeckRow` + `DeleteDeckDialog`. On mutations, it updates local state optimistically and rolls back on error.
 
 **Contract**:
+
 - Local state: `decks: Deck[]`, `status: 'loading' | 'idle' | 'error'`, `errorMessage: string | null`, `editingDeckId: string | null` (only one row in rename mode at a time), `deletingDeck: Deck | null` (the deck about to be confirmed for deletion; null when no dialog open).
 - On mount: `fetch('/api/decks')`, on success populate `decks` and set `status='idle'`; on failure show an inline `Alert` "Couldn't load your decks. Reload to retry." (and a Retry button that re-runs the fetch).
 - Handlers (each calls the corresponding REST endpoint, then mutates local state):
@@ -439,6 +450,7 @@ New `/decks/[id]` page mounting a React island that fetches the deck's cards and
 **Intent**: Top-level React component that fetches the deck's cards on mount, owns the list state, composes `NewCardsBanner` + `AddCardForm` + per-card `CardRow` + `DeleteCardDialog`. On mutations, updates local state and rolls back on error.
 
 **Contract**:
+
 - Props: `deckId: string`.
 - Local state: `deck: { id, name } | null` (resolved after first fetch), `cards: Card[]`, `status: 'loading' | 'idle' | 'error'`, `errorMessage: string | null`, `editingCardId: string | null`, `deletingCard: Card | null`, `since: string | null` (the `?since=` query param value, captured once on mount), `bannerDismissed: boolean`.
 - On mount: read `since` from `window.location.search`; fetch `/api/decks/[deckId]/cards`. The response includes `deck: { id, name }` (see Phase 2 §7), which the heading renders directly — no second round-trip needed.
@@ -523,6 +535,7 @@ Atomically rewire `PasteToGenerate.tsx`: add a deck dropdown above the textarea,
 **Intent**: Pre-flight deck context, target-deck selection, and on-success navigation to the detail page. No more in-place batch list.
 
 **Contract**:
+
 - New local state: `decks: Deck[]`, `selectedDeckId: string | null`, `decksStatus: 'loading' | 'idle' | 'error'`.
 - On mount: `fetch('/api/decks')`. If response is `{ ok: true, decks: [] }`, POST `/api/decks` with `{ name: "My Deck" }`; on success, populate `decks` with the new deck and select it. Else populate from the response.
 - Default selection: `sessionStorage.getItem('lastUsedDeckId')` if present AND it matches a deck in the list; else the first deck in the (newest-first) list.

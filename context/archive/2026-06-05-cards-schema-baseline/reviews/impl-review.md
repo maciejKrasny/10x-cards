@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: cards-schema-baseline (F-01)
 
 - **Plan**: context/changes/cards-schema-baseline/plan.md
@@ -9,13 +10,13 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Plan Adherence | WARNING (3 contract drifts) |
-| Architectural Fitness | PASS |
-| Lean Execution | PASS |
-| Verification Quality | WARNING (Phase 5 unverifiable until first PR run) |
+| Dimension             | Verdict                                           |
+| --------------------- | ------------------------------------------------- |
+| End-State Alignment   | PASS                                              |
+| Plan Adherence        | WARNING (3 contract drifts)                       |
+| Architectural Fitness | PASS                                              |
+| Lean Execution        | PASS                                              |
+| Verification Quality  | WARNING (Phase 5 unverifiable until first PR run) |
 
 ## Implementation commits
 

@@ -151,11 +151,11 @@ The `:linked` variant uses a transient `postgres:17-alpine` container (no local 
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:
 
-| Variable             | Description                                                                                                  |
-| -------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `SUPABASE_URL`       | Project URL from Supabase dashboard → Settings → API                                                         |
-| `SUPABASE_KEY`       | `anon` public key from Supabase dashboard → Settings → API                                                   |
-| `OPENROUTER_API_KEY` | API key for [OpenRouter](https://openrouter.ai/) — used by the AI card-generation endpoint                   |
+| Variable             | Description                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `SUPABASE_URL`       | Project URL from Supabase dashboard → Settings → API                                                           |
+| `SUPABASE_KEY`       | `anon` public key from Supabase dashboard → Settings → API                                                     |
+| `OPENROUTER_API_KEY` | API key for [OpenRouter](https://openrouter.ai/) — used by the AI card-generation endpoint                     |
 | `OPENROUTER_MODEL`   | OpenRouter model id, e.g. `openai/gpt-4o-mini` (default if unset); must support `response_format: json_schema` |
 
 ```
