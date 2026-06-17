@@ -29,10 +29,17 @@ const RATING_LABELS: Record<Rating, string> = {
 };
 
 const RATING_CLASSES: Record<Rating, string> = {
-  1: "bg-red-600 text-white hover:bg-red-500",
-  2: "bg-amber-500 text-black hover:bg-amber-400",
-  3: "bg-emerald-600 text-white hover:bg-emerald-500",
-  4: "bg-sky-500 text-white hover:bg-sky-400",
+  1: "border-red-400/70 bg-red-500/25 text-red-50 hover:border-red-300 hover:bg-red-500/40",
+  2: "border-amber-400/70 bg-amber-500/25 text-amber-50 hover:border-amber-300 hover:bg-amber-500/40",
+  3: "border-emerald-400/70 bg-emerald-500/25 text-emerald-50 hover:border-emerald-300 hover:bg-emerald-500/40",
+  4: "border-sky-400/70 bg-sky-500/25 text-sky-50 hover:border-sky-300 hover:bg-sky-500/40",
+};
+
+const RATING_DOT_CLASSES: Record<Rating, string> = {
+  1: "bg-red-400",
+  2: "bg-amber-400",
+  3: "bg-emerald-400",
+  4: "bg-sky-400",
 };
 
 const RATING_KEYS: Partial<Record<string, Rating>> = {
@@ -244,21 +251,30 @@ export default function StudySessionPage({ deckId }: { deckId: string }) {
         </CardContent>
         <CardFooter className="flex-wrap gap-2">
           {phase === "showFront" ? (
-            <Button onClick={reveal}>Show answer (Space)</Button>
+            <Button
+              onClick={reveal}
+              className="border border-purple-400/60 bg-purple-500/30 font-medium text-white backdrop-blur-sm hover:border-purple-300 hover:bg-purple-500/45"
+            >
+              Show answer (Space)
+            </Button>
           ) : (
-            ([1, 2, 3, 4] as const).map((rating) => (
-              <Button
-                key={rating}
-                onClick={() => void submit(rating)}
-                disabled={submitting}
-                className={`h-auto flex-col items-start gap-0 px-3 py-2 ${RATING_CLASSES[rating]}`}
-              >
-                <span className="text-sm">
-                  {rating}. {RATING_LABELS[rating]}
-                </span>
-                <span className="text-xs opacity-80">{relativeShort(previewByRating.get(rating) ?? "")}</span>
-              </Button>
-            ))
+            <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
+              {([1, 2, 3, 4] as const).map((rating) => (
+                <Button
+                  key={rating}
+                  onClick={() => void submit(rating)}
+                  disabled={submitting}
+                  className={`h-auto flex-col items-start gap-1 rounded-xl border px-3 py-2.5 backdrop-blur-sm transition-colors disabled:opacity-60 ${RATING_CLASSES[rating]}`}
+                >
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${RATING_DOT_CLASSES[rating]}`} />
+                    <span className="opacity-80">{rating}.</span>
+                    {RATING_LABELS[rating]}
+                  </span>
+                  <span className="text-xs text-white/75">{relativeShort(previewByRating.get(rating) ?? "")}</span>
+                </Button>
+              ))}
+            </div>
           )}
         </CardFooter>
       </Card>
