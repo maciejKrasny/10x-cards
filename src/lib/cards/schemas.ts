@@ -13,3 +13,12 @@ export const CardBodySchema = z.object({
 });
 
 export type CardBody = z.infer<typeof CardBodySchema>;
+
+// Bulk insert: caps the batch at 30 to match GeneratedCardsSchema (the LLM
+// is the only producer today). If a manual bulk path appears later, revisit.
+export const BulkCreateRequestSchema = z.object({
+  deck_id: z.uuid(),
+  cards: z.array(CardBodySchema).min(1).max(30),
+});
+
+export type BulkCreateRequest = z.infer<typeof BulkCreateRequestSchema>;
