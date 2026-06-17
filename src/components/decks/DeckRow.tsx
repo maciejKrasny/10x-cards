@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import DeckRowMenu from "./DeckRowMenu";
 import type { Deck } from "./DeckListPage";
 
 interface Props {
@@ -78,21 +79,27 @@ export default function DeckRow({ deck, isEditing, onStartEdit, onCancelEdit, on
           {deck.card_count} card{plural(deck.card_count)}
         </span>
       </a>
-      <div className="flex gap-2">
-        <Button asChild size="sm">
-          <a href={`/study/${deck.id}`}>Study</a>
-        </Button>
+      <div className="flex items-center gap-2">
         <Button
-          onClick={onStartEdit}
-          variant="outline"
-          size="sm"
-          className="border-white/30 bg-white/10 text-white hover:bg-white/20"
+          asChild
+          size="default"
+          className="bg-purple-600 px-4 font-semibold text-white shadow-sm shadow-purple-900/40 hover:bg-purple-500"
         >
-          Rename
+          <a href={`/study/${deck.id}`} className="inline-flex items-center gap-1.5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Study
+          </a>
         </Button>
-        <Button onClick={onDelete} variant="destructive" size="sm">
-          Delete
-        </Button>
+        <DeckRowMenu onRename={onStartEdit} onDelete={onDelete} />
       </div>
     </div>
   );

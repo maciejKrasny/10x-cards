@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
 import DeckDetailPage from "@/components/cards/DeckDetailPage";
 
 const id = Astro.params.id ?? "";
@@ -7,7 +8,10 @@ const id = Astro.params.id ?? "";
 
 <Layout title="Deck">
   <div class="bg-cosmic flex min-h-screen flex-col items-center p-4">
-    <div class="mt-10 w-full max-w-3xl rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+    <div class="mt-4 w-full max-w-3xl">
+      <Topbar />
+    </div>
+    <div class="mt-6 w-full max-w-3xl rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
       <DeckDetailPage deckId={id} client:load />
     </div>
   </div>

@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
 import StudySessionPage from "@/components/study/StudySessionPage";
 
 const deckId = Astro.params.deckId ?? "";
@@ -7,7 +8,10 @@ const deckId = Astro.params.deckId ?? "";
 
 <Layout title="Study">
   <div class="bg-cosmic flex min-h-screen flex-col items-center p-4">
-    <div class="mt-10 w-full max-w-2xl rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+    <div class="mt-4 w-full max-w-2xl">
+      <Topbar />
+    </div>
+    <div class="mt-6 w-full max-w-2xl rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
       <StudySessionPage deckId={deckId} client:load />
     </div>
   </div>
