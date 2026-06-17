@@ -28,4 +28,5 @@ export interface ReviewInput {
 
 export interface ReviewResult {
   next: StudyCardView | null;
+  conflicted: boolean;
 }

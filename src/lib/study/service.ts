@@ -1,16 +1,30 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fsrs, type Card } from "ts-fsrs";
-import type { Database, Tables } from "@/db/database.types";
+import type { Database, Json, Tables } from "@/db/database.types";
 import type { IntervalPreview, Rating, ReviewInput, ReviewResult, StudyCardView } from "./types";
 
 type StudyClient = SupabaseClient<Database>;
 type CardRow = Tables<"cards">;
+type FsrsCardFields = Pick<
+  CardRow,
+  | "difficulty"
+  | "due"
+  | "elapsed_days"
+  | "lapses"
+  | "last_review"
+  | "learning_steps"
+  | "reps"
+  | "scheduled_days"
+  | "stability"
+  | "state"
+>;
+type StudyCardRow = Pick<CardRow, "id" | "front" | "back"> & FsrsCardFields;
 
 const scheduler = fsrs();
 
 const RATING_ORDER: Rating[] = [1, 2, 3, 4];
 
-export function cardRowToFsrs(row: CardRow): Card {
+export function cardRowToFsrs(row: FsrsCardFields): Card {
   return {
     due: new Date(row.due),
     stability: row.stability,
@@ -69,7 +83,7 @@ export function previewIntervals(card: Card, now: Date): IntervalPreview[] {
   });
 }
 
-function rowToView(row: CardRow, now: Date): StudyCardView {
+function rowToView(row: StudyCardRow, now: Date): StudyCardView {
   return {
     id: row.id,
     front: row.front,
@@ -126,18 +140,21 @@ export async function applyRating(supabase: StudyClient, userId: string, input: 
 
   // 3. Single-transaction insert log + advance card via the rpc. The rpc
   //    handles ON CONFLICT (card_id, review_at) by re-reading without
-  //    re-applying the patch, so replays are idempotent.
-  const { error: rpcError } = await supabase.rpc("record_review", {
+  //    re-applying the patch, so replays are idempotent. The conflicted
+  //    bit tells the caller whether the write actually advanced the card
+  //    so the UI can skip counter increments on replay.
+  const { data: rpcData, error: rpcError } = await supabase.rpc("record_review", {
     p_card_id: input.card_id,
     p_rating: input.rating,
     p_review_at: input.review_at,
-    p_card_patch: patch,
+    p_card_patch: patch as unknown as Json,
   });
   if (rpcError) throw new Error("DB_UPDATE_FAILED");
+  const conflicted = (rpcData as { conflicted?: boolean } | null)?.conflicted === true;
 
   // 4. Fetch the next due card for the same deck. We use the card's
   //    deck_id rather than asking the client — the client never sent
   //    deck_id with the rating, so it cannot ask to rate "for the wrong deck".
   const next = await getNextDueCard(supabase, userId, cardRow.deck_id);
-  return { next };
+  return { next, conflicted };
 }

@@ -38,10 +38,18 @@ export const POST: APIRoute = async (context) => {
 
   try {
     const result = await applyRating(supabase, user.id, input);
-    return new Response(JSON.stringify({ ok: true, next: result.next, done: result.next === null }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        next: result.next,
+        done: result.next === null,
+        conflicted: result.conflicted,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   } catch (err) {
     return errorResponse(serviceErrorToCode(err));
   }

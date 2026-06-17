@@ -481,33 +481,33 @@ Add the "Study" button to `DeckRow` and run the full end-to-end smoke checklist 
 
 #### Automated
 
-- [x] 4.1 `npm run build` passes (route present, no import errors)
-- [x] 4.2 `npm run lint` passes
-- [x] 4.3 `npm run format` clean
+- [x] 4.1 `npm run build` passes (route present, no import errors) — 77c0900
+- [x] 4.2 `npm run lint` passes — 77c0900
+- [x] 4.3 `npm run format` clean — 77c0900
 
 #### Manual
 
-- [x] 4.4 Visiting `/study/<deckId>` logged-out redirects to `/auth/signin`
-- [x] 4.5 Logged-in user with due cards sees the front
-- [x] 4.6 "Show answer" reveals back + 4 buttons; clicking `Good` advances or shows summary
-- [x] 4.7 `Space` reveals the back; `1`/`2`/`3`/`4` rate when revealed; keys do nothing on the front
-- [x] 4.8 Summary card shows correct rating counts AND the "Come back tomorrow" copy
-- [x] 4.9 Empty-deck case renders summary with zero counts + "Nothing due right now" + "Back to deck" link
-- [x] 4.10 Mobile viewport (≤375px) keeps the 4 buttons tappable
-- [x] 4.11 Retry idempotency: throttle network in devtools to "Offline", click `Good`, the request fails with a retryable Alert; toggle back to "Online", click `Good` again — the request body shows the SAME `review_at` (component retained `pendingReviewAt`), the card advances exactly once, and `review_logs` shows exactly 1 row for that card
+- [x] 4.4 Visiting `/study/<deckId>` logged-out redirects to `/auth/signin` — 77c0900
+- [x] 4.5 Logged-in user with due cards sees the front — 77c0900
+- [x] 4.6 "Show answer" reveals back + 4 buttons; clicking `Good` advances or shows summary — 77c0900
+- [x] 4.7 `Space` reveals the back; `1`/`2`/`3`/`4` rate when revealed; keys do nothing on the front — 77c0900
+- [x] 4.8 Summary card shows correct rating counts AND the "Come back tomorrow" copy — 77c0900
+- [x] 4.9 Empty-deck case renders summary with zero counts + "Nothing due right now" + "Back to deck" link — 77c0900
+- [x] 4.10 Mobile viewport (≤375px) keeps the 4 buttons tappable — 77c0900
+- [x] 4.11 Retry idempotency: throttle network in devtools to "Offline", click `Good`, the request fails with a retryable Alert; toggle back to "Online", click `Good` again — the request body shows the SAME `review_at` (component retained `pendingReviewAt`), the card advances exactly once, and `review_logs` shows exactly 1 row for that card — 77c0900
 
 ### Phase 5: Entry point + smoke pass
 
 #### Automated
 
-- [ ] 5.1 `npm run build` + `npm run lint` + `npm run format` clean
-- [ ] 5.2 CI (lint + build) green on the PR
+- [x] 5.1 `npm run build` + `npm run lint` + `npm run format` clean
+- [x] 5.2 CI (lint + build) green on the PR
 
 #### Manual
 
-- [ ] 5.3 Golden path: `/decks` → `Study` → front → reveal → rate → next → … → summary (no console errors)
-- [ ] 5.4 Returning-day flow: card with `due = now() - 1d` appears on reload
-- [ ] 5.5 Idempotency replay: re-sent `POST /api/study/review` produces identical response; `review_logs` count unchanged
-- [ ] 5.6 RLS two-user smoke: user B URL-edit to user A's deck returns `DECK_NOT_FOUND` state; `review_logs` SELECT for user B returns 0 rows
-- [ ] 5.7 No regressions: dashboard, deck list, paste-to-generate, rename, delete, signout all work
-- [ ] 5.8 No production env vars touched (`.dev.vars` and Cloudflare dashboard secrets unchanged)
+- [x] 5.3 Golden path: `/decks` → `Study` → front → reveal → rate → next → … → summary (no console errors)
+- [x] 5.4 Returning-day flow: card with `due = now() - 1d` appears on reload
+- [x] 5.5 Idempotency replay: re-sent `POST /api/study/review` produces identical response; `review_logs` count unchanged
+- [x] 5.6 RLS two-user smoke: user B URL-edit to user A's deck returns `DECK_NOT_FOUND` state; `review_logs` SELECT for user B returns 0 rows
+- [x] 5.7 No regressions: dashboard, deck list, paste-to-generate, rename, delete, signout all work
+- [x] 5.8 No production env vars touched (`.dev.vars` and Cloudflare dashboard secrets unchanged)

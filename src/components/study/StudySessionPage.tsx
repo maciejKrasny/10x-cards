@@ -4,25 +4,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { relativeShort } from "@/lib/study/format";
-
-type Rating = 1 | 2 | 3 | 4;
-
-interface IntervalPreview {
-  rating: Rating;
-  due: string;
-}
-
-interface StudyCardView {
-  id: string;
-  front: string;
-  back: string;
-  previews: IntervalPreview[];
-}
+import type { Rating, StudyCardView } from "@/lib/study/types";
 
 type NextResponse = { ok: true; card: StudyCardView | null } | { ok: false; error: { code: string; message: string } };
 
 type ReviewResponse =
-  | { ok: true; next: StudyCardView | null; done: boolean }
+  | { ok: true; next: StudyCardView | null; done: boolean; conflicted: boolean }
   | { ok: false; error: { code: string; message: string } };
 
 interface Counters {
@@ -114,6 +101,7 @@ export default function StudySessionPage({ deckId }: { deckId: string }) {
   const submit = useCallback(
     async (rating: Rating) => {
       if (!card) return;
+      if (phase === "submitting") return;
       const reviewAt = pendingReviewAt ?? new Date().toISOString();
       setPendingReviewAt(reviewAt);
       setPhase("submitting");
@@ -142,14 +130,19 @@ export default function StudySessionPage({ deckId }: { deckId: string }) {
           setPhase("showAnswer");
           return;
         }
-        setCounters((prev) => {
-          const next = { ...prev };
-          if (rating === 1) next.again += 1;
-          else if (rating === 2) next.hard += 1;
-          else if (rating === 3) next.good += 1;
-          else next.easy += 1;
-          return next;
-        });
+        // Skip the counter tick on rpc-level replay: the rpc dedupes by
+        // (card_id, review_at) and surfaces `conflicted` so we don't
+        // double-count a logically-single review across retries or stale tabs.
+        if (!body.conflicted) {
+          setCounters((prev) => {
+            const next = { ...prev };
+            if (rating === 1) next.again += 1;
+            else if (rating === 2) next.hard += 1;
+            else if (rating === 3) next.good += 1;
+            else next.easy += 1;
+            return next;
+          });
+        }
         setPendingReviewAt(null);
         if (body.done || body.next === null) {
           setCard(null);
@@ -163,7 +156,7 @@ export default function StudySessionPage({ deckId }: { deckId: string }) {
         setPhase("showAnswer");
       }
     },
-    [card, deckId, pendingReviewAt],
+    [card, deckId, pendingReviewAt, phase],
   );
 
   useEffect(() => {

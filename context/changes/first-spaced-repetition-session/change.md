@@ -1,9 +1,9 @@
 ---
 change_id: first-spaced-repetition-session
 title: First spaced-repetition session (north star)
-status: implementing
+status: impl_reviewed
 created: 2026-06-13
-updated: 2026-06-13
+updated: 2026-06-17
 archived_at: null
 ---
 

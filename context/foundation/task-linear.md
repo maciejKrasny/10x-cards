@@ -21,44 +21,44 @@ Labels mirror the GitHub label system exactly. The `status:` labels are intentio
 
 ### Type
 
-| Label | Color | Meaning |
-|---|---|---|
+| Label              | Color     | Meaning                                                                            |
+| ------------------ | --------- | ---------------------------------------------------------------------------------- |
 | `type: foundation` | `#0075ca` | Horizontal enabler — no user-visible outcome on its own; unlocks downstream slices |
-| `type: slice` | `#e4e669` | Vertical, user-visible milestone |
+| `type: slice`      | `#e4e669` | Vertical, user-visible milestone                                                   |
 
 ### Stream (one-word outcome of the stream)
 
-| Label | Color | Stream | Roadmap items |
-|---|---|---|---|
-| `stream: learning` | `#d93f0b` | AI generation → spaced repetition north star | F-01, S-01, S-03 |
-| `stream: management` | `#0e8a16` | Deck management | S-02 |
-| `stream: auth` | `#5319e7` | Auth PRD compliance | S-04 |
+| Label                | Color     | Stream                                       | Roadmap items    |
+| -------------------- | --------- | -------------------------------------------- | ---------------- |
+| `stream: learning`   | `#d93f0b` | AI generation → spaced repetition north star | F-01, S-01, S-03 |
+| `stream: management` | `#0e8a16` | Deck management                              | S-02             |
+| `stream: auth`       | `#5319e7` | Auth PRD compliance                          | S-04             |
 
 ## Status mapping
 
 GitHub labels are translated to Linear's native workflow states so Linear filtering works without custom status labels.
 
-| GitHub label | Linear state | Rationale |
-|---|---|---|
-| `status: ready` | **Todo** | Actionable now — appears in the active backlog |
-| `status: proposed` | **Backlog** | Blocked by prerequisites — not yet actionable |
+| GitHub label       | Linear state | Rationale                                      |
+| ------------------ | ------------ | ---------------------------------------------- |
+| `status: ready`    | **Todo**     | Actionable now — appears in the active backlog |
+| `status: proposed` | **Backlog**  | Blocked by prerequisites — not yet actionable  |
 
 ## Roadmap → Linear issues mapping
 
-| Roadmap ID | Change ID | Linear ID | Linear State | GitHub mirror |
-|---|---|---|---|---|
-| F-01 | `cards-schema-baseline` | [10X-5](https://linear.app/10x-cards-mk/issue/10X-5) | Todo | [GH #1](https://github.com/maciejKrasny/10x-cards/issues/1) |
-| S-04 | `auth-prd-compliance` | [10X-6](https://linear.app/10x-cards-mk/issue/10X-6) | Todo | [GH #2](https://github.com/maciejKrasny/10x-cards/issues/2) |
-| S-01 | `ai-generate-from-paste` | [10X-7](https://linear.app/10x-cards-mk/issue/10X-7) | Backlog | [GH #3](https://github.com/maciejKrasny/10x-cards/issues/3) |
-| S-02 | `deck-management` | [10X-8](https://linear.app/10x-cards-mk/issue/10X-8) | Backlog | [GH #4](https://github.com/maciejKrasny/10x-cards/issues/4) |
-| S-03 | `first-spaced-repetition-session` | [10X-9](https://linear.app/10x-cards-mk/issue/10X-9) | Backlog | [GH #5](https://github.com/maciejKrasny/10x-cards/issues/5) |
+| Roadmap ID | Change ID                         | Linear ID                                            | Linear State | GitHub mirror                                               |
+| ---------- | --------------------------------- | ---------------------------------------------------- | ------------ | ----------------------------------------------------------- |
+| F-01       | `cards-schema-baseline`           | [10X-5](https://linear.app/10x-cards-mk/issue/10X-5) | Todo         | [GH #1](https://github.com/maciejKrasny/10x-cards/issues/1) |
+| S-04       | `auth-prd-compliance`             | [10X-6](https://linear.app/10x-cards-mk/issue/10X-6) | Todo         | [GH #2](https://github.com/maciejKrasny/10x-cards/issues/2) |
+| S-01       | `ai-generate-from-paste`          | [10X-7](https://linear.app/10x-cards-mk/issue/10X-7) | Backlog      | [GH #3](https://github.com/maciejKrasny/10x-cards/issues/3) |
+| S-02       | `deck-management`                 | [10X-8](https://linear.app/10x-cards-mk/issue/10X-8) | Backlog      | [GH #4](https://github.com/maciejKrasny/10x-cards/issues/4) |
+| S-03       | `first-spaced-repetition-session` | [10X-9](https://linear.app/10x-cards-mk/issue/10X-9) | Done         | [GH #5](https://github.com/maciejKrasny/10x-cards/issues/5) |
 
 ## Dependency graph
 
 ```
 10X-5 F-01 (Todo)
 ├── 10X-7 S-01 (Backlog) ──┐
-│                           ├── 10X-9 S-03 (Backlog)  ← north star
+│                           ├── 10X-9 S-03 (Done)  ← north star
 └── 10X-8 S-02 (Backlog) ──┘
 
 10X-6 S-04 (Todo)  ← standalone, no prereqs
