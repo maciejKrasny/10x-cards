@@ -108,6 +108,7 @@ Add `zod` as a runtime dependency, declare two new env vars (`OPENROUTER_API_KEY
 **Intent**: Define the two schemas the rest of the slice depends on, plus their inferred TypeScript types.
 
 **Contract**:
+
 - `GenerateRequestSchema` — `z.object({ text: z.string().min(1).max(6000) })`.
 - `GeneratedCardSchema` — `z.object({ front: z.string().min(1).max(1000), back: z.string().min(1).max(1000) })`.
 - `GeneratedCardsSchema` — `z.array(GeneratedCardSchema).min(1).max(30)`.
@@ -121,6 +122,7 @@ Add `zod` as a runtime dependency, declare two new env vars (`OPENROUTER_API_KEY
 **Intent**: Export one async function `generateCardsFromText(text: string): Promise<GeneratedCard[]>` that calls OpenRouter's `/api/v1/chat/completions` endpoint with the configured model, a system prompt instructing the model to detect the source language and produce front/back pairs in that language (max 30 cards), and `response_format: { type: 'json_schema', json_schema: { name: 'cards', strict: true, schema: ... } }`. On a successful 2xx response, parse the assistant message JSON, validate with `GeneratedCardsSchema.safeParse`, and return the array. On any failure path — non-2xx, missing assistant content, JSON parse failure, Zod validation failure — throw a typed error whose message is a stable code string (no LLM I/O substring), one of: `LLM_HTTP_ERROR`, `LLM_EMPTY_RESPONSE`, `LLM_INVALID_OUTPUT`.
 
 **Contract**:
+
 - Function signature: `export async function generateCardsFromText(text: string): Promise<GeneratedCard[]>`.
 - Reads `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` from `astro:env/server`; if either is missing, throw `LLM_NOT_CONFIGURED`.
 - Default model when `OPENROUTER_MODEL` is unset: `openai/gpt-4o-mini` (small/fast tier, strong json_schema support). The implementer should confirm availability on OpenRouter at implementation time and adjust if deprecated.
@@ -161,6 +163,7 @@ New JSON-in/JSON-out Astro API route. It takes `{ text }` in the body, Zod-valid
 **Intent**: Implement a `POST` handler that orchestrates: parse JSON body → Zod-validate → resolve user via SSR client → call `generateCardsFromText` → map to `TablesInsert<'cards'>` with `user_id` from the session → single `supabase.from('cards').insert(rows).select()` → return inserted rows as JSON. Returns a uniform success/error envelope.
 
 **Contract**:
+
 - Export: `export const POST: APIRoute = async (context) => { ... }`.
 - Success response: HTTP 200, `Content-Type: application/json`, body `{ ok: true, cards: Array<{ id, front, back, created_at }> }`.
 - Error envelope: HTTP `<status>`, `Content-Type: application/json`, body `{ ok: false, error: { code: string, message: string } }`. The `message` is a generic human-readable string in English (e.g. `"Generation failed. Please try again."`), NOT a verbatim error from Zod or the LLM client; the `code` is a machine-readable stable token.
@@ -224,6 +227,7 @@ A React island mounted on `/dashboard` that owns the textarea, the in-flight pro
 **Intent**: A React component (client-side state, fetch, render). It owns the textarea, a live character counter, the generate button, the progress UX, the success/error feedback, and the read-only list of the most recent batch. Calls `POST /api/cards/generate` with `{ text }`.
 
 **Contract**:
+
 - Default-exported React component, hydrated `client:load`.
 - Local state (React useState): `text: string`, `status: 'idle' | 'submitting' | 'success' | 'error'`, `phase: 0 | 1 | 2`, `cards: { id, front, back }[]`, `errorMessage: string | null`.
 - Textarea: `maxLength={6000}`, placeholder `"Paste text to generate flashcards…"`. Below it, a character counter `"{text.length} / 6000"` — turns red when over the limit (defence; maxLength also enforces).
@@ -300,6 +304,7 @@ Each phase's Manual Verification list is the gate. Phase 2 owns the NFR-2 privac
 No database migrations in this slice — F-01 already provides the `cards` table and RLS. The only "migration-like" concern is the environment-variable rollout: production must have `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` set via `npx wrangler secret put` before the route is deployed, otherwise the first paste returns a 502.
 
 Sequence at deploy time:
+
 1. `npx wrangler secret put OPENROUTER_API_KEY` (and same for `OPENROUTER_MODEL`).
 2. `npm run build && npx wrangler deploy`.
 3. Smoke-test the deployed URL.

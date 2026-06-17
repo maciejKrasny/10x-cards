@@ -33,24 +33,54 @@ export type Database = {
           back: string;
           created_at: string;
           deck_id: string;
+          difficulty: number;
+          due: string;
+          elapsed_days: number;
           front: string;
           id: string;
+          lapses: number;
+          last_review: string | null;
+          learning_steps: number;
+          reps: number;
+          scheduled_days: number;
+          stability: number;
+          state: number;
           user_id: string;
         };
         Insert: {
           back: string;
           created_at?: string;
           deck_id: string;
+          difficulty?: number;
+          due?: string;
+          elapsed_days?: number;
           front: string;
           id?: string;
+          lapses?: number;
+          last_review?: string | null;
+          learning_steps?: number;
+          reps?: number;
+          scheduled_days?: number;
+          stability?: number;
+          state?: number;
           user_id: string;
         };
         Update: {
           back?: string;
           created_at?: string;
           deck_id?: string;
+          difficulty?: number;
+          due?: string;
+          elapsed_days?: number;
           front?: string;
           id?: string;
+          lapses?: number;
+          last_review?: string | null;
+          learning_steps?: number;
+          reps?: number;
+          scheduled_days?: number;
+          stability?: number;
+          state?: number;
           user_id?: string;
         };
         Relationships: [
@@ -84,12 +114,73 @@ export type Database = {
         };
         Relationships: [];
       };
+      review_logs: {
+        Row: {
+          card_id: string;
+          created_at: string;
+          difficulty: number;
+          due: string;
+          id: string;
+          learning_steps: number;
+          rating: number;
+          review: string;
+          scheduled_days: number;
+          stability: number;
+          state: number;
+          user_id: string;
+        };
+        Insert: {
+          card_id: string;
+          created_at?: string;
+          difficulty: number;
+          due: string;
+          id?: string;
+          learning_steps: number;
+          rating: number;
+          review: string;
+          scheduled_days: number;
+          stability: number;
+          state: number;
+          user_id: string;
+        };
+        Update: {
+          card_id?: string;
+          created_at?: string;
+          difficulty?: number;
+          due?: string;
+          id?: string;
+          learning_steps?: number;
+          rating?: number;
+          review?: string;
+          scheduled_days?: number;
+          stability?: number;
+          state?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "review_logs_card_id_fkey";
+            columns: ["card_id"];
+            isOneToOne: false;
+            referencedRelation: "cards";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      record_review: {
+        Args: {
+          p_card_id: string;
+          p_card_patch: Json;
+          p_rating: number;
+          p_review_at: string;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       [_ in never]: never;

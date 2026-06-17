@@ -2,13 +2,13 @@
 
 ## Live environment
 
-| Key | Value |
-| --- | --- |
-| **Production URL** | https://10x-cards.maciej-krasny97.workers.dev |
-| **Worker name** | `10x-cards` |
-| **Current version ID** | `034a1bcd-4c01-45d1-a403-f61f53adc958` |
+| Key                    | Value                                                          |
+| ---------------------- | -------------------------------------------------------------- |
+| **Production URL**     | https://10x-cards.maciej-krasny97.workers.dev                  |
+| **Worker name**        | `10x-cards`                                                    |
+| **Current version ID** | `034a1bcd-4c01-45d1-a403-f61f53adc958`                         |
 | **Cloudflare account** | maciej.krasny97@gmail.com (`bd0cee5cf6e9933c450eb5dc6a7dcb62`) |
-| **KV Namespace** | `10x-cards-session` (`f38da7f0f79a4e7d8b082ae419f82465`) |
+| **KV Namespace**       | `10x-cards-session` (`f38da7f0f79a4e7d8b082ae419f82465`)       |
 
 ## Active secrets (names only)
 
@@ -19,13 +19,13 @@ Values are write-only via CLI. Retrieve from password manager; rotate with `npx 
 
 ## Supabase project
 
-| Key | Value |
-| --- | --- |
-| **Project URL** | https://adtjatwwrarnbsbiexul.supabase.co |
-| **Site URL** | https://10x-cards.maciej-krasny97.workers.dev |
+| Key                    | Value                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| **Project URL**        | https://adtjatwwrarnbsbiexul.supabase.co                                       |
+| **Site URL**           | https://10x-cards.maciej-krasny97.workers.dev                                  |
 | **Redirect allowlist** | `https://10x-cards.maciej-krasny97.workers.dev/**`, `http://localhost:4321/**` |
-| **SMTP provider** | Built-in Supabase SMTP (MVP — rate-limited to ~4 emails/hr) |
-| **Email templates** | Default English |
+| **SMTP provider**      | Built-in Supabase SMTP (MVP — rate-limited to ~4 emails/hr)                    |
+| **Email templates**    | Default English                                                                |
 
 ## Deploy
 
@@ -46,6 +46,7 @@ npx wrangler rollback <VERSION_ID>     # reverts routing in ~seconds
 ## Approval boundary
 
 **Human-only** (cannot be delegated to agent):
+
 - First-time `wrangler login` OAuth flow
 - Creating or revoking Cloudflare API tokens
 - Rotating Supabase service key or OpenRouter API key
@@ -53,6 +54,7 @@ npx wrangler rollback <VERSION_ID>     # reverts routing in ~seconds
 - Configuring custom domain DNS
 
 **Agent-allowed** (with active wrangler session):
+
 - `npx wrangler deploy`
 - `npx wrangler tail`
 - `npx wrangler secret put`

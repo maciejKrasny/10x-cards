@@ -79,6 +79,9 @@ export default function DeckRow({ deck, isEditing, onStartEdit, onCancelEdit, on
         </span>
       </a>
       <div className="flex gap-2">
+        <Button asChild size="sm">
+          <a href={`/study/${deck.id}`}>Study</a>
+        </Button>
         <Button
           onClick={onStartEdit}
           variant="outline"

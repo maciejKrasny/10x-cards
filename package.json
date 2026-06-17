@@ -14,7 +14,9 @@
     "db:test:rls": "cat supabase/tests/rls_cards_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1",
     "db:test:rls:linked": "cat supabase/tests/rls_cards_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1",
     "db:test:rls:decks": "cat supabase/tests/rls_decks_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1",
-    "db:test:rls:decks:linked": "cat supabase/tests/rls_decks_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1"
+    "db:test:rls:decks:linked": "cat supabase/tests/rls_decks_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1",
+    "db:test:rls:review-logs": "cat supabase/tests/rls_review_logs_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1",
+    "db:test:rls:review-logs:linked": "cat supabase/tests/rls_review_logs_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
@@ -37,6 +39,7 @@
     "react-dom": "^19.2.6",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.4",
+    "ts-fsrs": "^5.4.1",
     "tw-animate-css": "^1.4.0",
     "zod": "^4.4.3"
   },

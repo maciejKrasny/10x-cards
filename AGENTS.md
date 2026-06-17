@@ -14,6 +14,7 @@ npm run format       # Prettier format all files
 ```
 
 Deployment uses Wrangler (Cloudflare Workers):
+
 ```bash
 npx wrangler deploy  # deploy to Cloudflare
 npx wrangler dev     # local Cloudflare Workers runtime (differs from astro dev)
@@ -30,6 +31,7 @@ npx wrangler dev     # local Cloudflare Workers runtime (differs from astro dev)
 **LLM client**: `src/lib/llm/openrouter.ts` wraps OpenRouter's chat-completions endpoint with strict `json_schema` response format. Reads `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` (default `openai/gpt-4o-mini`) from `astro:env/server`. Errors throw `Error` with stable code messages (`LLM_HTTP_ERROR`, `LLM_EMPTY_RESPONSE`, `LLM_INVALID_OUTPUT`, `LLM_NOT_CONFIGURED`) and never leak request/response strings.
 
 **Routing**:
+
 - `src/pages/api/auth/` — POST-only form handlers (signin, signup, signout); form-encoded in, redirect out
 - `src/pages/api/cards/` — JSON-in / JSON-out endpoints; must call `supabase.auth.getUser()` for auth (middleware does not redirect API routes)
 - `src/middleware.ts` — session extraction and route protection (pages only)

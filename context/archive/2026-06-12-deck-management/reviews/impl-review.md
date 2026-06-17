@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Deck Management — list, edit, delete, and manually create cards
 
 - **Plan**: context/changes/deck-management/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | PASS |
-| Safety & Quality | WARNING |
-| Architecture | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | PASS    |
+| Safety & Quality    | WARNING |
+| Architecture        | PASS    |
 | Pattern Consistency | WARNING |
-| Success Criteria | PASS |
+| Success Criteria    | PASS    |
 
 ## Findings
 

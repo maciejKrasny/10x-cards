@@ -40,10 +40,10 @@ hints:
 
 ## Pre-scaffold verification
 
-| Signal      | Value                                  | Severity     | Notes                                                                                                      |
-| ----------- | -------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------- |
-| npm package | not run                                | n/a          | cmd_template starts with `git clone`; npm package recency check skipped per pre-scaffold-verification.md  |
-| GitHub repo | not run                                | n/a          | `gh api` returned 404 — gh CLI appears configured for GitHub Enterprise; public repo check unavailable     |
+| Signal      | Value   | Severity | Notes                                                                                                    |
+| ----------- | ------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| npm package | not run | n/a      | cmd_template starts with `git clone`; npm package recency check skipped per pre-scaffold-verification.md |
+| GitHub repo | not run | n/a      | `gh api` returned 404 — gh CLI appears configured for GitHub Enterprise; public repo check unavailable   |
 
 Recency check unavailable: `gh` CLI is configured for GitHub Enterprise Server (api returned 404 for `przeprogramowani/10x-astro-starter`). The repo cloned successfully via HTTPS, indicating it is publicly accessible on github.com. Proceeding.
 
@@ -58,6 +58,7 @@ Recency check unavailable: `gh` CLI is configured for GitHub Enterprise Server (
 **.bootstrap-scaffold cleanup**: deleted
 
 npm engine warnings (informational, not blocking):
+
 - Node v20.19.5 in use; several packages require `>=22.0.0` or `>=22.12.0`. The starter card's toolchain specifies `node 22`. Upgrading to Node 22 LTS is recommended before running `npm run dev` or deploying.
 
 ## Post-scaffold audit
@@ -93,21 +94,21 @@ None.
 
 ## Hints recorded but not acted on
 
-| Hint                    | Value               |
-| ----------------------- | ------------------- |
-| bootstrapper_confidence | first-class         |
-| quality_override        | false               |
-| path_taken              | standard            |
-| self_check_answers      | null                |
-| team_size               | solo                |
-| deployment_target       | cloudflare-pages    |
-| ci_provider             | github-actions      |
-| ci_default_flow         | auto-deploy-on-merge|
-| has_auth                | true                |
-| has_payments            | false               |
-| has_realtime            | false               |
-| has_ai                  | true                |
-| has_background_jobs     | false               |
+| Hint                    | Value                |
+| ----------------------- | -------------------- |
+| bootstrapper_confidence | first-class          |
+| quality_override        | false                |
+| path_taken              | standard             |
+| self_check_answers      | null                 |
+| team_size               | solo                 |
+| deployment_target       | cloudflare-pages     |
+| ci_provider             | github-actions       |
+| ci_default_flow         | auto-deploy-on-merge |
+| has_auth                | true                 |
+| has_payments            | false                |
+| has_realtime            | false                |
+| has_ai                  | true                 |
+| has_background_jobs     | false                |
 
 These values were read from the hand-off and preserved here for the future M1L4 skill (Memory Architecture). No automated action was taken on any of them in v1.
 
@@ -116,6 +117,7 @@ These values were read from the hand-off and preserved here for the future M1L4 
 Next: a future skill will set up agent context (CLAUDE.md, AGENTS.md). For now, your project is scaffolded and verified — happy hacking.
 
 Useful manual steps in the meantime:
+
 - `git init` (if you have not already) to start your own repo history.
 - Review `CLAUDE.md.scaffold` — the starter ships its own CLAUDE.md; diff it against your existing one to see if anything is worth merging in.
 - Upgrade to Node 22 LTS (`nvm install 22 && nvm use 22`) — several packages (astro, wrangler, miniflare) require it.

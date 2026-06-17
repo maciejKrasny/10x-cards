@@ -17,43 +17,43 @@ created: 2026-05-30
 
 ### Type
 
-| Label | Meaning |
-|---|---|
+| Label              | Meaning                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------- |
 | `type: foundation` | Horizontal enabler — no user-visible outcome on its own; unlocks downstream slices |
-| `type: slice` | Vertical, user-visible milestone |
+| `type: slice`      | Vertical, user-visible milestone                                                   |
 
 ### Stream (one-word outcome of the stream)
 
-| Label | Stream | Roadmap items |
-|---|---|---|
-| `stream: learning` | AI generation → spaced repetition north star | F-01, S-01, S-03 |
-| `stream: management` | Deck management | S-02 |
-| `stream: auth` | Auth PRD compliance | S-04 |
+| Label                | Stream                                       | Roadmap items    |
+| -------------------- | -------------------------------------------- | ---------------- |
+| `stream: learning`   | AI generation → spaced repetition north star | F-01, S-01, S-03 |
+| `stream: management` | Deck management                              | S-02             |
+| `stream: auth`       | Auth PRD compliance                          | S-04             |
 
 ### Status
 
-| Label | Meaning |
-|---|---|
-| `status: ready` | Prerequisites met — can be picked up immediately |
-| `status: proposed` | Waiting on one or more prerequisites |
+| Label              | Meaning                                          |
+| ------------------ | ------------------------------------------------ |
+| `status: ready`    | Prerequisites met — can be picked up immediately |
+| `status: proposed` | Waiting on one or more prerequisites             |
 
 ## Roadmap → Issues mapping
 
-| Roadmap ID | Change ID | GitHub Issue | Status |
-|---|---|---|---|
-| F-01 | `cards-schema-baseline` | [#1 Cards table + Supabase migration/codegen baseline](https://github.com/maciejKrasny/10x-cards/issues/1) | ready |
-| S-04 | `auth-prd-compliance` | [#2 Auth journey: PRD compliance + clean error states](https://github.com/maciejKrasny/10x-cards/issues/2) | ready |
-| S-01 | `ai-generate-from-paste` | [#3 Paste text → AI generates and saves flashcards](https://github.com/maciejKrasny/10x-cards/issues/3) | proposed |
-| S-02 | `deck-management` | [#4 List, edit, delete, and manually create flashcards](https://github.com/maciejKrasny/10x-cards/issues/4) | proposed |
-| S-03 | `first-spaced-repetition-session` | [#5 First spaced-repetition session — close the learning loop](https://github.com/maciejKrasny/10x-cards/issues/5) | proposed |
+| Roadmap ID | Change ID                         | GitHub Issue                                                                                                       | Status |
+| ---------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------ |
+| F-01       | `cards-schema-baseline`           | [#1 Cards table + Supabase migration/codegen baseline](https://github.com/maciejKrasny/10x-cards/issues/1)         | done   |
+| S-04       | `auth-prd-compliance`             | [#2 Auth journey: PRD compliance + clean error states](https://github.com/maciejKrasny/10x-cards/issues/2)         | ready  |
+| S-01       | `ai-generate-from-paste`          | [#3 Paste text → AI generates and saves flashcards](https://github.com/maciejKrasny/10x-cards/issues/3)            | done   |
+| S-02       | `deck-management`                 | [#4 List, edit, delete, and manually create flashcards](https://github.com/maciejKrasny/10x-cards/issues/4)        | done   |
+| S-03       | `first-spaced-repetition-session` | [#5 First spaced-repetition session — close the learning loop](https://github.com/maciejKrasny/10x-cards/issues/5) | done   |
 
 ## Dependency graph
 
 ```
-#1 F-01 (ready)
-├── #3 S-01 (proposed) ──┐
-│                        ├── #5 S-03 (proposed)  ← north star
-└── #4 S-02 (proposed) ──┘
+#1 F-01 (done)
+├── #3 S-01 (done) ──┐
+│                    ├── #5 S-03 (done)  ← north star
+└── #4 S-02 (done) ──┘
 
 #2 S-04 (ready)  ← standalone, no prereqs
 ```

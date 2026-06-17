@@ -3,7 +3,7 @@ project: 10xCards
 version: 1
 status: draft
 created: 2026-05-28
-updated: 2026-06-12
+updated: 2026-06-17
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -27,13 +27,13 @@ top_blocker: capacity
 
 ## At a glance
 
-| ID   | Change ID                       | Outcome (user can …)                                                            | Prerequisites | PRD refs                               | Status   |
-| ---- | ------------------------------- | ------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
-| F-01 | cards-schema-baseline           | (foundation) cards table + RLS + migration & codegen pattern established        | —             | Access Control, Guardrails-1           | done     |
-| S-01 | ai-generate-from-paste          | paste a block of text and get AI-generated cards auto-saved to their deck       | F-01          | US-01, FR-004, NFR-1, NFR-2            | done     |
-| S-02 | deck-management                 | list, edit, delete, and manually create cards                                   | F-01          | FR-005, FR-006, FR-007, FR-008         | done     |
-| S-03 | first-spaced-repetition-session | study their deck via a spaced-repetition session that persists review progress  | F-01, S-01    | US-01, FR-009, Primary SC, Guardrails-2 | proposed |
-| S-04 | auth-prd-compliance             | sign up, confirm email, sign in, sign out — PRD-compliant journey with user-readable error states | —             | FR-001, FR-002, FR-003, Access Control | ready    |
+| ID   | Change ID                       | Outcome (user can …)                                                                              | Prerequisites | PRD refs                                | Status |
+| ---- | ------------------------------- | ------------------------------------------------------------------------------------------------- | ------------- | --------------------------------------- | ------ |
+| F-01 | cards-schema-baseline           | (foundation) cards table + RLS + migration & codegen pattern established                          | —             | Access Control, Guardrails-1            | done   |
+| S-01 | ai-generate-from-paste          | paste a block of text and get AI-generated cards auto-saved to their deck                         | F-01          | US-01, FR-004, NFR-1, NFR-2             | done   |
+| S-02 | deck-management                 | list, edit, delete, and manually create cards                                                     | F-01          | FR-005, FR-006, FR-007, FR-008          | done   |
+| S-03 | first-spaced-repetition-session | study their deck via a spaced-repetition session that persists review progress                    | F-01, S-01    | US-01, FR-009, Primary SC, Guardrails-2 | done   |
+| S-04 | auth-prd-compliance             | sign up, confirm email, sign in, sign out — PRD-compliant journey with user-readable error states | —             | FR-001, FR-002, FR-003, Access Control  | ready  |
 
 ## Streams
 
@@ -116,7 +116,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Reviews-table schema shape — does it store the full FSRS state (stability, difficulty, retrievability) or only a minimal review-event log? The shape choice affects whether the SR library can be swapped later. — Owner: implementer. Block: no.
   - Session UX boundary — what counts as "session complete" (every due card reviewed, fixed batch size, time-bounded)? — Owner: implementer. Block: no.
 - **Risk:** North star — this slice IS the validation milestone the Primary Success Criterion names. Sequenced as early as Prerequisites allow under `main_goal: speed`. Failure mode for the slice: review state is lost between sessions (Guardrails-2 violation), or the next-due scheduling diverges from the wrapped library's contract; mitigation is to wrap ts-fsrs (or equivalent) rather than reimplement (Non-Goal-1 already enforces this) and to use an idempotent persist-then-acknowledge pattern in the review-write endpoint.
-- **Status:** proposed
+- **Status:** done
 
 ### S-04: Auth flow PRD compliance
 
@@ -133,13 +133,13 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                       | Suggested issue title                                                  | Ready for `/10x-plan` | Notes                                              |
-| ---------- | ------------------------------- | ---------------------------------------------------------------------- | --------------------- | -------------------------------------------------- |
-| F-01       | cards-schema-baseline           | Cards table + Supabase migration / codegen baseline (with RLS)         | yes                   | Run `/10x-plan cards-schema-baseline` first.       |
-| S-01       | ai-generate-from-paste          | Paste text → AI generates and saves flashcards (wedge)                 | no                    | Becomes `ready` once F-01 lands.                   |
-| S-02       | deck-management                 | List, edit, delete, and manually create flashcards                     | no                    | Becomes `ready` once F-01 lands; parallel with S-01. |
-| S-03       | first-spaced-repetition-session | First spaced-repetition session — close the learning loop (north star) | no                    | Becomes `ready` once F-01 and S-01 are `done`.     |
-| S-04       | auth-prd-compliance             | Auth journey: PRD compliance + clean error states                      | yes                   | Standalone — no Prereqs; runs in parallel with any other slice. |
+| Roadmap ID | Change ID                       | Suggested issue title                                                  | Ready for `/10x-plan` | Notes                                                                       |
+| ---------- | ------------------------------- | ---------------------------------------------------------------------- | --------------------- | --------------------------------------------------------------------------- |
+| F-01       | cards-schema-baseline           | Cards table + Supabase migration / codegen baseline (with RLS)         | yes                   | Run `/10x-plan cards-schema-baseline` first.                                |
+| S-01       | ai-generate-from-paste          | Paste text → AI generates and saves flashcards (wedge)                 | no                    | Becomes `ready` once F-01 lands.                                            |
+| S-02       | deck-management                 | List, edit, delete, and manually create flashcards                     | no                    | Becomes `ready` once F-01 lands; parallel with S-01.                        |
+| S-03       | first-spaced-repetition-session | First spaced-repetition session — close the learning loop (north star) | yes                   | F-01 and S-01 are `done` — run `/10x-plan first-spaced-repetition-session`. |
+| S-04       | auth-prd-compliance             | Auth journey: PRD compliance + clean error states                      | yes                   | Standalone — no Prereqs; runs in parallel with any other slice.             |
 
 ## Open Roadmap Questions
 
@@ -163,3 +163,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-01: (foundation) Supabase migrations and typed-client codegen pipeline are in place; a `cards` table exists with a Row-Level Security policy isolating each card to its owning user; downstream slices can extend the schema by following the established migration + codegen pattern.** — Archived 2026-06-05 → `context/archive/2026-06-05-cards-schema-baseline/`. Lesson: —.
 - **S-01: A logged-in user pastes a block of text, triggers AI generation, and finds the generated cards already saved to their deck — visible in a minimal post-generation view, with acknowledgement appearing within 2 s of triggering and visible progress for the full duration of the operation.** — Archived 2026-06-12 → `context/archive/2026-06-05-ai-generate-from-paste/`. Lesson: —.
 - **S-02: A logged-in user views every card in their deck, edits the front/back of any card, deletes any card, and adds a new card manually (the gen-failure fallback path that US-01's acceptance criteria require).** — Archived 2026-06-12 → `context/archive/2026-06-12-deck-management/`. Lesson: —.
+- **S-03: A logged-in user with cards in their deck starts a spaced-repetition session, sees one card at a time, rates recall, and finishes the session — their progress (review history per card) is persisted and the next-due scheduling has been computed by an existing open-source SR library (e.g. ts-fsrs). When they return the next day, the deck shows cards due for review.** — Archived 2026-06-17 → `context/archive/2026-06-13-first-spaced-repetition-session/`. Lesson: —.

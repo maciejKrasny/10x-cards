@@ -69,6 +69,7 @@ Bootstrap the migrations directory via the CLI and write the first migration: `c
 **Intent**: Create the canonical migration that establishes the `cards` table, enables RLS, and adds the four per-action policies. This is the file every downstream agent will copy as a template for their own migrations.
 
 **Contract**:
+
 - Table `public.cards`:
   - `id uuid primary key default gen_random_uuid()`
   - `user_id uuid not null references auth.users(id) on delete cascade`
@@ -188,6 +189,7 @@ Encode the Guardrails-1 invariant — "user B never sees user A's cards" — as 
 **Intent**: Prove that the four RLS policies actually isolate users. Two transactions: one inserts as user A, the next selects as user B and asserts zero rows.
 
 **Contract**: A `psql` script that:
+
 1. Inserts a fresh card for synthetic user A by setting `local request.jwt.claims` to `{"sub": "<uuid-A>", "role": "authenticated"}` inside one transaction.
 2. In a separate transaction, sets claims to user B and runs `select count(*) from public.cards where user_id = '<uuid-A>';` — asserts the result is `0` via `\if` + `\echo ERROR` + exit-on-error semantics (or via `do $$ begin assert ...; end $$;`).
 3. Repeats the inverse direction (B inserts, A counts zero) as a second check.
@@ -327,6 +329,7 @@ Catch the most likely silent regression — a migration lands without regenerati
 **Intent**: After lint passes and before `npm run build`, start Supabase, apply migrations, regen types, and fail if `git diff --exit-code src/db/database.types.ts` reports changes. The failure message must tell the contributor exactly how to fix it.
 
 **Contract**: A new step (or steps) that:
+
 - Runs `supabase` CLI inside the Actions runner. The CLI is already a devDependency, so it's available via `npx supabase` after `npm ci`. Action `supabase/setup-cli@v1` is the cleaner path if direct `npx` proves slow; either is acceptable — pick during implementation.
 - Executes `npx supabase start` (or `supabase/setup-cli` equivalent), then `npx supabase db reset --no-seed` (no seed file exists), then `npm run db:types`.
 - Final step: `git diff --exit-code src/db/database.types.ts` — non-zero exit fails the job.
