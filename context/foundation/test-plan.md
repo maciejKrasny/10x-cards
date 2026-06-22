@@ -134,7 +134,12 @@ How to add new tests in this project. Each sub-section is filled in once the rel
 
 ### 6.6 Adding a structural / parity check
 
-- TBD — see §3 Phase 4 (page-route ↔ `PROTECTED_ROUTES` parity; production env-var presence parity).
+- **Location**: `scripts/check-<concern>.ts`.
+- **Naming**: `check-<concern>` for the script and the npm script (`npm run check:<concern>`).
+- **Reference**: `scripts/check-env-rollout.ts`.
+- **Pattern**: read the PR diff via `git diff --unified=0 <base>...HEAD`; detect the trigger condition by text-matching against the diff (do not parse JS/TS — too brittle); on trigger, scan the relevant on-disk artifacts (e.g., `context/changes/*/plan.md`) and exit 1 with a readable, single-line, actionable error message when the acknowledgement is missing.
+- **Run locally**: `npm run check:<concern>`. Locally, the script falls back to `origin/main` as the base ref; in CI it uses `GITHUB_BASE_REF`.
+- **Wire into CI**: add a step under `.github/workflows/ci.yml`, guarded with `if: github.event_name == 'pull_request'` so direct pushes to `main` skip the check (no diff context).
 
 ### 6.7 Per-rollout-phase notes
 

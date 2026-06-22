@@ -442,7 +442,7 @@ The `if` guard skips the check on direct pushes to `main` (where there is no dif
 
 ### Rollout acknowledgements
 
-- [ ] 0.1 No production env vars introduced by this plan (acknowledgement-form per lessons.md)
+- [x] 0.1 No production env vars introduced by this plan (acknowledgement-form per lessons.md)
 
 ### Phase 1: Vitest bootstrap + smoke
 
@@ -477,26 +477,26 @@ The `if` guard skips the check on direct pushes to `main` (where there is no dif
 
 #### Automated
 
-- [x] 3.1 `npm test` exits 0 with all 6 + 16 = 22 cases passing
-- [x] 3.2 `npm run typecheck` exits 0
-- [x] 3.3 `npm run lint` still passes
-- [x] 3.4 CI run shows new `npm run typecheck` and `npm test` steps green
-- [x] 3.5 `git diff context/foundation/test-plan.md` shows only the §6.2 update
+- [x] 3.1 `npm test` exits 0 with all 6 + 16 = 22 cases passing — 68e75a9
+- [x] 3.2 `npm run typecheck` exits 0 — 68e75a9
+- [x] 3.3 `npm run lint` still passes — 68e75a9
+- [x] 3.4 CI run shows new `npm run typecheck` and `npm test` steps green — 68e75a9
+- [x] 3.5 `git diff context/foundation/test-plan.md` shows only the §6.2 update — 68e75a9
 
 #### Manual
 
-- [x] 3.6 A contributor can copy the shape of `generate.test.ts` to write a second route's integration test
-- [x] 3.7 GitHub Actions tab confirms the workflow ran the new steps in the expected order
-- [x] 3.8 Cookbook §6.2 is human-readable to a contributor unfamiliar with this plan
+- [x] 3.6 A contributor can copy the shape of `generate.test.ts` to write a second route's integration test — 68e75a9
+- [x] 3.7 GitHub Actions tab confirms the workflow ran the new steps in the expected order — 68e75a9
+- [x] 3.8 Cookbook §6.2 is human-readable to a contributor unfamiliar with this plan — 68e75a9
 
 ### Phase 4: Env-var rollout PR-check + cookbook §6.6
 
 #### Automated
 
-- [ ] 4.1 `npm install` succeeds (tsx resolves)
-- [ ] 4.2 `npm run check:env-rollout` exits 0 against this PR's actual diff
-- [ ] 4.3 A synthetic diff adding an envField without an acknowledged plan exits 1 with the documented message
-- [ ] 4.4 `npm test`, `npm run typecheck`, `npm run lint` all still pass
+- [x] 4.1 `npm install` succeeds (tsx resolves)
+- [x] 4.2 `npm run check:env-rollout` exits 0 against this PR's actual diff
+- [x] 4.3 A synthetic diff adding an envField without an acknowledged plan exits 1 with the documented message
+- [x] 4.4 `npm test`, `npm run typecheck`, `npm run lint` all still pass
 - [ ] 4.5 CI run shows the env-rollout step green
 
 #### Manual
