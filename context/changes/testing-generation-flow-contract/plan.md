@@ -462,32 +462,32 @@ The `if` guard skips the check on direct pushes to `main` (where there is no dif
 
 #### Automated
 
-- [x] 2.1 `npm test` exits 0 with all 8 + 8 = 16 cases passing
-- [x] 2.2 `npm run lint` still passes
-- [x] 2.3 `npx astro check` still passes
-- [x] 2.4 Smoke file `src/lib/llm/schemas.smoke.test.ts` is removed
+- [x] 2.1 `npm test` exits 0 with all 8 + 8 = 16 cases passing — f876e9e
+- [x] 2.2 `npm run lint` still passes — f876e9e
+- [x] 2.3 `npx astro check` still passes — f876e9e
+- [x] 2.4 Smoke file `src/lib/llm/schemas.smoke.test.ts` is removed — f876e9e
 
 #### Manual
 
-- [x] 2.5 Mutating one throw site in `openrouter.ts` makes exactly one test fail with a readable diff
-- [x] 2.6 Test names read as user-facing failure scenarios, not internal branch names
-- [x] 2.7 Cookbook §6.1 is human-readable to a contributor unfamiliar with this plan
+- [x] 2.5 Mutating one throw site in `openrouter.ts` makes exactly one test fail with a readable diff — f876e9e
+- [x] 2.6 Test names read as user-facing failure scenarios, not internal branch names — f876e9e
+- [x] 2.7 Cookbook §6.1 is human-readable to a contributor unfamiliar with this plan — f876e9e
 
 ### Phase 3: Generate-route integration tests + CI wiring + cookbook §6.2
 
 #### Automated
 
-- [ ] 3.1 `npm test` exits 0 with all 6 + 16 = 22 cases passing
-- [ ] 3.2 `npm run typecheck` exits 0
-- [ ] 3.3 `npm run lint` still passes
-- [ ] 3.4 CI run shows new `npm run typecheck` and `npm test` steps green
-- [ ] 3.5 `git diff context/foundation/test-plan.md` shows only the §6.2 update
+- [x] 3.1 `npm test` exits 0 with all 6 + 16 = 22 cases passing
+- [x] 3.2 `npm run typecheck` exits 0
+- [x] 3.3 `npm run lint` still passes
+- [x] 3.4 CI run shows new `npm run typecheck` and `npm test` steps green
+- [x] 3.5 `git diff context/foundation/test-plan.md` shows only the §6.2 update
 
 #### Manual
 
-- [ ] 3.6 A contributor can copy the shape of `generate.test.ts` to write a second route's integration test
-- [ ] 3.7 GitHub Actions tab confirms the workflow ran the new steps in the expected order
-- [ ] 3.8 Cookbook §6.2 is human-readable to a contributor unfamiliar with this plan
+- [x] 3.6 A contributor can copy the shape of `generate.test.ts` to write a second route's integration test
+- [x] 3.7 GitHub Actions tab confirms the workflow ran the new steps in the expected order
+- [x] 3.8 Cookbook §6.2 is human-readable to a contributor unfamiliar with this plan
 
 ### Phase 4: Env-var rollout PR-check + cookbook §6.6
 

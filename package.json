@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "astro check",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts && prettier --write src/db/database.types.ts",
     "db:test:rls": "cat supabase/tests/rls_cards_isolation.sql | docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1",
     "db:test:rls:linked": "cat supabase/tests/rls_cards_isolation.sql | docker run --rm -i postgres:17-alpine psql \"${HOSTED_DB_URL:?HOSTED_DB_URL not set; export it from the Supabase dashboard before running}\" -v ON_ERROR_STOP=1",

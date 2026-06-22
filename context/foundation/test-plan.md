@@ -110,7 +110,12 @@ How to add new tests in this project. Each sub-section is filled in once the rel
 
 ### 6.2 Adding an integration test for an API endpoint
 
-- TBD — see §3 Phase 1 (paste-to-cards endpoint with mocked LLM fixtures) and §3 Phase 2 (two-user IDOR matrix across cards/decks/review_logs).
+- **Location**: `src/pages/api/<area>/<endpoint>.test.ts` co-located with the route file.
+- **Naming**: `<route-filename-without-ext>.test.ts`.
+- **Reference test**: `src/pages/api/cards/generate.test.ts`.
+- **Mocking patterns**: `vi.mock("@/lib/supabase", () => ({ createClient: vi.fn() }))` to stub the Supabase client; a per-test `beforeEach` re-installs a fake exposing `.auth.getUser()` and the chainable `.from(...).select().eq().eq().maybeSingle()` shape the route uses. `vi.spyOn(globalThis, "fetch")` for outgoing HTTP. Build the `APIContext` inline (a real `Request` + a minimal `cookies`/`locals` stub); no Astro `Container` API required.
+- **Assertion shape**: status + body shape (`ok`, `error.code`, presence/absence of payload fields like `cards`). Do not assert on `error.message` — those strings are user-facing and may legitimately change.
+- **Run locally**: `npm test`. Scope to one file with `npm test -- src/pages/api/cards/generate.test.ts`.
 
 ### 6.3 Adding a component test (React inline edit / error path)
 
