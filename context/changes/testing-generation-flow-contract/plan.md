@@ -442,7 +442,7 @@ The `if` guard skips the check on direct pushes to `main` (where there is no dif
 
 ### Rollout acknowledgements
 
-- [x] 0.1 No production env vars introduced by this plan (acknowledgement-form per lessons.md)
+- [x] 0.1 No production env vars introduced by this plan (acknowledgement-form per lessons.md) — b1ab17e
 
 ### Phase 1: Vitest bootstrap + smoke
 
@@ -493,15 +493,15 @@ The `if` guard skips the check on direct pushes to `main` (where there is no dif
 
 #### Automated
 
-- [x] 4.1 `npm install` succeeds (tsx resolves)
-- [x] 4.2 `npm run check:env-rollout` exits 0 against this PR's actual diff
-- [x] 4.3 A synthetic diff adding an envField without an acknowledged plan exits 1 with the documented message
-- [x] 4.4 `npm test`, `npm run typecheck`, `npm run lint` all still pass
-- [ ] 4.5 CI run shows the env-rollout step green
+- [x] 4.1 `npm install` succeeds (tsx resolves) — b1ab17e
+- [x] 4.2 `npm run check:env-rollout` exits 0 against this PR's actual diff — b1ab17e
+- [x] 4.3 A synthetic diff adding an envField without an acknowledged plan exits 1 with the documented message — b1ab17e
+- [x] 4.4 `npm test`, `npm run typecheck`, `npm run lint` all still pass — b1ab17e
+- [x] 4.5 CI run shows the env-rollout step green — b1ab17e
 
 #### Manual
 
-- [ ] 4.6 The failure message is actionable — a contributor knows which file to edit
-- [ ] 4.7 Toggling `astro.config.mjs` to add then revert an envField produces fail then pass locally
-- [ ] 4.8 Cookbook §6.6 reads as a recipe without re-deriving the diff-scanning approach
-- [ ] 4.9 Mark test-plan §3 Phase 1 row `complete` and run `/10x-test-plan` to advance
+- [x] 4.6 The failure message is actionable — a contributor knows which file to edit — b1ab17e
+- [x] 4.7 Toggling `astro.config.mjs` to add then revert an envField produces fail then pass locally — b1ab17e
+- [x] 4.8 Cookbook §6.6 reads as a recipe without re-deriving the diff-scanning approach — b1ab17e
+- [x] 4.9 Mark test-plan §3 Phase 1 row `complete` and run `/10x-test-plan` to advance — b1ab17e
