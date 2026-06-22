@@ -1,10 +1,10 @@
 ---
 change_id: testing-generation-flow-contract
 title: Generation-flow contract — LLM payload robustness + env-var rollout gate
-status: implemented
+status: archived
 created: 2026-06-22
 updated: 2026-06-22
-archived_at: null
+archived_at: 2026-06-22T19:36:41Z
 ---
 
 ## Notes
