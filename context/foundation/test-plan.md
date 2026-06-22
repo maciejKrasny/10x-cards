@@ -50,7 +50,7 @@ Each row is a discrete rollout phase that will open its own change folder via `/
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
-| 1 | Generation-flow contract | Prove paste-to-cards cannot save garbage cards or crash on any LLM-response failure mode; bootstrap the JS/TS test runner; close the env-var rollout gap. | #1, #2 | unit + integration + CI gate | change opened | `context/changes/testing-generation-flow-contract/` |
+| 1 | Generation-flow contract | Prove paste-to-cards cannot save garbage cards or crash on any LLM-response failure mode; bootstrap the JS/TS test runner; close the env-var rollout gap. | #1, #2 | unit + integration + CI gate | complete | `context/archive/2026-06-22-testing-generation-flow-contract/` |
 | 2 | API ownership & inline-edit resilience | Prove every cards/decks/review_logs API route scopes on `auth.uid()` not path-param trust; prove inline-edit preserves user input on failure. | #3, #5 | integration + component | not started | — |
 | 3 | SR session integrity | Prove review writes are idempotent and the ts-fsrs wrapper schedules the card the library says is due — Primary SC + Guardrails-2 protection. | #4 | integration + contract | not started | — |
 | 4 | Auth gating parity + CI gate wiring | Prove no authenticated route ships without `PROTECTED_ROUTES` coverage; wire required gates (typecheck, unit+integration) into CI. | #6 | structural parity + CI gates | not started | — |
