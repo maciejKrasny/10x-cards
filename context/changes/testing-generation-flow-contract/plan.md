@@ -448,30 +448,30 @@ The `if` guard skips the check on direct pushes to `main` (where there is no dif
 
 #### Automated
 
-- [x] 1.1 `npm install` succeeds
-- [x] 1.2 `npm test` exits 0 with the smoke test passing
-- [x] 1.3 `npx astro check` still passes
-- [x] 1.4 `npm run lint` still passes
+- [x] 1.1 `npm install` succeeds — 52700fe
+- [x] 1.2 `npm test` exits 0 with the smoke test passing — 52700fe
+- [x] 1.3 `npx astro check` still passes — 52700fe
+- [x] 1.4 `npm run lint` still passes — 52700fe
 
 #### Manual
 
-- [x] 1.5 `npm run test:watch` starts watch mode and re-runs on save
-- [x] 1.6 A deliberate failing assertion produces a readable diff in the Vitest reporter
+- [x] 1.5 `npm run test:watch` starts watch mode and re-runs on save — 52700fe
+- [x] 1.6 A deliberate failing assertion produces a readable diff in the Vitest reporter — 52700fe
 
 ### Phase 2: LLM client + Zod unit tests + cookbook §6.1
 
 #### Automated
 
-- [ ] 2.1 `npm test` exits 0 with all 8 + 8 = 16 cases passing
-- [ ] 2.2 `npm run lint` still passes
-- [ ] 2.3 `npx astro check` still passes
-- [ ] 2.4 Smoke file `src/lib/llm/schemas.smoke.test.ts` is removed
+- [x] 2.1 `npm test` exits 0 with all 8 + 8 = 16 cases passing
+- [x] 2.2 `npm run lint` still passes
+- [x] 2.3 `npx astro check` still passes
+- [x] 2.4 Smoke file `src/lib/llm/schemas.smoke.test.ts` is removed
 
 #### Manual
 
-- [ ] 2.5 Mutating one throw site in `openrouter.ts` makes exactly one test fail with a readable diff
-- [ ] 2.6 Test names read as user-facing failure scenarios, not internal branch names
-- [ ] 2.7 Cookbook §6.1 is human-readable to a contributor unfamiliar with this plan
+- [x] 2.5 Mutating one throw site in `openrouter.ts` makes exactly one test fail with a readable diff
+- [x] 2.6 Test names read as user-facing failure scenarios, not internal branch names
+- [x] 2.7 Cookbook §6.1 is human-readable to a contributor unfamiliar with this plan
 
 ### Phase 3: Generate-route integration tests + CI wiring + cookbook §6.2
 
