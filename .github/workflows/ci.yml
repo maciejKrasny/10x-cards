@@ -18,6 +18,11 @@ jobs:
       - run: npm ci
       - run: npx astro sync
       - run: npm run lint
+      - name: Env-var rollout gate
+        if: github.event_name == 'pull_request'
+        run: npm run check:env-rollout
+      - run: npm run typecheck
+      - run: npm test
       - name: Start local Postgres for type generation
         run: npx supabase db start
       - name: Apply migrations and regenerate types
