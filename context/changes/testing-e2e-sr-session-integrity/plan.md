@@ -226,27 +226,27 @@ Add the two browser-level specs that exercise the React state-machine branches t
 
 #### Automated
 
-- [x] 1.1 `npm run test:e2e -- playwright/tests/study-session-happy-path.spec.ts` exits 0 against a running `npm run dev`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Deliberate-break: comment out the `setCounters(...)` block at `src/components/study/StudySessionPage.tsx:144-151` → spec goes red on the `Good: 2` assertion → revert the break
+- [x] 1.1 `npm run test:e2e -- playwright/tests/study-session-happy-path.spec.ts` exits 0 against a running `npm run dev` — bdf2b22
+- [x] 1.2 Lint passes: `npm run lint` — bdf2b22
+- [x] 1.3 Deliberate-break: comment out the `setCounters(...)` block at `src/components/study/StudySessionPage.tsx:144-151` → spec goes red on the `Good: 2` assertion → revert the break — bdf2b22
 
 #### Manual
 
-- [ ] 1.4 Run the spec headed (`npx playwright test playwright/tests/study-session-happy-path.spec.ts --headed`) and confirm the UI behaves as the spec asserts (reveal works, ratings tick, summary renders the expected counts)
-- [ ] 1.5 After the run, sign in as `test@test.pl` and confirm the test deck does not appear at `/decks`
+- [x] 1.4 Run the spec headed (`npx playwright test playwright/tests/study-session-happy-path.spec.ts --headed`) and confirm the UI behaves as the spec asserts (reveal works, ratings tick, summary renders the expected counts)
+- [x] 1.5 After the run, sign in as `test@test.pl` and confirm the test deck does not appear at `/decks`
 
 ### Phase 2: Conflicted-tick + REVIEW_CONFLICT recovery
 
 #### Automated
 
-- [ ] 2.1 `npm run test:e2e -- playwright/tests/study-conflicted-tick.spec.ts` exits 0 against `npm run dev`
-- [ ] 2.2 `npm run test:e2e -- playwright/tests/study-review-conflict-recovery.spec.ts` exits 0
-- [ ] 2.3 Lint passes: `npm run lint`
-- [ ] 2.4 Deliberate-break (conflicted-tick): remove the `if (!body.conflicted)` guard at `src/components/study/StudySessionPage.tsx:143` (always tick) → counter on card 2 jumps to `Good: 2` → spec goes red on the `getByText('Good: 2').toHaveCount(0)` assertion → revert
-- [ ] 2.5 Deliberate-break (recovery): comment out `setPendingReviewAt(null)` at `src/components/study/StudySessionPage.tsx:126` → the retried POST carries the same `review_at` → spec's "second review_at differs" assertion goes red → revert
+- [x] 2.1 `npm run test:e2e -- playwright/tests/study-conflicted-tick.spec.ts` exits 0 against `npm run dev`
+- [x] 2.2 `npm run test:e2e -- playwright/tests/study-review-conflict-recovery.spec.ts` exits 0
+- [x] 2.3 Lint passes: `npm run lint`
+- [x] 2.4 Deliberate-break (conflicted-tick): remove the `if (!body.conflicted)` guard at `src/components/study/StudySessionPage.tsx:143` (always tick) → counter on card 2 jumps to `Good: 2` → spec goes red on the `getByText('Good: 2').toHaveCount(0)` assertion → revert
+- [x] 2.5 Deliberate-break (recovery): comment out `setPendingReviewAt(null)` at `src/components/study/StudySessionPage.tsx:126` → the retried POST carries the same `review_at` → spec's "second review_at differs" assertion goes red → revert
 
 #### Manual
 
-- [ ] 2.6 Eyeball both specs against the five `/10x-e2e` anti-patterns: no hallucinated assertion, no brittle selector (role-only), no shared state across tests, no `waitForTimeout`, every test has its own `afterEach` cleanup
-- [ ] 2.7 Run both specs headed (`--headed`) and confirm the error alert renders as expected when the synthetic 409 fires
-- [ ] 2.8 After both specs run, sign in as `test@test.pl` and confirm no leftover test decks at `/decks`
+- [x] 2.6 Eyeball both specs against the five `/10x-e2e` anti-patterns: no hallucinated assertion, no brittle selector (role-only), no shared state across tests, no `waitForTimeout`, every test has its own `afterEach` cleanup
+- [x] 2.7 Run both specs headed (`--headed`) and confirm the error alert renders as expected when the synthetic 409 fires
+- [x] 2.8 After both specs run, sign in as `test@test.pl` and confirm no leftover test decks at `/decks`
