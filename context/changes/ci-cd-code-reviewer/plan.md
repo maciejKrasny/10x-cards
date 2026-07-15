@@ -370,20 +370,20 @@ The one-time repo setup (secret, variable, three labels) is captured as `## Prog
 
 #### Automated
 
-- [x] 3.1 .github/workflows/ci.yml is valid YAML and actionlint (or GitHub's parser) accepts it after the edit
-- [x] 3.2 ci.yml references ./.github/actions/ai-code-review (relative path resolves)
-- [x] 3.3 on.pull_request.types includes labeled
-- [x] 3.4 existing ci job has if: github.event_name != 'pull_request' || github.event.action != 'labeled' set
-- [x] 3.5 new ai-code-review job has permissions: and concurrency: blocks defined at the job level (not workflow level)
-- [x] 3.6 npm run lint at repo root passes
+- [x] 3.1 .github/workflows/ci.yml is valid YAML and actionlint (or GitHub's parser) accepts it after the edit — 624bf78
+- [x] 3.2 ci.yml references ./.github/actions/ai-code-review (relative path resolves) — 624bf78
+- [x] 3.3 on.pull_request.types includes labeled — 624bf78
+- [x] 3.4 existing ci job has if: github.event_name != 'pull_request' || github.event.action != 'labeled' set — 624bf78
+- [x] 3.5 new ai-code-review job has permissions: and concurrency: blocks defined at the job level (not workflow level) — 624bf78
+- [x] 3.6 npm run lint at repo root passes — 624bf78
 
 #### Manual
 
-- [x] 3.7 OPENROUTER_API_KEY is set at repo secret scope (verified via gh secret list)
-- [x] 3.8 AI_CR_MODEL is set at repo variable scope with value google/gemma-4-31b-it:free (verified via gh variable list)
-- [x] 3.9 ai-cr:passed label exists with color 0e8a16 (verified via gh label list)
-- [x] 3.10 ai-cr:failed label exists with color d93f0b (verified via gh label list)
-- [x] 3.11 ai-cr:review label exists (verified via gh label list)
+- [x] 3.7 OPENROUTER_API_KEY is set at repo secret scope (verified via gh secret list) — 624bf78
+- [x] 3.8 AI_CR_MODEL is set at repo variable scope with value google/gemma-4-31b-it:free (verified via gh variable list) — 624bf78
+- [x] 3.9 ai-cr:passed label exists with color 0e8a16 (verified via gh label list) — 624bf78
+- [x] 3.10 ai-cr:failed label exists with color d93f0b (verified via gh label list) — 624bf78
+- [x] 3.11 ai-cr:review label exists (verified via gh label list) — 624bf78
 - [ ] 3.12 throwaway PR against main produces a comment with all 6 criterion scores and a verdict within ~1 minute
 - [ ] 3.13 exactly one of ai-cr:passed / ai-cr:failed is applied to the PR
 - [ ] 3.14 adding ai-cr:review triggers a second comment with a distinct timestamp; retry label is removed at end of run

@@ -1,7 +1,7 @@
 ---
 change_id: ci-cd-code-reviewer
 title: CI/CD AI code reviewer in packages/code-reviewer
-status: implementing
+status: implemented
 created: 2026-07-15
 updated: 2026-07-15
 archived_at: null
