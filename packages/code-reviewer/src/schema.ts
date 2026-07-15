@@ -13,13 +13,13 @@ export type CriterionName = z.infer<typeof CriterionName>;
 export const CriterionSchema = z.object({
   name: CriterionName,
   score: z.number().int().min(1).max(10),
-  rationale: z.string().min(1).max(500),
+  rationale: z.string().min(1).max(4000),
 });
 export type Criterion = z.infer<typeof CriterionSchema>;
 
 export const OverallSchema = z.object({
   verdict: z.enum(["pass", "fail"]),
-  summary: z.string().min(1).max(1000),
+  summary: z.string().min(1).max(4000),
 });
 export type Overall = z.infer<typeof OverallSchema>;
 
