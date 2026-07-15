@@ -93,6 +93,7 @@ export async function runCli(deps: CliDeps): Promise<number> {
     return 0;
   } catch (err) {
     const code = extractErrorCode(err);
+    deps.stderr(`[ai-code-review] reviewer failed: ${err instanceof Error ? err.message : String(err)}\n`);
     const markdown = renderUnavailableComment(code, meta);
     postComment(deps, env, markdown);
     removeRetryLabel(deps, env);
