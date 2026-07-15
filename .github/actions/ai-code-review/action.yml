@@ -44,6 +44,21 @@ runs:
       working-directory: ${{ github.workspace }}
       run: npm run --workspace @10x-cards/code-reviewer build
 
+    - name: Resolve base ref
+      id: resolve-base
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        REF="${{ inputs.base-ref }}"
+        if git rev-parse --verify --quiet "$REF" >/dev/null; then
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+        elif git rev-parse --verify --quiet "origin/$REF" >/dev/null; then
+          echo "ref=origin/$REF" >> "$GITHUB_OUTPUT"
+        else
+          echo "::error::Cannot resolve base ref '$REF' (tried '$REF' and 'origin/$REF')" >&2
+          exit 1
+        fi
+
     - name: Run AI code review
       shell: bash
       working-directory: ${{ github.workspace }}
@@ -53,7 +68,7 @@ runs:
         GH_TOKEN: ${{ inputs.github-token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         PR_NUMBER: ${{ inputs.pr-number }}
-        BASE_REF: ${{ inputs.base-ref }}
+        BASE_REF: ${{ steps.resolve-base.outputs.ref }}
         HEAD_REF: ${{ inputs.head-ref }}
         AI_CR_MAX_DIFF_LINES: ${{ inputs.max-diff-lines }}
       run: node packages/code-reviewer/dist/cli.js
