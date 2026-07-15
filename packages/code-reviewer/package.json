@@ -1,0 +1,26 @@
+{
+  "name": "@10x-cards/code-reviewer",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/index.js",
+  "bin": {
+    "ai-code-review": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p . && chmod +x ./dist/cli.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "dependencies": {
+    "@openrouter/ai-sdk-provider": "^3.0.0",
+    "ai": "^7.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
