@@ -338,32 +338,32 @@ The one-time repo setup (secret, variable, three labels) is captured as `## Prog
 
 #### Automated
 
-- [x] 1.1 packages/code-reviewer/ exists with package.json, tsconfig.json, src/, and no dist/ under source control
-- [x] 1.2 root package.json contains "workspaces": ["packages/*"]
-- [x] 1.3 npm ci at repo root installs the package's deps into a hoisted node_modules without errors
-- [x] 1.4 npm run --workspace @10x-cards/code-reviewer build produces dist/{schema,diff,prompt,review,comment}.js
-- [x] 1.5 npm run --workspace @10x-cards/code-reviewer test passes with all Vitest suites green
-- [x] 1.6 npm run lint at repo root passes (root ESLint flat config picks up the new files)
-- [x] 1.7 npm run typecheck passes
+- [x] 1.1 packages/code-reviewer/ exists with package.json, tsconfig.json, src/, and no dist/ under source control — 6ebc0b8
+- [x] 1.2 root package.json contains "workspaces": ["packages/*"] — 6ebc0b8
+- [x] 1.3 npm ci at repo root installs the package's deps into a hoisted node_modules without errors — 6ebc0b8
+- [x] 1.4 npm run --workspace @10x-cards/code-reviewer build produces dist/{schema,diff,prompt,review,comment}.js — 6ebc0b8
+- [x] 1.5 npm run --workspace @10x-cards/code-reviewer test passes with all Vitest suites green — 6ebc0b8
+- [x] 1.6 npm run lint at repo root passes (root ESLint flat config picks up the new files) — 6ebc0b8
+- [x] 1.7 npm run typecheck passes — 6ebc0b8
 
 #### Manual
 
-- [ ] 1.8 read the schema and confirm the six criterion enum names match requirements.md verbatim
-- [ ] 1.9 read the rendered comment output from a Vitest snapshot: verify the verdict rule is correctly reported and the truncation footer is clear
+- [x] 1.8 read the schema and confirm the six criterion enum names match requirements.md verbatim — 6ebc0b8
+- [x] 1.9 read the rendered comment output from a Vitest snapshot: verify the verdict rule is correctly reported and the truncation footer is clear — 6ebc0b8
 
 ### Phase 2: CLI entry + composite action
 
 #### Automated
 
-- [ ] 2.1 packages/code-reviewer/dist/cli.js builds and has an executable shebang
-- [ ] 2.2 npm run --workspace @10x-cards/code-reviewer test passes (now including cli.test.ts)
-- [ ] 2.3 AI_CR_DRY_RUN=1 invocation prints the intended gh commands without contacting the network
-- [ ] 2.4 actionlint (or GitHub's built-in YAML validation) accepts .github/actions/ai-code-review/action.yml
-- [ ] 2.5 npm run typecheck passes
+- [x] 2.1 packages/code-reviewer/dist/cli.js builds and has an executable shebang
+- [x] 2.2 npm run --workspace @10x-cards/code-reviewer test passes (now including cli.test.ts)
+- [x] 2.3 AI_CR_DRY_RUN=1 invocation prints the intended gh commands without contacting the network
+- [x] 2.4 actionlint (or GitHub's built-in YAML validation) accepts .github/actions/ai-code-review/action.yml
+- [x] 2.5 npm run typecheck passes
 
 #### Manual
 
-- [ ] 2.6 read the dry-run stdout: confirm the gh pr comment and gh pr edit commands look correct and no secrets are printed
+- [x] 2.6 read the dry-run stdout: confirm the gh pr comment and gh pr edit commands look correct and no secrets are printed
 - [ ] 2.7 (optional) end-to-end run against a personal test PR confirms the comment appears
 
 ### Phase 3: Extend ci.yml + repo configuration

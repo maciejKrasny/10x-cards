@@ -66,6 +66,10 @@ function escapeTableCell(text: string): string {
   return text.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 }
 
-export function verdictLabel(verdict: Verdict): string {
-  return verdict === "pass" ? "ai-cr:passed" : "ai-cr:failed";
+export const LABEL_PASSED = "ai-cr:passed";
+export const LABEL_FAILED = "ai-cr:failed";
+export type VerdictLabel = typeof LABEL_PASSED | typeof LABEL_FAILED;
+
+export function verdictLabel(verdict: Verdict): VerdictLabel {
+  return verdict === "pass" ? LABEL_PASSED : LABEL_FAILED;
 }

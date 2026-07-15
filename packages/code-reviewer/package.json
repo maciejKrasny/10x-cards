@@ -8,7 +8,7 @@
     "ai-code-review": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsc -p . && chmod +x ./dist/cli.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --max-warnings 0"

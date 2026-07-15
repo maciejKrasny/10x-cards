@@ -1,0 +1,59 @@
+name: "AI Code Review"
+description: "Run the AI code reviewer on the current PR"
+
+inputs:
+  openrouter-api-key:
+    description: "OpenRouter API key"
+    required: true
+  model:
+    description: "OpenRouter model id (e.g. google/gemma-4-31b-it:free)"
+    required: true
+  github-token:
+    description: "Token used by gh CLI to post comments and toggle labels"
+    required: true
+  pr-number:
+    description: "Pull request number"
+    required: true
+  base-ref:
+    description: "Base ref (branch or SHA) to diff against"
+    required: true
+  head-ref:
+    description: "Head ref (branch or SHA) of the PR"
+    required: true
+  max-diff-lines:
+    description: "Maximum diff lines to send to the model (default 3000)"
+    required: false
+    default: "3000"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: npm ci
+
+    - name: Build reviewer package
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: npm run --workspace @10x-cards/code-reviewer build
+
+    - name: Run AI code review
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        OPENROUTER_API_KEY: ${{ inputs.openrouter-api-key }}
+        AI_CR_MODEL: ${{ inputs.model }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+        BASE_REF: ${{ inputs.base-ref }}
+        HEAD_REF: ${{ inputs.head-ref }}
+        AI_CR_MAX_DIFF_LINES: ${{ inputs.max-diff-lines }}
+      run: node packages/code-reviewer/dist/cli.js
