@@ -43,3 +43,22 @@ npm run --workspace @10x-cards/code-reviewer lint   # eslint
 
 - `0` — review completed (either a normal review or a fail-safe "unavailable" comment was posted).
 - `2` — required env var missing (setup error, not a review outcome).
+
+## Repo setup (one-time)
+
+Before the reviewer can run against a repo, complete these three GitHub-side steps. `OPENROUTER_API_KEY` is a **repo secret** (encrypted, hidden from logs). `AI_CR_MODEL` is a **repo variable** (plain-text, visible in workflow logs — model names are not secret).
+
+```bash
+# 1. Secret: OpenRouter API key
+gh secret set OPENROUTER_API_KEY
+
+# 2. Variable: model id (free-tier Gemma by default)
+gh variable set AI_CR_MODEL --body 'google/gemma-4-31b-it:free'
+
+# 3. Labels (three total — verdicts + retry trigger)
+gh label create ai-cr:passed --color 0e8a16
+gh label create ai-cr:failed --color d93f0b
+gh label create ai-cr:review --color c5def5 --description 'Add to trigger a re-review'
+```
+
+Verify with `gh secret list`, `gh variable list`, and `gh label list` before opening a test PR.

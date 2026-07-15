@@ -355,35 +355,35 @@ The one-time repo setup (secret, variable, three labels) is captured as `## Prog
 
 #### Automated
 
-- [x] 2.1 packages/code-reviewer/dist/cli.js builds and has an executable shebang
-- [x] 2.2 npm run --workspace @10x-cards/code-reviewer test passes (now including cli.test.ts)
-- [x] 2.3 AI_CR_DRY_RUN=1 invocation prints the intended gh commands without contacting the network
-- [x] 2.4 actionlint (or GitHub's built-in YAML validation) accepts .github/actions/ai-code-review/action.yml
-- [x] 2.5 npm run typecheck passes
+- [x] 2.1 packages/code-reviewer/dist/cli.js builds and has an executable shebang — d5c6b5e
+- [x] 2.2 npm run --workspace @10x-cards/code-reviewer test passes (now including cli.test.ts) — d5c6b5e
+- [x] 2.3 AI_CR_DRY_RUN=1 invocation prints the intended gh commands without contacting the network — d5c6b5e
+- [x] 2.4 actionlint (or GitHub's built-in YAML validation) accepts .github/actions/ai-code-review/action.yml — d5c6b5e
+- [x] 2.5 npm run typecheck passes — d5c6b5e
 
 #### Manual
 
-- [x] 2.6 read the dry-run stdout: confirm the gh pr comment and gh pr edit commands look correct and no secrets are printed
+- [x] 2.6 read the dry-run stdout: confirm the gh pr comment and gh pr edit commands look correct and no secrets are printed — d5c6b5e
 - [ ] 2.7 (optional) end-to-end run against a personal test PR confirms the comment appears
 
 ### Phase 3: Extend ci.yml + repo configuration
 
 #### Automated
 
-- [ ] 3.1 .github/workflows/ci.yml is valid YAML and actionlint (or GitHub's parser) accepts it after the edit
-- [ ] 3.2 ci.yml references ./.github/actions/ai-code-review (relative path resolves)
-- [ ] 3.3 on.pull_request.types includes labeled
-- [ ] 3.4 existing ci job has if: github.event_name != 'pull_request' || github.event.action != 'labeled' set
-- [ ] 3.5 new ai-code-review job has permissions: and concurrency: blocks defined at the job level (not workflow level)
-- [ ] 3.6 npm run lint at repo root passes
+- [x] 3.1 .github/workflows/ci.yml is valid YAML and actionlint (or GitHub's parser) accepts it after the edit
+- [x] 3.2 ci.yml references ./.github/actions/ai-code-review (relative path resolves)
+- [x] 3.3 on.pull_request.types includes labeled
+- [x] 3.4 existing ci job has if: github.event_name != 'pull_request' || github.event.action != 'labeled' set
+- [x] 3.5 new ai-code-review job has permissions: and concurrency: blocks defined at the job level (not workflow level)
+- [x] 3.6 npm run lint at repo root passes
 
 #### Manual
 
-- [ ] 3.7 OPENROUTER_API_KEY is set at repo secret scope (verified via gh secret list)
-- [ ] 3.8 AI_CR_MODEL is set at repo variable scope with value google/gemma-4-31b-it:free (verified via gh variable list)
-- [ ] 3.9 ai-cr:passed label exists with color 0e8a16 (verified via gh label list)
-- [ ] 3.10 ai-cr:failed label exists with color d93f0b (verified via gh label list)
-- [ ] 3.11 ai-cr:review label exists (verified via gh label list)
+- [x] 3.7 OPENROUTER_API_KEY is set at repo secret scope (verified via gh secret list)
+- [x] 3.8 AI_CR_MODEL is set at repo variable scope with value google/gemma-4-31b-it:free (verified via gh variable list)
+- [x] 3.9 ai-cr:passed label exists with color 0e8a16 (verified via gh label list)
+- [x] 3.10 ai-cr:failed label exists with color d93f0b (verified via gh label list)
+- [x] 3.11 ai-cr:review label exists (verified via gh label list)
 - [ ] 3.12 throwaway PR against main produces a comment with all 6 criterion scores and a verdict within ~1 minute
 - [ ] 3.13 exactly one of ai-cr:passed / ai-cr:failed is applied to the PR
 - [ ] 3.14 adding ai-cr:review triggers a second comment with a distinct timestamp; retry label is removed at end of run
