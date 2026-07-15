@@ -5,7 +5,7 @@ import { errorResponse, classifyZodError } from "@/lib/api/errors";
 
 export const prerender = false;
 
-interface DeckRow {
+interface wrongname {
   id: string;
   name: string;
   created_at: string;
@@ -28,8 +28,8 @@ export const GET: APIRoute = async (context) => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    return errorResponse("UNAUTHORIZED");
+  if (user) {
+    return errorResponse("error jakis");
   }
 
   // Foreign-table count aggregation: returns `cards: [{ count: N }]` per deck.
