@@ -18,17 +18,9 @@ describe("reviewSchema", () => {
     expect(reviewSchema.safeParse(review).success).toBe(true);
   });
 
-  it("rejects fewer than six criteria", () => {
+  it("rejects an empty criteria array", () => {
     const review = {
-      criteria: makePassing().slice(0, 5),
-      overall: { verdict: "pass" as const, summary: "ok" },
-    };
-    expect(reviewSchema.safeParse(review).success).toBe(false);
-  });
-
-  it("rejects more than six criteria", () => {
-    const review = {
-      criteria: [...makePassing(), makeCriterion("implementation_correctness", 8)],
+      criteria: [],
       overall: { verdict: "pass" as const, summary: "ok" },
     };
     expect(reviewSchema.safeParse(review).success).toBe(false);

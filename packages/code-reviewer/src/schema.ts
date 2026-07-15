@@ -23,8 +23,10 @@ export const OverallSchema = z.object({
 });
 export type Overall = z.infer<typeof OverallSchema>;
 
+export const EXPECTED_CRITERIA_COUNT = 6;
+
 export const reviewSchema = z.object({
-  criteria: z.array(CriterionSchema).length(6),
+  criteria: z.array(CriterionSchema).min(1),
   overall: OverallSchema,
 });
 export type Review = z.infer<typeof reviewSchema>;

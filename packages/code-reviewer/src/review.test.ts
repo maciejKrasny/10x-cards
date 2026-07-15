@@ -105,4 +105,13 @@ describe("reviewPR", () => {
     generateTextMock.mockRejectedValueOnce(new Error("upstream returned no completion"));
     await expect(reviewPR(PROMPT_INPUT, { apiKey: "k", model: "m" })).rejects.toThrow(/^LLM_EMPTY_RESPONSE: /);
   });
+
+  it("throws LLM_INVALID_OUTPUT when the model returns wrong criteria count", async () => {
+    const shortReview: Review = {
+      criteria: OK_REVIEW.criteria.slice(0, 3),
+      overall: { verdict: "pass", summary: "partial" },
+    };
+    generateTextMock.mockResolvedValueOnce({ output: shortReview });
+    await expect(reviewPR(PROMPT_INPUT, { apiKey: "k", model: "m" })).rejects.toThrow(/^LLM_INVALID_OUTPUT:/);
+  });
 });

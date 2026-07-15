@@ -1,7 +1,7 @@
 import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { buildPrompt, type PromptInput } from "./prompt.js";
-import { computeVerdict, reviewSchema, type Review, type Verdict } from "./schema.js";
+import { computeVerdict, EXPECTED_CRITERIA_COUNT, reviewSchema, type Review, type Verdict } from "./schema.js";
 
 const REQUEST_TIMEOUT_MS = 45_000;
 const UPSTREAM_ERROR_TRUNCATION = 240;
@@ -36,6 +36,12 @@ export async function reviewPR(input: PromptInput, env: ReviewEnv): Promise<Revi
     object = result.output;
   } catch (err) {
     throw mapError(err);
+  }
+
+  if (object.criteria.length !== EXPECTED_CRITERIA_COUNT) {
+    throw new Error(
+      `LLM_INVALID_OUTPUT: expected ${EXPECTED_CRITERIA_COUNT.toString()} criteria, got ${object.criteria.length.toString()}`,
+    );
   }
 
   return { ...object, deterministicVerdict: computeVerdict(object.criteria) };
