@@ -4,8 +4,6 @@ import { BulkCreateRequestSchema } from "@/lib/cards/schemas";
 import { errorResponse, classifyZodError } from "@/lib/api/errors";
 import type { TablesInsert } from "@/db/database.types";
 
-export const prerender = false;
-
 export const POST: APIRoute = async (context) => {
   let body: unknown;
   try {
