@@ -12,6 +12,10 @@ import {
 
 const REQUEST_TIMEOUT_MS = 45_000;
 const UPSTREAM_ERROR_TRUNCATION = 240;
+// 6 criteria × ~500-token rationales + short summary fits well under 4k output
+// tokens. Explicit cap avoids the AI SDK defaulting to the model's max (often
+// 64k+), which OpenRouter free-tier credits cannot cover.
+const MAX_OUTPUT_TOKENS = 4000;
 
 export interface ReviewEnv {
   apiKey: string;
@@ -38,6 +42,7 @@ export async function reviewPR(input: PromptInput, env: ReviewEnv): Promise<Revi
       output: Output.object({ schema: modelOutputSchema }),
       system,
       prompt,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
       abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     raw = result.output;
