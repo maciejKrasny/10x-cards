@@ -38,7 +38,10 @@ export type Review = z.infer<typeof reviewSchema>;
 // generation, wrapped as LLM_INVALID_OUTPUT on failure.
 const PermissiveCriterionSchema = z.object({
   name: CriterionName,
-  score: z.number().int(),
+  // z.number() alone emits {type:"number"} with no bounds. z.number().int()
+  // adds minimum/maximum safe-integer bounds which Azure rejects. Strict
+  // int/range enforcement lives in reviewSchema (validated post-generation).
+  score: z.number(),
   rationale: z.string(),
 });
 
