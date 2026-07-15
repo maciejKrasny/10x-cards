@@ -1,0 +1,83 @@
+import { generateText, NoObjectGeneratedError, Output } from "ai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { buildPrompt, type PromptInput } from "./prompt.js";
+import {
+  computeVerdict,
+  EXPECTED_CRITERIA_COUNT,
+  modelOutputSchema,
+  reviewSchema,
+  type Review,
+  type Verdict,
+} from "./schema.js";
+
+const REQUEST_TIMEOUT_MS = 45_000;
+const UPSTREAM_ERROR_TRUNCATION = 240;
+// 6 criteria × ~500-token rationales + short summary fits well under 4k output
+// tokens. Explicit cap avoids the AI SDK defaulting to the model's max (often
+// 64k+), which OpenRouter free-tier credits cannot cover.
+const MAX_OUTPUT_TOKENS = 4000;
+
+export interface ReviewEnv {
+  apiKey: string;
+  model: string;
+}
+
+export interface ReviewResult extends Review {
+  deterministicVerdict: Verdict;
+}
+
+export async function reviewPR(input: PromptInput, env: ReviewEnv): Promise<ReviewResult> {
+  if (env.apiKey.length === 0) {
+    throw new Error("LLM_NOT_CONFIGURED");
+  }
+
+  const { system, prompt } = buildPrompt(input);
+  const provider = createOpenRouter({ apiKey: env.apiKey });
+  const model = provider.chat(env.model);
+
+  let raw: unknown;
+  try {
+    const result = await generateText({
+      model,
+      output: Output.object({ schema: modelOutputSchema }),
+      system,
+      prompt,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
+      abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+    raw = result.output;
+  } catch (err) {
+    throw mapError(err);
+  }
+
+  const parsed = reviewSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(`LLM_INVALID_OUTPUT: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ").slice(0, 240)}`);
+  }
+  const object: Review = parsed.data;
+
+  if (object.criteria.length !== EXPECTED_CRITERIA_COUNT) {
+    throw new Error(
+      `LLM_INVALID_OUTPUT: expected ${EXPECTED_CRITERIA_COUNT.toString()} criteria, got ${object.criteria.length.toString()}`,
+    );
+  }
+
+  return { ...object, deterministicVerdict: computeVerdict(object.criteria) };
+}
+
+function mapError(err: unknown): Error {
+  if (NoObjectGeneratedError.isInstance(err)) {
+    return new Error("LLM_INVALID_OUTPUT");
+  }
+  const message = err instanceof Error ? err.message : String(err);
+  const truncated = message.slice(0, UPSTREAM_ERROR_TRUNCATION);
+  if (isEmptyResponseHint(message)) {
+    return new Error(`LLM_EMPTY_RESPONSE: ${truncated}`);
+  }
+  return new Error(`LLM_HTTP_ERROR: ${truncated}`);
+}
+
+function isEmptyResponseHint(message: string): boolean {
+  const m = message.toLowerCase();
+  return m.includes("empty response") || m.includes("no content") || m.includes("no completion");
+}
