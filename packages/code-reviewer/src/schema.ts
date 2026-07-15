@@ -31,6 +31,25 @@ export const reviewSchema = z.object({
 });
 export type Review = z.infer<typeof reviewSchema>;
 
+// Permissive schema shipped to the model provider. Azure-hosted OpenRouter
+// models reject standard JSON Schema features like integer minimum/maximum or
+// array minItems > 1, so the model boundary uses types only. Strict validation
+// (score range, string bounds, exact criteria count) happens in reviewPR after
+// generation, wrapped as LLM_INVALID_OUTPUT on failure.
+const PermissiveCriterionSchema = z.object({
+  name: CriterionName,
+  score: z.number().int(),
+  rationale: z.string(),
+});
+
+export const modelOutputSchema = z.object({
+  criteria: z.array(PermissiveCriterionSchema),
+  overall: z.object({
+    verdict: z.enum(["pass", "fail"]),
+    summary: z.string(),
+  }),
+});
+
 export type Verdict = "pass" | "fail";
 
 const MIN_SCORE_THRESHOLD = 4;

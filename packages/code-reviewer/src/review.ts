@@ -1,7 +1,14 @@
 import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { buildPrompt, type PromptInput } from "./prompt.js";
-import { computeVerdict, EXPECTED_CRITERIA_COUNT, reviewSchema, type Review, type Verdict } from "./schema.js";
+import {
+  computeVerdict,
+  EXPECTED_CRITERIA_COUNT,
+  modelOutputSchema,
+  reviewSchema,
+  type Review,
+  type Verdict,
+} from "./schema.js";
 
 const REQUEST_TIMEOUT_MS = 45_000;
 const UPSTREAM_ERROR_TRUNCATION = 240;
@@ -24,19 +31,25 @@ export async function reviewPR(input: PromptInput, env: ReviewEnv): Promise<Revi
   const provider = createOpenRouter({ apiKey: env.apiKey });
   const model = provider.chat(env.model);
 
-  let object: Review;
+  let raw: unknown;
   try {
     const result = await generateText({
       model,
-      output: Output.object({ schema: reviewSchema }),
+      output: Output.object({ schema: modelOutputSchema }),
       system,
       prompt,
       abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
-    object = result.output;
+    raw = result.output;
   } catch (err) {
     throw mapError(err);
   }
+
+  const parsed = reviewSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(`LLM_INVALID_OUTPUT: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ").slice(0, 240)}`);
+  }
+  const object: Review = parsed.data;
 
   if (object.criteria.length !== EXPECTED_CRITERIA_COUNT) {
     throw new Error(
