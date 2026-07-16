@@ -458,9 +458,9 @@ When the reviewer errors and posts the "unavailable" comment, also strip any sta
 
 #### Automated
 
-- [x] 3.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1 / 2.1)
-- [x] 3.2 Type-check + build pass
-- [x] 3.3 All tests pass — including new `findings.test.ts` and extended `diff.test.ts`, `schema.test.ts`, `comment.test.ts`, `prompt.test.ts`
+- [x] 3.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1 / 2.1) — 5287935
+- [x] 3.2 Type-check + build pass — 5287935
+- [x] 3.3 All tests pass — including new `findings.test.ts` and extended `diff.test.ts`, `schema.test.ts`, `comment.test.ts`, `prompt.test.ts` — 5287935
 - [ ] 3.4 Schema still round-trips through OpenRouter without triggering Azure JSON-Schema rejections
 
 #### Manual
@@ -476,12 +476,12 @@ When the reviewer errors and posts the "unavailable" comment, also strip any sta
 
 #### Automated
 
-- [ ] 4.1 Lint passes
-- [ ] 4.2 Type-check + build pass
-- [ ] 4.3 `labels.test.ts` covers both happy and fail-safe paths
-- [ ] 4.4 All tests pass
+- [x] 4.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1 / 2.1 / 3.1)
+- [x] 4.2 Type-check + build pass
+- [x] 4.3 `labels.test.ts` covers both happy and fail-safe paths
+- [x] 4.4 All tests pass
 
 #### Manual
 
-- [ ] 4.5 On a PR with `ai-cr:passed`, forced LLM failure posts unavailable comment and removes `ai-cr:passed`; `gh pr view --json labels` shows neither verdict label
-- [ ] 4.6 `ai-cr:review` still removed on the fail-safe path (regression guard)
+- [x] 4.5 On a PR with `ai-cr:passed`, forced LLM failure posts unavailable comment and removes `ai-cr:passed`; `gh pr view --json labels` shows neither verdict label
+- [x] 4.6 `ai-cr:review` still removed on the fail-safe path (regression guard)

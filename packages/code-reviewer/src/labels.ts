@@ -36,15 +36,28 @@ export function applyLabels(deps: LabelDeps, env: Env, verdictLbl: VerdictLabel)
   deps.logger.info("labels_applied", { pr: env.prNumber, added: verdictLbl, removed: `${opposite},${LABEL_RETRY}` });
 }
 
-export function removeRetryLabel(deps: LabelDeps, env: Env): void {
-  const args = ["pr", "edit", env.prNumber, "--repo", env.repo, "--remove-label", LABEL_RETRY];
+export function cleanupOnUnavailable(deps: LabelDeps, env: Env): void {
+  const removed = `${LABEL_RETRY},${LABEL_PASSED},${LABEL_FAILED}`;
+  const args = [
+    "pr",
+    "edit",
+    env.prNumber,
+    "--repo",
+    env.repo,
+    "--remove-label",
+    LABEL_RETRY,
+    "--remove-label",
+    LABEL_PASSED,
+    "--remove-label",
+    LABEL_FAILED,
+  ];
   if (env.dryRun) {
     deps.stdout(`[dry-run] gh ${args.join(" ")}\n`);
-    deps.logger.info("labels_removed", { pr: env.prNumber, removed: LABEL_RETRY, dry_run: true });
+    deps.logger.warn("labels_cleaned_on_unavailable", { pr: env.prNumber, removed, dry_run: true });
     return;
   }
   deps.runGh(args[0] ?? "pr", args.slice(1));
-  deps.logger.info("labels_removed", { pr: env.prNumber, removed: LABEL_RETRY });
+  deps.logger.warn("labels_cleaned_on_unavailable", { pr: env.prNumber, removed });
 }
 
 export { LABEL_FAILED, LABEL_PASSED, verdictLabel };

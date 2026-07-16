@@ -6,7 +6,7 @@ import { extractTouchedRanges, scopeDiff } from "./diff.js";
 import { parseEnv, type Env } from "./env.js";
 import { filterFindings } from "./findings.js";
 import { fetchPRField, postComment } from "./gh.js";
-import { applyLabels, removeRetryLabel, verdictLabel } from "./labels.js";
+import { applyLabels, cleanupOnUnavailable, verdictLabel } from "./labels.js";
 import { createLogger, type Logger } from "./logger.js";
 import { reviewPR } from "./review.js";
 import { CriterionName } from "./schema.js";
@@ -92,7 +92,7 @@ export async function runCli(deps: CliDeps): Promise<number> {
     deps.stderr(`[ai-code-review] reviewer failed: ${message}\n`);
     const markdown = renderUnavailableComment(code, meta);
     postComment(ghDeps, env, markdown);
-    removeRetryLabel(labelDeps, env);
+    cleanupOnUnavailable(labelDeps, env);
     return 0;
   }
 }

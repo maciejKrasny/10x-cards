@@ -147,7 +147,7 @@ describe("runCli — happy path", () => {
 });
 
 describe("runCli — reviewer failure path", () => {
-  it("on reviewer error, posts an unavailable comment, removes the retry label, and exits 0", async () => {
+  it("on reviewer error, posts an unavailable comment, strips retry + both verdict labels, and exits 0", async () => {
     const { deps, ghCalls } = makeDeps({
       reviewer: vi.fn().mockRejectedValue(new Error("LLM_HTTP_ERROR: upstream 502")),
     });
@@ -158,6 +158,8 @@ describe("runCli — reviewer failure path", () => {
     const editCall = ghCalls.find((c) => c.args[0] === "edit");
     expect(editCall?.args).toContain("--remove-label");
     expect(editCall?.args).toContain("ai-cr:review");
+    expect(editCall?.args).toContain("ai-cr:passed");
+    expect(editCall?.args).toContain("ai-cr:failed");
     expect(editCall?.args).not.toContain("--add-label");
   });
 });

@@ -3,10 +3,10 @@ import type { Env } from "./env.js";
 import { createLogger } from "./logger.js";
 import {
   applyLabels,
+  cleanupOnUnavailable,
   LABEL_FAILED,
   LABEL_PASSED,
   LABEL_RETRY,
-  removeRetryLabel,
   verdictLabel,
   type LabelDeps,
 } from "./labels.js";
@@ -101,34 +101,40 @@ describe("applyLabels", () => {
   });
 });
 
-describe("removeRetryLabel", () => {
-  it("removes only the retry label", () => {
+describe("cleanupOnUnavailable", () => {
+  it("removes the retry label and both verdict labels in one gh call, adding no labels", () => {
     const { deps, ghCalls } = makeDeps();
-    removeRetryLabel(deps, makeEnv());
+    cleanupOnUnavailable(deps, makeEnv());
     expect(ghCalls).toHaveLength(1);
     const args = ghCalls[0]?.args ?? [];
     expect(args).toContain("--remove-label");
     expect(args).toContain(LABEL_RETRY);
-    expect(args).not.toContain(LABEL_PASSED);
-    expect(args).not.toContain(LABEL_FAILED);
+    expect(args).toContain(LABEL_PASSED);
+    expect(args).toContain(LABEL_FAILED);
     expect(args).not.toContain("--add-label");
+    const removeFlagCount = args.filter((a) => a === "--remove-label").length;
+    expect(removeFlagCount).toBe(3);
   });
 
   it("prints the intended command in dry-run and does not invoke gh", () => {
     const { deps, ghCalls, stdout } = makeDeps();
-    removeRetryLabel(deps, makeEnv({ dryRun: true }));
+    cleanupOnUnavailable(deps, makeEnv({ dryRun: true }));
     expect(ghCalls).toHaveLength(0);
-    expect(stdout.join("")).toMatch(/\[dry-run\] gh pr edit 42/);
-    expect(stdout.join("")).toContain("--remove-label ai-cr:review");
+    const out = stdout.join("");
+    expect(out).toMatch(/\[dry-run\] gh pr edit 42/);
+    expect(out).toContain("--remove-label ai-cr:review");
+    expect(out).toContain("--remove-label ai-cr:passed");
+    expect(out).toContain("--remove-label ai-cr:failed");
   });
 
-  it("emits a labels_removed event with the pr and removed fields", () => {
+  it("emits a labels_cleaned_on_unavailable warn event listing every removed label", () => {
     const { deps, logLines } = makeDeps();
-    removeRetryLabel(deps, makeEnv());
+    cleanupOnUnavailable(deps, makeEnv());
     const line = logLines.join("");
-    expect(line).toContain("event=labels_removed");
+    expect(line).toContain("level=warn");
+    expect(line).toContain("event=labels_cleaned_on_unavailable");
     expect(line).toContain("pr=42");
-    expect(line).toContain("removed=ai-cr:review");
+    expect(line).toContain("removed=ai-cr:review,ai-cr:passed,ai-cr:failed");
   });
 });
 
