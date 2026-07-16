@@ -476,12 +476,12 @@ When the reviewer errors and posts the "unavailable" comment, also strip any sta
 
 #### Automated
 
-- [x] 4.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1 / 2.1 / 3.1)
-- [x] 4.2 Type-check + build pass
-- [x] 4.3 `labels.test.ts` covers both happy and fail-safe paths
-- [x] 4.4 All tests pass
+- [x] 4.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1 / 2.1 / 3.1) — b683d47
+- [x] 4.2 Type-check + build pass — b683d47
+- [x] 4.3 `labels.test.ts` covers both happy and fail-safe paths — b683d47
+- [x] 4.4 All tests pass — b683d47
 
 #### Manual
 
-- [x] 4.5 On a PR with `ai-cr:passed`, forced LLM failure posts unavailable comment and removes `ai-cr:passed`; `gh pr view --json labels` shows neither verdict label
-- [x] 4.6 `ai-cr:review` still removed on the fail-safe path (regression guard)
+- [x] 4.5 On a PR with `ai-cr:passed`, forced LLM failure posts unavailable comment and removes `ai-cr:passed`; `gh pr view --json labels` shows neither verdict label — b683d47
+- [x] 4.6 `ai-cr:review` still removed on the fail-safe path (regression guard) — b683d47
