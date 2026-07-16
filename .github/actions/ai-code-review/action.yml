@@ -28,6 +28,10 @@ inputs:
     description: "Reviewer log level: debug | info | warn | error (default info)"
     required: false
     default: "info"
+  max-findings:
+    description: "Maximum per-line findings rendered in the PR comment (default 20)"
+    required: false
+    default: "20"
 
 runs:
   using: "composite"
@@ -76,4 +80,5 @@ runs:
         HEAD_REF: ${{ inputs.head-ref }}
         AI_CR_MAX_DIFF_LINES: ${{ inputs.max-diff-lines }}
         AI_CR_LOG_LEVEL: ${{ inputs.log-level }}
+        AI_CR_MAX_FINDINGS: ${{ inputs.max-findings }}
       run: node packages/code-reviewer/dist/cli.js

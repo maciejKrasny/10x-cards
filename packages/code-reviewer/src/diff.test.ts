@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isExcluded, scopeDiff, splitDiffByFile } from "./diff.js";
+import { extractTouchedRanges, isExcluded, scopeDiff, splitDiffByFile } from "./diff.js";
 
 function fileDiff(path: string, changes: number): string {
   const hunkLines: string[] = [];
@@ -102,5 +102,63 @@ describe("scopeDiff", () => {
     expect(result.skippedFiles).toEqual([]);
     expect(result.truncated).toBe(false);
     expect(result.diff).toBe("");
+  });
+});
+
+describe("extractTouchedRanges", () => {
+  it("returns an empty map for empty input", () => {
+    expect(extractTouchedRanges("").size).toBe(0);
+  });
+
+  it("parses a standard @@ -a,b +c,d @@ hunk header", () => {
+    const raw = [
+      "diff --git a/src/a.ts b/src/a.ts",
+      "@@ -10,3 +12,5 @@",
+      "+one",
+    ].join("\n");
+    const ranges = extractTouchedRanges(raw);
+    expect(ranges.get("src/a.ts")).toEqual([[12, 16]]);
+  });
+
+  it("treats a hunk header with no length as length 1 (single-line hunk)", () => {
+    const raw = [
+      "diff --git a/src/b.ts b/src/b.ts",
+      "@@ -5 +7 @@",
+      "+one",
+    ].join("\n");
+    const ranges = extractTouchedRanges(raw);
+    expect(ranges.get("src/b.ts")).toEqual([[7, 7]]);
+  });
+
+  it("collects multiple hunks per file", () => {
+    const raw = [
+      "diff --git a/src/c.ts b/src/c.ts",
+      "@@ -1,2 +1,2 @@",
+      "+one",
+      "@@ -10,1 +20,3 @@",
+      "+two",
+    ].join("\n");
+    const ranges = extractTouchedRanges(raw);
+    expect(ranges.get("src/c.ts")).toEqual([[1, 2], [20, 22]]);
+  });
+
+  it("registers files with zero hunks (mode-only changes) as an empty array", () => {
+    const raw = "diff --git a/src/d.ts b/src/d.ts\nold mode 100644\nnew mode 100755\n";
+    const ranges = extractTouchedRanges(raw);
+    expect(ranges.get("src/d.ts")).toEqual([]);
+  });
+
+  it("collects ranges across multiple files", () => {
+    const raw = [
+      "diff --git a/x.ts b/x.ts",
+      "@@ -1,1 +1,1 @@",
+      "+x",
+      "diff --git a/y.ts b/y.ts",
+      "@@ -1,1 +5,2 @@",
+      "+y",
+    ].join("\n");
+    const ranges = extractTouchedRanges(raw);
+    expect(ranges.get("x.ts")).toEqual([[1, 1]]);
+    expect(ranges.get("y.ts")).toEqual([[5, 6]]);
   });
 });

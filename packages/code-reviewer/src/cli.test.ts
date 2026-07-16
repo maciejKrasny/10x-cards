@@ -10,6 +10,7 @@ function makeReview(verdict: Verdict): ReviewerResult {
   return {
     criteria: CriterionName.options.map((name) => ({ name, score: verdict === "pass" ? 8 : 3, rationale: "r" })),
     overall: { verdict, summary: "s" },
+    findings: [],
     deterministicVerdict: verdict,
   };
 }

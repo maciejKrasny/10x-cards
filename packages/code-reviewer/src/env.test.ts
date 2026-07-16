@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_MAX_DIFF_LINES, parseEnv } from "./env.js";
+import { DEFAULT_MAX_DIFF_LINES, DEFAULT_MAX_FINDINGS, parseEnv } from "./env.js";
 
 const BASE = {
   GH_TOKEN: "gh-token",
@@ -65,6 +65,7 @@ describe("parseEnv", () => {
       model: "google/gemma-4-31b-it:free",
       dryRun: false,
       maxDiffLines: DEFAULT_MAX_DIFF_LINES,
+      maxFindings: DEFAULT_MAX_FINDINGS,
       logLevel: "info",
     });
   });
@@ -83,6 +84,15 @@ describe("parseEnv", () => {
     expect(parseEnv({ ...BASE, AI_CR_MAX_DIFF_LINES: "abc" }, write)?.maxDiffLines).toBe(DEFAULT_MAX_DIFF_LINES);
     expect(parseEnv({ ...BASE, AI_CR_MAX_DIFF_LINES: "0" }, write)?.maxDiffLines).toBe(DEFAULT_MAX_DIFF_LINES);
     expect(parseEnv({ ...BASE, AI_CR_MAX_DIFF_LINES: "-10" }, write)?.maxDiffLines).toBe(DEFAULT_MAX_DIFF_LINES);
+  });
+
+  it("parses AI_CR_MAX_FINDINGS when set, falls back to default when unset, invalid, or non-positive", () => {
+    const { write } = captureStderr();
+    expect(parseEnv({ ...BASE, AI_CR_MAX_FINDINGS: "5" }, write)?.maxFindings).toBe(5);
+    expect(parseEnv(BASE, write)?.maxFindings).toBe(DEFAULT_MAX_FINDINGS);
+    expect(parseEnv({ ...BASE, AI_CR_MAX_FINDINGS: "abc" }, write)?.maxFindings).toBe(DEFAULT_MAX_FINDINGS);
+    expect(parseEnv({ ...BASE, AI_CR_MAX_FINDINGS: "0" }, write)?.maxFindings).toBe(DEFAULT_MAX_FINDINGS);
+    expect(parseEnv({ ...BASE, AI_CR_MAX_FINDINGS: "-3" }, write)?.maxFindings).toBe(DEFAULT_MAX_FINDINGS);
   });
 
   it("parses AI_CR_LOG_LEVEL, defaults to info, and warns on unknown values", () => {

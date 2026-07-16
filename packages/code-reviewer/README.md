@@ -8,9 +8,9 @@ This package is **standalone**: it does not import from the Astro app under `src
 
 1. Read the PR diff (`git diff <base>...<head>`), excluding lockfiles, generated files, and minified assets.
 2. Truncate at 3000 lines on file boundaries; report which files were reviewed vs skipped.
-3. Call an LLM (via `@openrouter/ai-sdk-provider` + Vercel AI SDK `generateObject`) with a Zod-enforced schema of six criteria × 1–10 scores + an overall summary.
-4. Compute the pass/fail verdict deterministically from the scores (not from the model's own verdict).
-5. Post a Markdown comment + apply `ai-cr:passed` or `ai-cr:failed` label via `gh` CLI.
+3. Call an LLM (via `@openrouter/ai-sdk-provider` + Vercel AI SDK `generateObject`) with a Zod-enforced schema of six criteria × 1–10 scores + an overall summary. The model may also return an optional `findings[]` array of per-file, per-line issues.
+4. Compute the pass/fail verdict deterministically from the scores (not from the model's own verdict). Findings are informational and never affect the verdict.
+5. Post a Markdown comment (criteria table + summary + optional `### Findings` section) + apply `ai-cr:passed` or `ai-cr:failed` label via `gh` CLI.
 
 On any LLM error, post a neutral "review unavailable" comment (no verdict label), so a model outage never blocks a merge.
 
@@ -26,6 +26,7 @@ On any LLM error, post a neutral "review unavailable" comment (no verdict label)
 | `BASE_REF`            | yes      | variable | Base branch/ref for `git diff`                            |
 | `HEAD_REF`            | yes      | variable | Head SHA for `git diff`                                   |
 | `AI_CR_MAX_DIFF_LINES`| no       | variable | Truncation cap in diff-lines (default `3000`)             |
+| `AI_CR_MAX_FINDINGS`  | no       | variable | Cap on per-line findings rendered in the PR comment (default `20`) |
 | `AI_CR_LOG_LEVEL`     | no       | variable | Structured-log threshold: `debug` \| `info` \| `warn` \| `error` (default `info`) |
 | `AI_CR_DRY_RUN`       | no       | variable | If `1`, print intended `gh` invocations instead of executing them |
 

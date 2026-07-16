@@ -444,10 +444,10 @@ When the reviewer errors and posts the "unavailable" comment, also strip any sta
 
 #### Automated
 
-- [x] 2.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1)
-- [x] 2.2 Type-check + build pass
-- [x] 2.3 Logger tests pass, including redaction test
-- [x] 2.4 `logger.test.ts` exists
+- [x] 2.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1) — 2d8ae32
+- [x] 2.2 Type-check + build pass — 2d8ae32
+- [x] 2.3 Logger tests pass, including redaction test — 2d8ae32
+- [x] 2.4 `logger.test.ts` exists — 2d8ae32
 
 #### Manual
 
@@ -458,9 +458,9 @@ When the reviewer errors and posts the "unavailable" comment, also strip any sta
 
 #### Automated
 
-- [ ] 3.1 Lint passes
-- [ ] 3.2 Type-check + build pass
-- [ ] 3.3 All tests pass — including new `findings.test.ts` and extended `diff.test.ts`, `schema.test.ts`, `comment.test.ts`, `prompt.test.ts`
+- [x] 3.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1 / 2.1)
+- [x] 3.2 Type-check + build pass
+- [x] 3.3 All tests pass — including new `findings.test.ts` and extended `diff.test.ts`, `schema.test.ts`, `comment.test.ts`, `prompt.test.ts`
 - [ ] 3.4 Schema still round-trips through OpenRouter without triggering Azure JSON-Schema rejections
 
 #### Manual

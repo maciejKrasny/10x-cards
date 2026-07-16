@@ -10,6 +10,7 @@ export const REQUIRED_ENV = [
 ] as const;
 
 export const DEFAULT_MAX_DIFF_LINES = 3000;
+export const DEFAULT_MAX_FINDINGS = 20;
 export const DEFAULT_LOG_LEVEL: LogLevel = "info";
 const VALID_LOG_LEVELS: readonly LogLevel[] = ["debug", "info", "warn", "error"];
 
@@ -23,6 +24,7 @@ export interface Env {
   model: string;
   dryRun: boolean;
   maxDiffLines: number;
+  maxFindings: number;
   logLevel: LogLevel;
 }
 
@@ -40,6 +42,9 @@ export function parseEnv(source: NodeJS.ProcessEnv, stderr: (s: string) => void)
   const maxLinesRaw = source.AI_CR_MAX_DIFF_LINES;
   const maxDiffLines =
     maxLinesRaw !== undefined && maxLinesRaw.length > 0 ? Number.parseInt(maxLinesRaw, 10) : DEFAULT_MAX_DIFF_LINES;
+  const maxFindingsRaw = source.AI_CR_MAX_FINDINGS;
+  const maxFindings =
+    maxFindingsRaw !== undefined && maxFindingsRaw.length > 0 ? Number.parseInt(maxFindingsRaw, 10) : DEFAULT_MAX_FINDINGS;
   return {
     ghToken,
     repo: source.GITHUB_REPOSITORY ?? "",
@@ -50,6 +55,7 @@ export function parseEnv(source: NodeJS.ProcessEnv, stderr: (s: string) => void)
     model: source.AI_CR_MODEL ?? "",
     dryRun: source.AI_CR_DRY_RUN === "1",
     maxDiffLines: Number.isFinite(maxDiffLines) && maxDiffLines > 0 ? maxDiffLines : DEFAULT_MAX_DIFF_LINES,
+    maxFindings: Number.isFinite(maxFindings) && maxFindings > 0 ? maxFindings : DEFAULT_MAX_FINDINGS,
     logLevel: parseLogLevel(source.AI_CR_LOG_LEVEL, stderr),
   };
 }

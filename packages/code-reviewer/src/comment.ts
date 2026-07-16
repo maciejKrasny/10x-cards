@@ -1,4 +1,4 @@
-import type { Review, Verdict } from "./schema.js";
+import type { Finding, Review, Verdict } from "./schema.js";
 
 export const COMMENT_MARKER = "<!-- ai-code-review:v1 -->";
 
@@ -30,7 +30,22 @@ export function renderComment(review: Review, meta: CommentMeta): string {
   lines.push("");
   lines.push("**Summary:** " + review.overall.summary);
   lines.push("");
+  if (review.findings.length > 0) {
+    lines.push(renderFindings(review.findings));
+    lines.push("");
+  }
   lines.push(renderFooter(meta));
+  return lines.join("\n");
+}
+
+function renderFindings(findings: readonly Finding[]): string {
+  const lines: string[] = ["### Findings"];
+  for (const f of findings) {
+    lines.push(`- **\`${f.file}:${String(f.line)}\`** *(${f.severity})* — ${f.description}`);
+    lines.push("  ```");
+    lines.push("  " + f.snippet.replace(/\r?\n/g, "\n  "));
+    lines.push("  ```");
+  }
   return lines.join("\n");
 }
 

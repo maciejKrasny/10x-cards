@@ -2,8 +2,9 @@
 import { execFileSync } from "node:child_process";
 
 import { renderComment, renderUnavailableComment, type CommentMeta } from "./comment.js";
-import { scopeDiff } from "./diff.js";
+import { extractTouchedRanges, scopeDiff } from "./diff.js";
 import { parseEnv, type Env } from "./env.js";
+import { filterFindings } from "./findings.js";
 import { fetchPRField, postComment } from "./gh.js";
 import { applyLabels, removeRetryLabel, verdictLabel } from "./labels.js";
 import { createLogger, type Logger } from "./logger.js";
@@ -49,6 +50,7 @@ export async function runCli(deps: CliDeps): Promise<number> {
 
   const rawDiff = deps.runGit("diff", [`${env.baseRef}...${env.headRef}`]);
   const scoped = scopeDiff(rawDiff, env.maxDiffLines);
+  const touchedRanges = extractTouchedRanges(scoped.diff);
   logger.info("diff_fetched", {
     reviewed_files: scoped.reviewedFiles.length,
     skipped_files: scoped.skippedFiles.length,
@@ -69,11 +71,17 @@ export async function runCli(deps: CliDeps): Promise<number> {
     const review = env.dryRun
       ? synthesizeDryRunReview()
       : await callReviewer(deps.reviewer, env, { title, description: body, scoped }, logger);
+    const filteredFindings = filterFindings(review.findings, touchedRanges, {
+      maxFindings: env.maxFindings,
+      logger,
+    });
+    const reviewWithFindings = { ...review, findings: filteredFindings };
     logger.info("verdict_computed", {
       verdict: review.deterministicVerdict,
       summary_bytes: review.overall.summary.length,
+      findings: filteredFindings.length,
     });
-    const markdown = renderComment(review, meta);
+    const markdown = renderComment(reviewWithFindings, meta);
     postComment(ghDeps, env, markdown);
     applyLabels(labelDeps, env, verdictLabel(review.deterministicVerdict));
     return 0;
@@ -122,6 +130,7 @@ function synthesizeDryRunReview(): Awaited<ReturnType<typeof reviewPR>> {
   return {
     criteria: CriterionName.options.map((name) => ({ name, score: 8, rationale: "dry-run" })),
     overall: { verdict: "pass", summary: "dry-run synthetic review" },
+    findings: [],
     deterministicVerdict: "pass",
   };
 }

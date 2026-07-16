@@ -27,6 +27,15 @@ const RUBRIC_LINES = [
   "",
   "Set `overall.verdict` to your best judgment ('pass' or 'fail'), but note that the caller computes the authoritative verdict deterministically from the scores.",
   "Keep rationales concrete. Reference specific files or hunks when useful. Do not restate the diff.",
+  "",
+  "Findings (optional):",
+  "Return a `findings` array with per-line issues you want to surface to the author. It is fine — and expected for clean PRs — to return `[]`.",
+  "Each finding MUST reference a real file+line inside the diff below. Files or lines not in the diff will be dropped.",
+  "- `file`: the path exactly as it appears in the `+++ b/<path>` header.",
+  "- `line`: an integer line number on the new-file side (inside a hunk range).",
+  "- `snippet`: the offending line or a short excerpt, ≤ 200 characters.",
+  "- `description`: what is wrong and why, ≤ 500 characters.",
+  "- `severity`: one of `info` | `warn` | `blocker`. This is informational only — it does not force the verdict.",
 ].join("\n");
 
 export interface PromptInput {

@@ -22,6 +22,7 @@ function makeEnv(overrides: Partial<Env> = {}): Env {
     model: "m",
     dryRun: false,
     maxDiffLines: 3000,
+    maxFindings: 20,
     logLevel: "info",
     ...overrides,
   };
