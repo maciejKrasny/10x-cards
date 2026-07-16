@@ -21,6 +21,7 @@ function makeReview(verdict: "pass" | "fail"): Review {
   return {
     criteria: CriterionName.options.map((name) => ({ name, score: 8, rationale: "solid" })),
     overall: { verdict, summary: "looks good" },
+    findings: [],
   };
 }
 
@@ -74,6 +75,34 @@ describe("renderComment", () => {
     const md = renderComment(review, META);
     expect(md.includes("a \\| b")).toBe(true);
     expect(md.includes("\nand line two")).toBe(false);
+  });
+
+  it("omits the Findings section entirely when findings is empty", () => {
+    const md = renderComment(makeReview("pass"), META);
+    expect(md.includes("### Findings")).toBe(false);
+  });
+
+  it("renders a Findings section beneath the summary with file:line, severity, description, and snippet", () => {
+    const review = makeReview("fail");
+    review.findings = [
+      {
+        file: "src/foo.ts",
+        line: 42,
+        snippet: "throw new Error(msg)",
+        description: "swallows the original stack",
+        severity: "warn",
+      },
+    ];
+    const md = renderComment(review, META);
+    const findingsIdx = md.indexOf("### Findings");
+    const summaryIdx = md.indexOf("**Summary:**");
+    const footerIdx = md.indexOf("_Model");
+    expect(findingsIdx).toBeGreaterThan(summaryIdx);
+    expect(findingsIdx).toBeLessThan(footerIdx);
+    expect(md).toContain("**`src/foo.ts:42`**");
+    expect(md).toContain("*(warn)*");
+    expect(md).toContain("swallows the original stack");
+    expect(md).toContain("throw new Error(msg)");
   });
 });
 

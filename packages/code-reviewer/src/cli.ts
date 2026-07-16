@@ -1,45 +1,15 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 
-import { scopeDiff } from "./diff.js";
-import {
-  LABEL_FAILED,
-  LABEL_PASSED,
-  renderComment,
-  renderUnavailableComment,
-  verdictLabel,
-  type CommentMeta,
-  type VerdictLabel,
-} from "./comment.js";
+import { renderComment, renderUnavailableComment, type CommentMeta } from "./comment.js";
+import { extractTouchedRanges, scopeDiff } from "./diff.js";
+import { parseEnv, type Env } from "./env.js";
+import { filterFindings } from "./findings.js";
+import { fetchPRField, postComment } from "./gh.js";
+import { applyLabels, cleanupOnUnavailable, verdictLabel } from "./labels.js";
+import { createLogger, type Logger } from "./logger.js";
 import { reviewPR } from "./review.js";
 import { CriterionName } from "./schema.js";
-
-const REQUIRED_ENV = [
-  "GITHUB_REPOSITORY",
-  "PR_NUMBER",
-  "BASE_REF",
-  "HEAD_REF",
-  "OPENROUTER_API_KEY",
-  "AI_CR_MODEL",
-] as const;
-
-const LABEL_RETRY = "ai-cr:review";
-const DEFAULT_MAX_DIFF_LINES = 3000;
-
-interface Env {
-  ghToken: string;
-  repo: string;
-  prNumber: string;
-  baseRef: string;
-  headRef: string;
-  openrouterApiKey: string;
-  model: string;
-  dryRun: boolean;
-  maxDiffLines: number;
-}
 
 type Runner = (cmd: string, args: readonly string[]) => string;
 
@@ -57,12 +27,36 @@ export async function runCli(deps: CliDeps): Promise<number> {
   const env = parseEnv(deps.env, deps.stderr);
   if (env === null) return 2;
 
+  const logger = createLogger({
+    level: env.logLevel,
+    redact: [env.openrouterApiKey, env.ghToken],
+    write: deps.stderr,
+  });
+  logger.info("env_parsed", {
+    pr: env.prNumber,
+    repo: env.repo,
+    model: env.model,
+    dry_run: env.dryRun,
+    max_diff_lines: env.maxDiffLines,
+    log_level: env.logLevel,
+  });
+
+  const ghDeps = { stdout: deps.stdout, runGh: deps.runGh, logger };
+  const labelDeps = { stdout: deps.stdout, runGh: deps.runGh, logger };
+
   const title = env.dryRun ? "(dry-run) PR title" : fetchPRField(deps.runGh, env, "title");
   const body = env.dryRun ? "(dry-run) PR body" : fetchPRField(deps.runGh, env, "body");
   const commitSha = deps.runGit("rev-parse", ["--short", "HEAD"]).trim();
 
   const rawDiff = deps.runGit("diff", [`${env.baseRef}...${env.headRef}`]);
   const scoped = scopeDiff(rawDiff, env.maxDiffLines);
+  const touchedRanges = extractTouchedRanges(scoped.diff);
+  logger.info("diff_fetched", {
+    reviewed_files: scoped.reviewedFiles.length,
+    skipped_files: scoped.skippedFiles.length,
+    truncated: scoped.truncated,
+    diff_bytes: scoped.diff.length,
+  });
 
   const meta: CommentMeta = {
     timestamp: deps.now(),
@@ -76,112 +70,67 @@ export async function runCli(deps: CliDeps): Promise<number> {
   try {
     const review = env.dryRun
       ? synthesizeDryRunReview()
-      : await deps.reviewer(
-          {
-            title,
-            description: body,
-            diff: scoped.diff,
-            truncationNote: scoped.truncated
-              ? `Reviewed ${scoped.reviewedFiles.length.toString()} of ${(scoped.reviewedFiles.length + scoped.skippedFiles.length).toString()} files (truncated at ${env.maxDiffLines.toString()}-line budget).`
-              : undefined,
-          },
-          { apiKey: env.openrouterApiKey, model: env.model },
-        );
-    const markdown = renderComment(review, meta);
-    postComment(deps, env, markdown);
-    applyLabels(deps, env, verdictLabel(review.deterministicVerdict));
+      : await callReviewer(deps.reviewer, env, { title, description: body, scoped }, logger);
+    const filteredFindings = filterFindings(review.findings, touchedRanges, {
+      maxFindings: env.maxFindings,
+      logger,
+    });
+    const reviewWithFindings = { ...review, findings: filteredFindings };
+    logger.info("verdict_computed", {
+      verdict: review.deterministicVerdict,
+      summary_bytes: review.overall.summary.length,
+      findings: filteredFindings.length,
+    });
+    const markdown = renderComment(reviewWithFindings, meta);
+    postComment(ghDeps, env, markdown);
+    applyLabels(labelDeps, env, verdictLabel(review.deterministicVerdict));
     return 0;
   } catch (err) {
     const code = extractErrorCode(err);
-    deps.stderr(`[ai-code-review] reviewer failed: ${err instanceof Error ? err.message : String(err)}\n`);
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error("reviewer_failed", { code, message });
+    deps.stderr(`[ai-code-review] reviewer failed: ${message}\n`);
     const markdown = renderUnavailableComment(code, meta);
-    postComment(deps, env, markdown);
-    removeRetryLabel(deps, env);
+    postComment(ghDeps, env, markdown);
+    cleanupOnUnavailable(labelDeps, env);
     return 0;
   }
 }
 
-function parseEnv(source: NodeJS.ProcessEnv, stderr: (s: string) => void): Env | null {
-  const missing: string[] = [];
-  for (const key of REQUIRED_ENV) {
-    if (!source[key] || source[key]?.length === 0) missing.push(key);
+async function callReviewer(
+  reviewer: typeof reviewPR,
+  env: Env,
+  input: { title: string; description: string; scoped: ReturnType<typeof scopeDiff> },
+  logger: Logger,
+): Promise<Awaited<ReturnType<typeof reviewPR>>> {
+  logger.group("AI review");
+  const started = Date.now();
+  logger.info("llm_call_started", { model: env.model });
+  try {
+    const { scoped } = input;
+    const review = await reviewer(
+      {
+        title: input.title,
+        description: input.description,
+        diff: scoped.diff,
+        truncationNote: scoped.truncated
+          ? `Reviewed ${scoped.reviewedFiles.length.toString()} of ${(scoped.reviewedFiles.length + scoped.skippedFiles.length).toString()} files (truncated at ${env.maxDiffLines.toString()}-line budget).`
+          : undefined,
+      },
+      { apiKey: env.openrouterApiKey, model: env.model },
+    );
+    logger.info("llm_call_finished", { duration_ms: Date.now() - started });
+    return review;
+  } finally {
+    logger.endGroup();
   }
-  const ghToken = source.GH_TOKEN ?? source.GITHUB_TOKEN ?? "";
-  if (ghToken.length === 0) missing.push("GH_TOKEN or GITHUB_TOKEN");
-  if (missing.length > 0) {
-    stderr(`Missing required environment variable(s): ${missing.join(", ")}\n`);
-    return null;
-  }
-  const maxLinesRaw = source.AI_CR_MAX_DIFF_LINES;
-  const maxDiffLines =
-    maxLinesRaw !== undefined && maxLinesRaw.length > 0 ? Number.parseInt(maxLinesRaw, 10) : DEFAULT_MAX_DIFF_LINES;
-  return {
-    ghToken,
-    repo: source.GITHUB_REPOSITORY ?? "",
-    prNumber: source.PR_NUMBER ?? "",
-    baseRef: source.BASE_REF ?? "",
-    headRef: source.HEAD_REF ?? "",
-    openrouterApiKey: source.OPENROUTER_API_KEY ?? "",
-    model: source.AI_CR_MODEL ?? "",
-    dryRun: source.AI_CR_DRY_RUN === "1",
-    maxDiffLines: Number.isFinite(maxDiffLines) && maxDiffLines > 0 ? maxDiffLines : DEFAULT_MAX_DIFF_LINES,
-  };
-}
-
-function fetchPRField(runGh: Runner, env: Env, field: "title" | "body"): string {
-  const out = runGh("pr", ["view", env.prNumber, "--repo", env.repo, "--json", field, "--jq", `.${field}`]);
-  return out.trim();
-}
-
-function postComment(deps: CliDeps, env: Env, markdown: string): void {
-  if (env.dryRun) {
-    deps.stdout(`[dry-run] gh pr comment ${env.prNumber} --repo ${env.repo} --body-file <tempfile>\n`);
-    deps.stdout("--- comment body ---\n");
-    deps.stdout(markdown);
-    deps.stdout("\n--- end body ---\n");
-    return;
-  }
-  const dir = mkdtempSync(join(tmpdir(), "ai-cr-"));
-  const path = join(dir, "comment.md");
-  writeFileSync(path, markdown, "utf8");
-  deps.runGh("pr", ["comment", env.prNumber, "--repo", env.repo, "--body-file", path]);
-}
-
-function applyLabels(deps: CliDeps, env: Env, verdictLbl: VerdictLabel): void {
-  const opposite: VerdictLabel = verdictLbl === LABEL_PASSED ? LABEL_FAILED : LABEL_PASSED;
-  const args = [
-    "pr",
-    "edit",
-    env.prNumber,
-    "--repo",
-    env.repo,
-    "--add-label",
-    verdictLbl,
-    "--remove-label",
-    opposite,
-    "--remove-label",
-    LABEL_RETRY,
-  ];
-  if (env.dryRun) {
-    deps.stdout(`[dry-run] gh ${args.join(" ")}\n`);
-    return;
-  }
-  deps.runGh(args[0] ?? "pr", args.slice(1));
-}
-
-function removeRetryLabel(deps: CliDeps, env: Env): void {
-  const args = ["pr", "edit", env.prNumber, "--repo", env.repo, "--remove-label", LABEL_RETRY];
-  if (env.dryRun) {
-    deps.stdout(`[dry-run] gh ${args.join(" ")}\n`);
-    return;
-  }
-  deps.runGh(args[0] ?? "pr", args.slice(1));
 }
 
 function synthesizeDryRunReview(): Awaited<ReturnType<typeof reviewPR>> {
   return {
     criteria: CriterionName.options.map((name) => ({ name, score: 8, rationale: "dry-run" })),
     overall: { verdict: "pass", summary: "dry-run synthetic review" },
+    findings: [],
     deterministicVerdict: "pass",
   };
 }

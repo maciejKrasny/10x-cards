@@ -47,4 +47,15 @@ describe("buildPrompt", () => {
     expect(withoutNote.prompt.includes("Note:")).toBe(false);
     expect(withEmptyNote.prompt.includes("Note:")).toBe(false);
   });
+
+  it("describes the optional findings contract in the system prompt", () => {
+    const { system } = buildPrompt({ title: "t", description: "d", diff: "x" });
+    expect(system).toContain("Findings (optional)");
+    expect(system).toContain("`file`");
+    expect(system).toContain("`line`");
+    expect(system).toContain("`snippet`");
+    expect(system).toContain("`description`");
+    expect(system).toContain("`severity`");
+    expect(system).toContain("informational only");
+  });
 });

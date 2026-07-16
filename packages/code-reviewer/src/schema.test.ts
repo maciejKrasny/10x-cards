@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeVerdict, CriterionName, reviewSchema, type Criterion } from "./schema.js";
+import { computeVerdict, CriterionName, FindingSchema, reviewSchema, type Criterion } from "./schema.js";
 
 function makeCriterion(name: CriterionName, score: number): Criterion {
   return { name, score, rationale: "ok" };
@@ -60,6 +60,79 @@ describe("reviewSchema", () => {
     criteria[0] = { name: "implementation_correctness", score: 8, rationale: "" };
     const review = { criteria, overall: { verdict: "pass" as const, summary: "ok" } };
     expect(reviewSchema.safeParse(review).success).toBe(false);
+  });
+
+  it("defaults findings to an empty array when omitted", () => {
+    const review = { criteria: makePassing(), overall: { verdict: "pass" as const, summary: "ok" } };
+    const parsed = reviewSchema.safeParse(review);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.findings).toEqual([]);
+  });
+
+  it("accepts a review with well-formed findings", () => {
+    const review = {
+      criteria: makePassing(),
+      overall: { verdict: "pass" as const, summary: "ok" },
+      findings: [
+        { file: "src/a.ts", line: 3, snippet: "x", description: "y", severity: "info" as const },
+      ],
+    };
+    expect(reviewSchema.safeParse(review).success).toBe(true);
+  });
+});
+
+describe("FindingSchema", () => {
+  it("accepts a well-formed finding", () => {
+    const parsed = FindingSchema.safeParse({
+      file: "src/a.ts",
+      line: 12,
+      snippet: "let x = 1",
+      description: "why this is wrong",
+      severity: "blocker",
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects non-integer line", () => {
+    expect(
+      FindingSchema.safeParse({ file: "a", line: 1.5, snippet: "s", description: "d", severity: "info" }).success,
+    ).toBe(false);
+  });
+
+  it("rejects line < 1", () => {
+    expect(
+      FindingSchema.safeParse({ file: "a", line: 0, snippet: "s", description: "d", severity: "info" }).success,
+    ).toBe(false);
+  });
+
+  it("rejects snippet longer than 200 chars", () => {
+    expect(
+      FindingSchema.safeParse({
+        file: "a",
+        line: 1,
+        snippet: "x".repeat(201),
+        description: "d",
+        severity: "info",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects description longer than 500 chars", () => {
+    expect(
+      FindingSchema.safeParse({
+        file: "a",
+        line: 1,
+        snippet: "s",
+        description: "x".repeat(501),
+        severity: "info",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects severity outside the enum", () => {
+    expect(
+      FindingSchema.safeParse({ file: "a", line: 1, snippet: "s", description: "d", severity: "critical" }).success,
+    ).toBe(false);
   });
 });
 

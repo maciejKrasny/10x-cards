@@ -70,6 +70,34 @@ export interface ScopedDiff {
   truncated: boolean;
 }
 
+export function extractTouchedRanges(scopedDiff: string): Map<string, Array<[number, number]>> {
+  const result = new Map<string, Array<[number, number]>>();
+  if (scopedDiff.length === 0) return result;
+
+  const HEADER_PATTERN = /^diff --git a\/(.+) b\/(.+)$/;
+  const HUNK_PATTERN = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/;
+
+  let currentPath: string | null = null;
+  for (const line of scopedDiff.split("\n")) {
+    const header = HEADER_PATTERN.exec(line);
+    if (header) {
+      currentPath = header[2] ?? header[1] ?? null;
+      if (currentPath !== null && !result.has(currentPath)) {
+        result.set(currentPath, []);
+      }
+      continue;
+    }
+    if (currentPath === null) continue;
+    const hunk = HUNK_PATTERN.exec(line);
+    if (!hunk) continue;
+    const start = Number.parseInt(hunk[1] ?? "0", 10);
+    const length = hunk[2] === undefined ? 1 : Number.parseInt(hunk[2], 10);
+    if (!Number.isFinite(start) || start < 1 || length < 1) continue;
+    result.get(currentPath)?.push([start, start + length - 1]);
+  }
+  return result;
+}
+
 export function scopeDiff(rawDiff: string, maxLines = 3000): ScopedDiff {
   const chunks = splitDiffByFile(rawDiff);
   const included: FileChunk[] = [];

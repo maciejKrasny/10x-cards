@@ -23,11 +23,24 @@ export const OverallSchema = z.object({
 });
 export type Overall = z.infer<typeof OverallSchema>;
 
+export const Severity = z.enum(["info", "warn", "blocker"]);
+export type Severity = z.infer<typeof Severity>;
+
+export const FindingSchema = z.object({
+  file: z.string().min(1),
+  line: z.number().int().min(1),
+  snippet: z.string().min(1).max(200),
+  description: z.string().min(1).max(500),
+  severity: Severity,
+});
+export type Finding = z.infer<typeof FindingSchema>;
+
 export const EXPECTED_CRITERIA_COUNT = 6;
 
 export const reviewSchema = z.object({
   criteria: z.array(CriterionSchema).min(1),
   overall: OverallSchema,
+  findings: z.array(FindingSchema).default([]),
 });
 export type Review = z.infer<typeof reviewSchema>;
 
@@ -45,12 +58,21 @@ const PermissiveCriterionSchema = z.object({
   rationale: z.string(),
 });
 
+const PermissiveFindingSchema = z.object({
+  file: z.string(),
+  line: z.number(),
+  snippet: z.string(),
+  description: z.string(),
+  severity: Severity,
+});
+
 export const modelOutputSchema = z.object({
   criteria: z.array(PermissiveCriterionSchema),
   overall: z.object({
     verdict: z.enum(["pass", "fail"]),
     summary: z.string(),
   }),
+  findings: z.array(PermissiveFindingSchema).default([]),
 });
 
 export type Verdict = "pass" | "fail";
