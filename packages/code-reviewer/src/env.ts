@@ -1,3 +1,5 @@
+import type { LogLevel } from "./logger.js";
+
 export const REQUIRED_ENV = [
   "GITHUB_REPOSITORY",
   "PR_NUMBER",
@@ -8,6 +10,8 @@ export const REQUIRED_ENV = [
 ] as const;
 
 export const DEFAULT_MAX_DIFF_LINES = 3000;
+export const DEFAULT_LOG_LEVEL: LogLevel = "info";
+const VALID_LOG_LEVELS: readonly LogLevel[] = ["debug", "info", "warn", "error"];
 
 export interface Env {
   ghToken: string;
@@ -19,6 +23,7 @@ export interface Env {
   model: string;
   dryRun: boolean;
   maxDiffLines: number;
+  logLevel: LogLevel;
 }
 
 export function parseEnv(source: NodeJS.ProcessEnv, stderr: (s: string) => void): Env | null {
@@ -45,5 +50,13 @@ export function parseEnv(source: NodeJS.ProcessEnv, stderr: (s: string) => void)
     model: source.AI_CR_MODEL ?? "",
     dryRun: source.AI_CR_DRY_RUN === "1",
     maxDiffLines: Number.isFinite(maxDiffLines) && maxDiffLines > 0 ? maxDiffLines : DEFAULT_MAX_DIFF_LINES,
+    logLevel: parseLogLevel(source.AI_CR_LOG_LEVEL, stderr),
   };
+}
+
+function parseLogLevel(raw: string | undefined, stderr: (s: string) => void): LogLevel {
+  if (raw === undefined || raw.length === 0) return DEFAULT_LOG_LEVEL;
+  if ((VALID_LOG_LEVELS as readonly string[]).includes(raw)) return raw as LogLevel;
+  stderr(`AI_CR_LOG_LEVEL="${raw}" is not one of ${VALID_LOG_LEVELS.join("|")}; falling back to ${DEFAULT_LOG_LEVEL}.\n`);
+  return DEFAULT_LOG_LEVEL;
 }

@@ -183,3 +183,43 @@ describe("runCli — dry-run", () => {
     expect(out.includes("gh-token")).toBe(false);
   });
 });
+
+describe("runCli — structured logging", () => {
+  it("emits env_parsed, diff_fetched, and verdict_computed events on the happy path", async () => {
+    const { deps, stderr } = makeDeps();
+    await runCli(deps);
+    const out = stderr.join("");
+    expect(out).toContain("event=env_parsed");
+    expect(out).toContain("event=diff_fetched");
+    expect(out).toContain("event=verdict_computed");
+    expect(out).toContain("verdict=pass");
+  });
+
+  it("wraps the LLM call in ::group::AI review / ::endgroup::", async () => {
+    const { deps, stderr } = makeDeps();
+    await runCli(deps);
+    const out = stderr.join("");
+    expect(out).toContain("::group::AI review");
+    expect(out).toContain("::endgroup::");
+    expect(out).toContain("event=llm_call_started");
+    expect(out).toContain("event=llm_call_finished");
+  });
+
+  it("redacts the OpenRouter key and GH token from log output", async () => {
+    const { deps, stderr } = makeDeps();
+    await runCli(deps);
+    const out = stderr.join("");
+    expect(out.includes("or-key")).toBe(false);
+    expect(out.includes("gh-token")).toBe(false);
+  });
+
+  it("emits reviewer_failed with the extracted code on the fail-safe path", async () => {
+    const { deps, stderr } = makeDeps({
+      reviewer: vi.fn().mockRejectedValue(new Error("LLM_HTTP_ERROR: upstream 502")),
+    });
+    await runCli(deps);
+    const out = stderr.join("");
+    expect(out).toContain("event=reviewer_failed");
+    expect(out).toContain("code=LLM_HTTP_ERROR");
+  });
+});

@@ -3,9 +3,10 @@ import { execFileSync } from "node:child_process";
 
 import { renderComment, renderUnavailableComment, type CommentMeta } from "./comment.js";
 import { scopeDiff } from "./diff.js";
-import { parseEnv } from "./env.js";
+import { parseEnv, type Env } from "./env.js";
 import { fetchPRField, postComment } from "./gh.js";
 import { applyLabels, removeRetryLabel, verdictLabel } from "./labels.js";
+import { createLogger, type Logger } from "./logger.js";
 import { reviewPR } from "./review.js";
 import { CriterionName } from "./schema.js";
 
@@ -25,12 +26,35 @@ export async function runCli(deps: CliDeps): Promise<number> {
   const env = parseEnv(deps.env, deps.stderr);
   if (env === null) return 2;
 
+  const logger = createLogger({
+    level: env.logLevel,
+    redact: [env.openrouterApiKey, env.ghToken],
+    write: deps.stderr,
+  });
+  logger.info("env_parsed", {
+    pr: env.prNumber,
+    repo: env.repo,
+    model: env.model,
+    dry_run: env.dryRun,
+    max_diff_lines: env.maxDiffLines,
+    log_level: env.logLevel,
+  });
+
+  const ghDeps = { stdout: deps.stdout, runGh: deps.runGh, logger };
+  const labelDeps = { stdout: deps.stdout, runGh: deps.runGh, logger };
+
   const title = env.dryRun ? "(dry-run) PR title" : fetchPRField(deps.runGh, env, "title");
   const body = env.dryRun ? "(dry-run) PR body" : fetchPRField(deps.runGh, env, "body");
   const commitSha = deps.runGit("rev-parse", ["--short", "HEAD"]).trim();
 
   const rawDiff = deps.runGit("diff", [`${env.baseRef}...${env.headRef}`]);
   const scoped = scopeDiff(rawDiff, env.maxDiffLines);
+  logger.info("diff_fetched", {
+    reviewed_files: scoped.reviewedFiles.length,
+    skipped_files: scoped.skippedFiles.length,
+    truncated: scoped.truncated,
+    diff_bytes: scoped.diff.length,
+  });
 
   const meta: CommentMeta = {
     timestamp: deps.now(),
@@ -44,28 +68,53 @@ export async function runCli(deps: CliDeps): Promise<number> {
   try {
     const review = env.dryRun
       ? synthesizeDryRunReview()
-      : await deps.reviewer(
-          {
-            title,
-            description: body,
-            diff: scoped.diff,
-            truncationNote: scoped.truncated
-              ? `Reviewed ${scoped.reviewedFiles.length.toString()} of ${(scoped.reviewedFiles.length + scoped.skippedFiles.length).toString()} files (truncated at ${env.maxDiffLines.toString()}-line budget).`
-              : undefined,
-          },
-          { apiKey: env.openrouterApiKey, model: env.model },
-        );
+      : await callReviewer(deps.reviewer, env, { title, description: body, scoped }, logger);
+    logger.info("verdict_computed", {
+      verdict: review.deterministicVerdict,
+      summary_bytes: review.overall.summary.length,
+    });
     const markdown = renderComment(review, meta);
-    postComment(deps, env, markdown);
-    applyLabels(deps, env, verdictLabel(review.deterministicVerdict));
+    postComment(ghDeps, env, markdown);
+    applyLabels(labelDeps, env, verdictLabel(review.deterministicVerdict));
     return 0;
   } catch (err) {
     const code = extractErrorCode(err);
-    deps.stderr(`[ai-code-review] reviewer failed: ${err instanceof Error ? err.message : String(err)}\n`);
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error("reviewer_failed", { code, message });
+    deps.stderr(`[ai-code-review] reviewer failed: ${message}\n`);
     const markdown = renderUnavailableComment(code, meta);
-    postComment(deps, env, markdown);
-    removeRetryLabel(deps, env);
+    postComment(ghDeps, env, markdown);
+    removeRetryLabel(labelDeps, env);
     return 0;
+  }
+}
+
+async function callReviewer(
+  reviewer: typeof reviewPR,
+  env: Env,
+  input: { title: string; description: string; scoped: ReturnType<typeof scopeDiff> },
+  logger: Logger,
+): Promise<Awaited<ReturnType<typeof reviewPR>>> {
+  logger.group("AI review");
+  const started = Date.now();
+  logger.info("llm_call_started", { model: env.model });
+  try {
+    const { scoped } = input;
+    const review = await reviewer(
+      {
+        title: input.title,
+        description: input.description,
+        diff: scoped.diff,
+        truncationNote: scoped.truncated
+          ? `Reviewed ${scoped.reviewedFiles.length.toString()} of ${(scoped.reviewedFiles.length + scoped.skippedFiles.length).toString()} files (truncated at ${env.maxDiffLines.toString()}-line budget).`
+          : undefined,
+      },
+      { apiKey: env.openrouterApiKey, model: env.model },
+    );
+    logger.info("llm_call_finished", { duration_ms: Date.now() - started });
+    return review;
+  } finally {
+    logger.endGroup();
   }
 }
 

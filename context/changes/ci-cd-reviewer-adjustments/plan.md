@@ -430,24 +430,24 @@ When the reviewer errors and posts the "unavailable" comment, also strip any sta
 
 #### Automated
 
-- [x] 1.1 Lint passes: `npm run --workspace @10x-cards/code-reviewer lint` (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope)
-- [x] 1.2 Type-check passes: `npm run --workspace @10x-cards/code-reviewer build`
-- [x] 1.3 All tests pass, including pre-existing `cli.test.ts`: `npm run --workspace @10x-cards/code-reviewer test`
-- [x] 1.4 New test files exist: `env.test.ts`, `labels.test.ts`, `gh.test.ts`
+- [x] 1.1 Lint passes: `npm run --workspace @10x-cards/code-reviewer lint` (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope) — 9e277de
+- [x] 1.2 Type-check passes: `npm run --workspace @10x-cards/code-reviewer build` — 9e277de
+- [x] 1.3 All tests pass, including pre-existing `cli.test.ts`: `npm run --workspace @10x-cards/code-reviewer test` — 9e277de
+- [x] 1.4 New test files exist: `env.test.ts`, `labels.test.ts`, `gh.test.ts` — 9e277de
 
 #### Manual
 
-- [x] 1.5 `git diff --stat` on Phase 1 commit shows `cli.ts` shrinking to roughly ≤ 90 lines with three new module files sized proportionally (actual: 216 → 106; env.ts 49, labels.ts 45, gh.ts 31)
-- [x] 1.6 Reading the new `runCli` top-to-bottom in `cli.ts` requires no scrolling past one screen
+- [x] 1.5 `git diff --stat` on Phase 1 commit shows `cli.ts` shrinking to roughly ≤ 90 lines with three new module files sized proportionally (actual: 216 → 106; env.ts 49, labels.ts 45, gh.ts 31) — 9e277de
+- [x] 1.6 Reading the new `runCli` top-to-bottom in `cli.ts` requires no scrolling past one screen — 9e277de
 
 ### Phase 2: Structured Event Logger
 
 #### Automated
 
-- [ ] 2.1 Lint passes
-- [ ] 2.2 Type-check + build pass
-- [ ] 2.3 Logger tests pass, including redaction test
-- [ ] 2.4 `logger.test.ts` exists
+- [x] 2.1 Lint passes (skipped — pre-existing `packages/**` ignore in root `eslint.config.js:73`; infra gap out of scope, same as 1.1)
+- [x] 2.2 Type-check + build pass
+- [x] 2.3 Logger tests pass, including redaction test
+- [x] 2.4 `logger.test.ts` exists
 
 #### Manual
 

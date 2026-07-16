@@ -65,6 +65,7 @@ describe("parseEnv", () => {
       model: "google/gemma-4-31b-it:free",
       dryRun: false,
       maxDiffLines: DEFAULT_MAX_DIFF_LINES,
+      logLevel: "info",
     });
   });
 
@@ -82,5 +83,18 @@ describe("parseEnv", () => {
     expect(parseEnv({ ...BASE, AI_CR_MAX_DIFF_LINES: "abc" }, write)?.maxDiffLines).toBe(DEFAULT_MAX_DIFF_LINES);
     expect(parseEnv({ ...BASE, AI_CR_MAX_DIFF_LINES: "0" }, write)?.maxDiffLines).toBe(DEFAULT_MAX_DIFF_LINES);
     expect(parseEnv({ ...BASE, AI_CR_MAX_DIFF_LINES: "-10" }, write)?.maxDiffLines).toBe(DEFAULT_MAX_DIFF_LINES);
+  });
+
+  it("parses AI_CR_LOG_LEVEL, defaults to info, and warns on unknown values", () => {
+    const { write } = captureStderr();
+    expect(parseEnv({ ...BASE, AI_CR_LOG_LEVEL: "debug" }, write)?.logLevel).toBe("debug");
+    expect(parseEnv({ ...BASE, AI_CR_LOG_LEVEL: "info" }, write)?.logLevel).toBe("info");
+    expect(parseEnv({ ...BASE, AI_CR_LOG_LEVEL: "warn" }, write)?.logLevel).toBe("warn");
+    expect(parseEnv({ ...BASE, AI_CR_LOG_LEVEL: "error" }, write)?.logLevel).toBe("error");
+    expect(parseEnv(BASE, write)?.logLevel).toBe("info");
+    expect(parseEnv({ ...BASE, AI_CR_LOG_LEVEL: "" }, write)?.logLevel).toBe("info");
+    const noisy = captureStderr();
+    expect(parseEnv({ ...BASE, AI_CR_LOG_LEVEL: "loud" }, noisy.write)?.logLevel).toBe("info");
+    expect(noisy.text()).toMatch(/AI_CR_LOG_LEVEL="loud"/);
   });
 });

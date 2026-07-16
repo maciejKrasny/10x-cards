@@ -26,6 +26,7 @@ On any LLM error, post a neutral "review unavailable" comment (no verdict label)
 | `BASE_REF`            | yes      | variable | Base branch/ref for `git diff`                            |
 | `HEAD_REF`            | yes      | variable | Head SHA for `git diff`                                   |
 | `AI_CR_MAX_DIFF_LINES`| no       | variable | Truncation cap in diff-lines (default `3000`)             |
+| `AI_CR_LOG_LEVEL`     | no       | variable | Structured-log threshold: `debug` \| `info` \| `warn` \| `error` (default `info`) |
 | `AI_CR_DRY_RUN`       | no       | variable | If `1`, print intended `gh` invocations instead of executing them |
 
 ## Local development

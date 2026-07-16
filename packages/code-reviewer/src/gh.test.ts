@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import type { Env } from "./env.js";
 import { fetchPRField, postComment, type GhDeps } from "./gh.js";
+import { createLogger } from "./logger.js";
 
 function makeEnv(overrides: Partial<Env> = {}): Env {
   return {
@@ -14,6 +15,7 @@ function makeEnv(overrides: Partial<Env> = {}): Env {
     model: "m",
     dryRun: false,
     maxDiffLines: 3000,
+    logLevel: "info",
     ...overrides,
   };
 }
@@ -22,17 +24,20 @@ function makeDeps(): {
   deps: GhDeps;
   stdout: string[];
   ghCalls: { subcmd: string; args: readonly string[] }[];
+  logLines: string[];
 } {
   const stdout: string[] = [];
   const ghCalls: { subcmd: string; args: readonly string[] }[] = [];
+  const logLines: string[] = [];
   const deps: GhDeps = {
     stdout: (s) => stdout.push(s),
     runGh: vi.fn((subcmd: string, args: readonly string[]) => {
       ghCalls.push({ subcmd, args });
       return "";
     }),
+    logger: createLogger({ write: (line) => logLines.push(line) }),
   };
-  return { deps, stdout, ghCalls };
+  return { deps, stdout, ghCalls, logLines };
 }
 
 describe("fetchPRField", () => {
@@ -83,5 +88,22 @@ describe("postComment", () => {
     expect(out).toContain("--- comment body ---");
     expect(out).toContain("hello");
     expect(out).toContain("--- end body ---");
+  });
+
+  it("emits a comment_posted event with the pr and bytes fields", () => {
+    const { deps, logLines } = makeDeps();
+    postComment(deps, makeEnv(), "hello world");
+    const line = logLines.join("");
+    expect(line).toContain("event=comment_posted");
+    expect(line).toContain("pr=42");
+    expect(line).toContain("bytes=11");
+  });
+
+  it("marks the comment_posted event with dry_run=true in dry-run", () => {
+    const { deps, logLines } = makeDeps();
+    postComment(deps, makeEnv({ dryRun: true }), "hello");
+    const line = logLines.join("");
+    expect(line).toContain("event=comment_posted");
+    expect(line).toContain("dry_run=true");
   });
 });

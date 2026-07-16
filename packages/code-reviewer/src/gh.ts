@@ -3,12 +3,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import type { Env } from "./env.js";
+import type { Logger } from "./logger.js";
 
 type Runner = (cmd: string, args: readonly string[]) => string;
 
 export interface GhDeps {
   stdout: (s: string) => void;
   runGh: Runner;
+  logger: Logger;
 }
 
 export function fetchPRField(runGh: Runner, env: Env, field: "title" | "body"): string {
@@ -22,10 +24,12 @@ export function postComment(deps: GhDeps, env: Env, markdown: string): void {
     deps.stdout("--- comment body ---\n");
     deps.stdout(markdown);
     deps.stdout("\n--- end body ---\n");
+    deps.logger.info("comment_posted", { pr: env.prNumber, bytes: markdown.length, dry_run: true });
     return;
   }
   const dir = mkdtempSync(join(tmpdir(), "ai-cr-"));
   const path = join(dir, "comment.md");
   writeFileSync(path, markdown, "utf8");
   deps.runGh("pr", ["comment", env.prNumber, "--repo", env.repo, "--body-file", path]);
+  deps.logger.info("comment_posted", { pr: env.prNumber, bytes: markdown.length });
 }
